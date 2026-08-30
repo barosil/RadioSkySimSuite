@@ -1,0 +1,8 @@
+packages:
+  - path: ../../src/radioskysims/ # caminho até seu código
+    include:
+      - "**/*.py"
+
+renderer:
+  - type: markdown
+    output: api

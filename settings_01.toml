@@ -1,0 +1,157 @@
+[paths]
+raw_data_folder = "data/raw/"
+auxiliary_data_folder = "data/aux/"
+log_folder = "data/logs/"
+skyfield_folder="data/aux/skyfield/"
+
+[ports]
+db_port = 5432
+panel_port = 8080
+
+[radiotelescopes]
+[radiotelescopes.default]
+name = "Default Telescope"
+
+[radiotelescopes.default.observer]
+lat = 40.5678
+lon = -72.1234
+height = 0.0
+
+[[radiotelescopes.default.antennas]]
+name = "Horn"
+frequency_range = [900, 1300, 1]
+
+[radiotelescopes.default.antennas.pointing]
+mode = "transit"
+alt_deg = 90.0
+az_deg = 0.0
+
+[radiotelescopes.default.antennas.beam]
+name = "Default Beam"
+polarizations = ["horizontal", "vertical"]
+pattern_file = "radioskysims/resources/beams/beam_example.csv"
+
+[radiotelescopes.default.antennas.backend]
+type = "spectrometer"
+frequency_range = [900, 1300, 1]
+name = "Default Backend"
+bandwidth_mhz = 400
+sampling_rate_mhz = 1
+integration_time_s = 60
+num_channels = 1024
+T_sys_K = 50
+
+[[radiotelescopes.default.antennas]]
+name = "Horn 2"
+frequency_range = [900, 1300, 1]
+
+[radiotelescopes.default.antennas.pointing]
+mode = "transit"
+alt_deg = 90.0
+az_deg = 0.0
+
+[radiotelescopes.default.antennas.beam]
+name = "Narrow Beam"
+polarizations = ["horizontal"]
+pattern_file = "radioskysims/resources/beams/narrow_beam.csv"
+
+[radiotelescopes.default.antennas.backend]
+type = "spectrometer"
+frequency_range = [900, 1300, 1]
+name = "Narrow Backend"
+bandwidth_mhz = 200
+sampling_rate_mhz = 2
+integration_time_s = 30
+num_channels = 512
+T_sys_K = 60
+
+# ── BINGO profile ────────────────────────────────────────────────
+[radiotelescopes.bingo]
+name = "BINGO Telescope"
+
+[radiotelescopes.bingo.observer]
+lat = -7.25
+lon = -35.86
+height = 550.0
+
+[[radiotelescopes.bingo.antennas]]
+name = "BINGO Horn"
+frequency_range = [980, 1360, 1]
+
+[radiotelescopes.bingo.antennas.pointing]
+mode = "transit"
+alt_deg = 80.0
+az_deg = 30.0
+
+[radiotelescopes.bingo.antennas.beam]
+name = "BINGO Horn LIT"
+# polarizations = ["H_COPOL", "H_CROSS", "V_COPOL", "V_CROSS"]
+polarizations = ["H_COPOL"]
+pattern_file = "radioskysims/resources/beams/beampattern_horn01.csv"
+
+[radiotelescopes.bingo.antennas.backend]
+type = "spectrometer"
+frequency_range = [980, 1360, 1]
+name = "BINGO Backend"
+bandwidth_mhz = 380
+sampling_rate_mhz = 1
+integration_time_s = 60
+num_channels = 2048
+T_sys_K = 50
+
+[simulations]
+time_range = ["2026-07-25T00:00:00", "2026-07-26T00:00:00", 60]
+
+[processing]
+# Limite de memória por batch em MB (opcional — detecta automático se omitido)
+# max_batch_mb = 2048
+# Número de CPUs a usar (opcional — detecta automático se omitido)
+# cpu_count = 4
+# Scheduler dask: "threads" (padrão), "synchronous" ou "distributed".
+# "distributed" sobe um LocalCluster e loga o endereço do dashboard
+# (use_processor=True).
+dask_scheduler = "threads"
+# Estratégia de execução do scheduler "distributed":
+#   - true (padrão): workers em processos separados (isolamento)
+#   - false: 1 worker com threads (menos overhead de memória)
+# dask_processes = true
+
+[beams]
+name = "Default Beam"
+file_path = "radioskysims/resources/beams/beampattern_horn01.csv"
+
+[catalogs]
+[catalogs.radiosources]
+name = "Default Radio Sources Catalog"
+url = "src/radioskysims/resources/catalogs/default_radiosources.csv"
+[catalogs.spectral_indexes]
+name = "Default Spectral Index Catalog"
+url = "src/radioskysims/resources/catalogs/default_spectral_indexes.csv"
+
+[radiosources]
+query_str = "SELECT * FROM radiosources WHERE flux > 1"
+
+[noisemodels]
+pysm3_component = ["synchrotron"]
+
+[satellites]
+constellations = ["GPS", "GALILEO", "BEIDOU", "GLONASS"]
+satellites = []
+
+[signals]
+sat_signals = "radioskysims/resources/satellites/sat_signals.json"
+
+[DB]
+POSTGRES_USER = "radio"
+POSTGRES_PASSWORD = "radio"
+POSTGRES_HOST = "localhost"
+POSTGRES_PORT = 5432
+POSTGRES_DB = "radioskysims"
+
+[SPACETRACK]
+# Credenciais do SpaceTrack NÃO devem ser versionadas aqui.
+# Forneça via variáveis de ambiente (ST_USER/ST_PWD) ou em credentials.env
+# (gitignored; veja credentials.env.example). O SpaceTrackClient carrega
+# credentials.env automaticamente.
+ST_USER = ""
+ST_PWD = ""

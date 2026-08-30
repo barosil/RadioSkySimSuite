@@ -1,0 +1,29 @@
+===== beam =====
+src/radioskysims/application/services/beam_services.py
+src/radioskysims/domain/beam
+src/radioskysims/domain/beam/test_beam.py
+src/radioskysims/domain/beam/test_beam_factory.py
+src/radioskysims/beam
+src/radioskysims/infrastructure/beams
+===== catalog =====
+src/radioskysims/application/services/catalog_services.py
+src/radioskysims/domain/catalog
+===== geometry =====
+src/radioskysims/domain/geometry
+===== localsources =====
+src/radioskysims/domain/localsources
+===== maps =====
+===== radiosources =====
+src/radioskysims/domain/radiosources
+===== radiotelescope =====
+src/radioskysims/application/services/radiotelescope_services.py
+src/radioskysims/domain/radiotelescope
+===== satellite =====
+src/radioskysims/application/services/satellite.py
+src/radioskysims/domain/satellite
+src/radioskysims/infrastructure/db/satellite
+===== signal =====
+src/radioskysims/domain/signal
+src/radioskysims/infrastructure/db/signal
+===== tracks =====
+src/radioskysims/domain/tracks

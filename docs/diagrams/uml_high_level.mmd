@@ -1,0 +1,65 @@
+---
+title: RadioSkySim — visão de alto nível (camadas e dependências)
+---
+%% UML de alto nível - RadioSkySim
+%% Diagrama de pacotes/camadas (arquitetura hexagonal + composition root)
+flowchart TB
+    subgraph ENTRY["Interfaces / Entrypoints"]
+        CLI["interfaces/cli"]
+        GUI["interfaces/gui (TODPanel, skymap)"]
+        API["interfaces/api (FastAPI)"]
+        SCRIPTS["scripts/ (start_service, check_db)"]
+    end
+
+    subgraph BOOT["Bootstrap (Composition Root)"]
+        COMP["bootstrap/composition"]
+        BUILD["bootstrap/builders"]
+    end
+
+    subgraph APP["Application"]
+        ORCH["services/SimOrchestrator"]
+        SVC["services/* (SimulationService, SatelliteService,\n LocalSourcesService, RadioSourceCatalogService)"]
+        PORTS["ports/* (beam, geometry, localsources,\n radiosources, satellite, simulations, skymap)"]
+    end
+
+    subgraph DOM["Domain (regras de negócio)"]
+        COMMON["common (Observer, TimeRange, FrequencyRange)"]
+        BEAM["beam (Beam, BeamProperties)"]
+        SAT["satellite (Satellite, TLESelector)"]
+        SIGNAL["signal (SignalFactory, SignalSource)"]
+        GEOM["geometry (SkyfieldGeometryProvider)"]
+        TOD["tod (TODSimulator)"]
+        SKY["skymap (SkyMap, NSide, SkyMapFactory)"]
+        SIM["simulation (SimulationResult, Simulation)"]
+        TRACKS["tracks (TrackFactory)"]
+        RADIO["radiosources"]
+        LOCAL["localsources"]
+    end
+
+    subgraph INFRA["Infrastructure (Adapters)"]
+        DB["db (SQLModel, SimulationRepository,\n satellite/radiosource repositories)"]
+        CONFIG["config / logging"]
+        BEAMSAD["beams/loaders (CSV, Analytical, LIT)"]
+        SKYAD["skymap (Healpy, PySM3, HiPS, FITS)"]
+        PROC["processing/ResourceAwareProcessor (dask)"]
+        EXT["external (SpaceTrack, TAP/astroquery, httpx)"]
+    end
+
+    subgraph DATASTORE["Persistência / Dados"]
+        PG[("PostgreSQL (data/DB)")]
+        FILES[("HDF5/Zarr (data/TOD, data/MAPS)")]
+        AUX[("data/aux, data/catalog, data/hips, data/temp")]
+    end
+
+    ENTRY --> BOOT
+    BOOT --> APP
+    BOOT --> INFRA
+    APP --> DOM
+    APP --> PORTS
+    INFRA -. "implementa" .-> PORTS
+    INFRA --> DOM
+    ORCH --> PROC
+    PROC --> FILES
+    DB --> PG
+    SKYAD --> FILES
+    AUX -. "leitura/escrita" .- INFRA

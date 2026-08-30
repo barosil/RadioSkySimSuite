@@ -1,0 +1,28 @@
+---
+title: Casos de uso — Simulação de TOD
+---
+%% Use Case - Simulação de TOD
+flowchart LR
+    A[("Cientista /\nOperador")]
+    B[("Sistema BINGO")]
+    D[("TAP / catálogos NVSS")]
+    E[("SpaceTrack TLE")]
+
+    A --> UC1["Configurar observação\n(telescópio, time_range,\nconstelações, frequências)"]
+    A --> UC2["Executar simulação de TOD\n(run_simulation)"]
+    A --> UC3["Visualizar waterfall\n(TODPanel)"]
+    A --> UC6["Persistir resumo no banco\n(save_result)"]
+
+    B --> UC4["Ingerir catálogo de\nrádio fontes (astroquery/TAP)"]
+    B --> UC5["Obter TLEs de satélites"]
+    B --> UC7["Processar em batches\n(ResourceAwareProcessor + dask)"]
+
+    UC4 --> D
+    UC5 --> E
+    UC2 --> UC4
+    UC2 --> UC5
+    UC2 --> UC7
+    UC7 --> UC3
+    UC6 --> UC2
+
+    UC8["Carregar/recuperar simulação\npersistida (load_result)"] --> A

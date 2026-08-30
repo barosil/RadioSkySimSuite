@@ -1,0 +1,194 @@
+---
+title: RadioSkySim — classes principais (domínio, ports e adapters)
+---
+%% UML detalhado - RadioSkySim
+%% Classes principais do domínio + ports + adapters (visão simplificada)
+classDiagram
+    direction LR
+
+    %% ── Common ──
+    class Observer {
+        +float lat
+        +float lon
+        +float height
+        +to_tuple()
+    }
+    class TimeRange {
+        +Time start
+        +Time end
+        +float resolution_s
+        +to_tuple()
+    }
+    class FrequencyRange {
+        +float min_mhz
+        +float max_mhz
+        +int num_channels
+        +resolution_mhz
+    }
+
+    %% ── Beam ──
+    class Beam
+    class BeamProperties {
+        +compute_properties(dataset)
+        +fwhm
+        +directivity_db
+    }
+    class BeamFactory {
+        +create(spec)
+    }
+
+    %% ── Satellite ──
+    class Satellite {
+        +str constellation
+        +int norad_id
+        +OrbitalElement element
+    }
+    class TLESelector {
+        +select(tles, time_range)
+    }
+    class SatelliteFactory {
+        +create(...)
+    }
+
+    %% ── Signal / Source ──
+    class SignalFactory {
+        +create(...)
+    }
+    class SignalSource {
+        <<protocol>>
+        +psd()
+        +name
+    }
+    class SatelliteSignalSource {
+        +Satellite satellite
+    }
+
+    %% ── Geometry ──
+    class SkyfieldGeometryProvider {
+        +compute(tracks, observer, sat_block)
+        +calculate_position(...)
+    }
+
+    %% ── TOD ──
+    class TODSimulator {
+        +simulate(...)
+    }
+    class TOD
+
+    %% ── Simulation ──
+    class Simulation {
+        +list~SignalSource~ sources
+        +run()
+    }
+    class SimulationResult {
+        +xr.Dataset dataset
+        +compute()
+        +save(path)
+        +load(path)
+        +summary()
+    }
+    class SimulationOrchestratorResult {
+        +SimulationResult simulation_result
+        +dict config
+        +summary()
+        +format_summary()
+        +to_json()
+        +save_result(filepath)
+        +load_result(filepath)
+    }
+
+    %% ── SkyMap ──
+    class NSide {
+        +int value
+        +npix
+    }
+    class SkyMap {
+        +np.ndarray data
+        +NSide nside
+        +alm()
+    }
+    class SkyMapDataset {
+        +np.ndarray data
+    }
+    class SkyMapFactory {
+        +create(...)
+    }
+    class SkyMapOperations
+    class SkyMapAnalysis {
+        +mean(skymap)
+        +rms(skymap)
+    }
+
+    %% ── Application ──
+    class SimOrchestrator {
+        +SimulationContext context
+        +run_simulation(...)
+        +save_result(...)
+        +shutdown()
+    }
+    class SimulationService {
+        +run_multi_source(...)
+    }
+
+    %% ── Ports (application) ──
+    class SatelliteRepositoryPort {
+        <<interface>>
+    }
+    class SimulationRepositoryPort {
+        <<interface>>
+        +save(result)
+        +get(id)
+        +list()
+    }
+    class BeamEvaluatorPort {
+        <<interface>>
+        +evaluate(beam, frequency, angle, pol)
+    }
+    class SkyMapGeneratorPort {
+        <<interface>>
+        +generate(nside, freq_ghz, components)
+    }
+
+    %% ── Adapters (infrastructure) ──
+    class ResourceAwareProcessor {
+        +partition_sources()
+        +run_batches()
+        +shutdown()
+    }
+    class SimulationRepository {
+        +save(result)
+        +get(id)
+        +load(id)
+        +flush()
+        +delete()
+    }
+    class SimulationRecord {
+        <<SQLModel>>
+        +int id
+        +str config_json
+        +bool saved
+    }
+
+    %% ── Relações ──
+    Observer *-- TimeRange : usa
+    Satellite "1" --> "1" OrbitalElement
+    SatelliteSignalSource --> Satellite
+    SignalFactory --> SignalSource : cria
+    Simulation --> TODSimulator
+    Simulation --> Beam
+    Simulation --> SkyfieldGeometryProvider
+    Simulation --> SimulationResult : produz
+    SimulationOrchestratorResult --> SimulationResult
+    SimOrchestrator --> SimulationService
+    SimOrchestrator --> ResourceAwareProcessor : use_processor
+    SimOrchestrator --> SimulationRepositoryPort
+    SimulationRepository ..|> SimulationRepositoryPort : implementa
+    SimulationRepository --> SimulationRecord
+    BeamProperties --> Beam
+    BeamFactory --> Beam
+    SkyMapFactory --> SkyMap
+    SkyMap --> NSide
+    SkyMap --> SkyMapDataset
+    SkyMapAnalysis --> SkyMap
+    TODSimulator --> TOD
+    TODSimulator --> Beam

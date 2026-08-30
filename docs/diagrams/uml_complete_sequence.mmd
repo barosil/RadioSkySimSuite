@@ -1,0 +1,73 @@
+---
+title: "RadioSkySim — Sequência: Simulação TOD GNSS"
+---
+sequenceDiagram
+    actor User
+    participant CLI as CLI / Entrypoint
+    participant Orch as SimOrchestrator
+    participant Cfg as ConfigLoader
+    participant SatSvc as SatelliteService
+    participant SimSvc as SimulationService
+    participant TrackF as TrackFactory
+    participant Geo as SkyfieldGeometryProvider
+    participant SigF as SignalFactory
+    participant TOD as TODSimulator
+    participant Sim as Simulation
+    participant NoiseSvc as NoiseService
+    participant RFI as RFIService
+
+    User->>CLI: run(constellations, time_range_str)
+    CLI->>Orch: run(constellations, time_range)
+
+    %% FASE 1: CONFIGURAÇÃO
+    Orch->>Cfg: load_config(settings.toml)
+    Cfg-->>Orch: Radiotelescope, Observer, FrequencyRange
+    Orch->>Orch: build_simulation_context()
+
+    %% FASE 2: OBTENÇÃO DE SATÉLITES
+    Orch->>SatSvc: get_by_constellations(constellations)
+    SatSvc->>SatSvc: query_constellation(name)
+    SatSvc->>SatSvc: update_orbital_elements_sync(sats)
+    SatSvc-->>Orch: list~Satellite~
+
+    %% FASE 3: CRIAÇÃO DAS TRACKS
+    Orch->>SimSvc: run_by_constellations(satellites, time_range)
+    SimSvc->>TrackF: build(sat_blocks, observer, time_range)
+    TrackF->>TrackF: skyfield.compute() [lazy/dask delayed]
+    TrackF-->>SimSvc: Tracks (xr.Dataset)
+
+    %% FASE 4: GEOMETRIA
+    SimSvc->>Geo: compute(tracks, observer, sat_blocks)
+    Geo->>Geo: calculate_range() [dask delayed]
+    Geo-->>SimSvc: geometry_ds (theta, az, el, range)
+
+    %% FASE 5: SINAIS
+    SimSvc->>SigF: build(sat_blocks, frequency_range)
+    SigF->>SigF: modulation_bpsk/qpsk/boc() [lazy]
+    SigF-->>SimSvc: dict~norad_id, SatSignal~
+
+    %% FASE 6: ASSEMBLY
+    SimSvc->>SimSvc: assemble(satellites, tracks, geometry, signals)
+    SimSvc-->>SimSvc: list~SatelliteAssembled~
+
+    %% FASE 7: EXECUÇÃO DA SIMULAÇÃO
+    SimSvc->>Sim: run(assembled, time_range, geometry, signal_factory, tod_simulator)
+    loop Para cada satélite
+        Sim->>TOD: simulate(sat, angle, mueller_matrix)
+        TOD->>TOD: compute_antenna_temperature(psd, beam_pattern)
+        TOD-->>Sim: tod_ds (T_antenna, power)
+    end
+    Sim-->>SimSvc: SimulationResult (xr.Dataset)
+
+    %% FASE 8: RUÍDO E RFI
+    SimSvc->>NoiseSvc: compose_noise(tod, tsys, bandwidth)
+    NoiseSvc-->>SimSvc: noise_ds
+    SimSvc->>RFI: flag_rfi(tod_with_noise, detector)
+    RFI-->>SimSvc: rfi_events
+
+    %% FASE 9: RESULTADO FINAL
+    SimSvc-->>Orch: SimulationResult (TOD + Noise + RFI flags)
+    Orch-->>CLI: SimulationResult
+    CLI-->>User: Dataset / Plot / Export
+
+    note over SimSvc, TOD: Cálculos lazy via Dask Delayed.<br/>Avaliação real sob demanda ou em chunks.

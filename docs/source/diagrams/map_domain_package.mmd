@@ -1,0 +1,64 @@
+---
+title: Pacote Domain/Map - Estrutura e Dependências
+---
+graph TB
+    subgraph DomainMap["Domain/Map (EM IMPLEMENTAÇÃO)"]
+        direction TB
+        MapModels["📝 models.py<br/>(VAZIO - TODO)"]
+        MapInit["📦 __init__.py<br/>(vazio)"]
+    end
+
+    subgraph DomainSkyMap["Domain/SkyMap (REFERÊNCIA)"]
+        direction TB
+        SkyMapModels["SkyMap<br/>Entidade de domínio<br/>representa mapa HEALPix"]
+        NSide["NSide<br/>Value Object<br/>discretização espacial"]
+        SkyMapDataset["SkyMapDataset<br/>Value Object<br/>encapsula dados"]
+        SkyMapFactory["SkyMapFactory<br/>Factory Pattern<br/>criação de SkyMap"]
+        SkyMapAnalysis["SkyMapAnalysis<br/>Domain Service<br/>operações científicas"]
+        SkyMapOperations["SkyMapOperations<br/>Domain Service<br/>operações físicas"]
+    end
+
+    subgraph DomainOthers["Outros Domínios"]
+        direction TB
+        Beam["Domain/Beam<br/>Modelagem de feixes"]
+        Signal["Domain/Signal<br/>Modelagem de sinais"]
+        Noise["Domain/Noise<br/>Ruído"]
+        RFI["Domain/RFI<br/>Interferência"]
+    end
+
+    subgraph ApplicationLayer["Application Layer"]
+        direction TB
+        GenerateUC["GenerateSkyMapUseCase<br/>Geração de mapas"]
+        AnalyzeUC["AnalyzeSkyMapUseCase<br/>Análise espectral"]
+    end
+
+    subgraph InfrastructureLayer["Infrastructure Layer"]
+        direction TB
+        HealpyProvider["HealpySkyMapProvider<br/>I/O com HEALPy"]
+        SkyMapRecord["SkyMapRecord<br/>Persistência em BD"]
+    end
+
+    MapInit --> MapModels
+    
+    SkyMapFactory --> SkyMapModels
+    NSide --> SkyMapModels
+    SkyMapDataset --> SkyMapModels
+    SkyMapAnalysis -.->|operações| SkyMapModels
+    SkyMapOperations -.->|operações| SkyMapModels
+    
+    GenerateUC --> SkyMapFactory
+    GenerateUC --> SkyMapModels
+    AnalyzeUC --> SkyMapAnalysis
+    AnalyzeUC --> SkyMapModels
+    
+    HealpyProvider --> SkyMapModels
+    SkyMapRecord --> SkyMapModels
+    
+    Beam -.->|pode usar| SkyMapModels
+    Signal -.->|pode usar| SkyMapModels
+    Noise -.->|pode usar| SkyMapModels
+    RFI -.->|pode usar| SkyMapModels
+    
+    style MapModels fill:#ff9999,stroke:#cc0000,stroke-width:3px
+    style MapInit fill:#ffcccc,stroke:#cc0000,stroke-width:2px
+    style DomainMap fill:#ffe6e6,stroke:#cc0000,stroke-width:2px

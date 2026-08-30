@@ -1,0 +1,92 @@
+---
+title: Arquitetura do Pacote Domain/Map em Camadas
+---
+graph TB
+    subgraph presentation["🎨 PRESENTATION LAYER"]
+        API["REST API<br/>FastAPI"]
+        CLI["CLI<br/>Click/Typer"]
+    end
+
+    subgraph application["📦 APPLICATION LAYER"]
+        UC1["GenerateMapUseCase"]
+        UC2["AnalyzeMapUseCase"]
+        UC3["TransformMapUseCase"]
+        DTOs["DTOs<br/>(Input/Output)"]
+        Ports["Ports<br/>(Interfaces)"]
+    end
+
+    subgraph domain["🎯 DOMAIN LAYER (Map)"]
+        MapEntity["Map<br/>Entidade<br/>Imutável"]
+        MapMetadata["MapMetadata<br/>Value Object"]
+        Coordinates["Coordinates<br/>Value Object"]
+        Projection["Projection<br/>Value Object"]
+        
+        MapOps["MapOperations<br/>Domain Service"]
+        MapAnalysis["MapAnalysis<br/>Domain Service"]
+        MapFactory["MapFactory<br/>Factory"]
+    end
+
+    subgraph relatedDomain["🎯 OUTROS DOMÍNIOS"]
+        SkyMap["SkyMap<br/>(Domain/SkyMap)"]
+        Beam["Beam<br/>(Domain/Beam)"]
+        Signal["Signal<br/>(Domain/Signal)"]
+    end
+
+    subgraph infrastructure["🔧 INFRASTRUCTURE LAYER"]
+        FileLoader["MapFileLoader<br/>FITS, HDF5, etc"]
+        Repository["MapRepository<br/>Persistência"]
+        MapProvider["MapProvider<br/>Backend específico"]
+    end
+
+    subgraph external["🌐 EXTERNAL LAYER"]
+        FITS["FITS Library<br/>astropy.io"]
+        HDF5["HDF5<br/>h5py"]
+        DB["Database<br/>PostgreSQL"]
+    end
+
+    %% Conexões Presentation -> Application
+    API --> UC1
+    API --> UC2
+    API --> UC3
+    CLI --> UC1
+    CLI --> UC2
+
+    %% Conexões Application -> Domain
+    UC1 --> MapFactory
+    UC2 --> MapAnalysis
+    UC3 --> MapOps
+    DTOs --> MapEntity
+
+    %% Conexões internas do Domain
+    MapFactory --> MapEntity
+    MapFactory --> MapMetadata
+    MapFactory --> Coordinates
+    MapFactory --> Projection
+    MapOps -.-> MapEntity
+    MapAnalysis -.-> MapEntity
+
+    %% Conexões Domain -> Other Domains
+    MapEntity -.->|pode relação com| SkyMap
+    MapEntity -.->|pode convolver com| Beam
+    MapEntity -.->|pode derivar de| Signal
+
+    %% Conexões Infrastructure
+    UC1 --> FileLoader
+    UC1 --> Repository
+    FileLoader --> FITS
+    FileLoader --> HDF5
+    Repository --> DB
+    MapProvider --> MapEntity
+
+    %% Estilos
+    style domain fill:#99ff99,stroke:#006600,stroke-width:3px
+    style MapEntity fill:#66dd66,stroke:#003300,stroke-width:3px
+    style MapOps fill:#99ff99,stroke:#006600
+    style MapAnalysis fill:#99ff99,stroke:#006600
+    style MapFactory fill:#99ff99,stroke:#006600
+    
+    style application fill:#99ccff,stroke:#003366,stroke-width:2px
+    style infrastructure fill:#ffcc99,stroke:#663300,stroke-width:2px
+    style presentation fill:#ffccff,stroke:#660066,stroke-width:2px
+    style relatedDomain fill:#dddddd,stroke:#666666,stroke-width:2px
+    style external fill:#ffffcc,stroke:#cccc00,stroke-width:2px

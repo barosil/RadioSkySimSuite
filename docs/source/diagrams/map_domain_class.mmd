@@ -1,0 +1,101 @@
+---
+title: Domínio Map - Modelo de Classes Proposto
+---
+classDiagram
+    direction LR
+
+    %% Value Objects
+    class Coordinates {
+        +float ra
+        +float dec
+        +float l
+        +float b
+        +validate()
+        +to_equatorial()
+        +to_galactic()
+    }
+
+    class Projection {
+        +str name
+        +dict params
+        +validate()
+    }
+
+    class MapMetadata {
+        +str author
+        +datetime created_at
+        +str description
+        +str version
+    }
+
+    %% Entidades
+    class Map {
+        -np.ndarray _data
+        -MapMetadata _metadata
+        -Projection _projection
+        +data: np.ndarray
+        +metadata: MapMetadata
+        +projection: Projection
+        +shape: tuple
+        +dtype: type
+        -_validate()
+        +copy(): Map
+        +apply_mask(mask): Map
+        +get_region(coords): float
+    }
+
+    class MapRegion {
+        -Map _map
+        -Coordinates _center
+        -float _radius
+        +map: Map
+        +center: Coordinates
+        +radius: float
+        +get_data(): np.ndarray
+    }
+
+    %% Domain Services
+    class MapOperations {
+        +reproject(map, new_proj): Map
+        +regrid(map, new_shape): Map
+        +smooth(map, kernel): Map
+        +rotate(map, rotation): Map
+        +crop(map, region): Map
+    }
+
+    class MapAnalysis {
+        +mean(map): float
+        +std(map): float
+        +min_max(map): tuple
+        +statistics(map): dict
+        +correlation(map1, map2): float
+    }
+
+    %% Factory
+    class MapFactory {
+        -str _default_proj
+        -str _default_author
+        +create(data, projection, metadata): Map
+        +from_file(path): Map
+        +from_array(data, **kwargs): Map
+    }
+
+    %% Relações
+    Map --> Projection : usa
+    Map --> MapMetadata : contém
+    Projection --> Coordinates : pode usar
+    MapRegion --> Map : referencia
+    MapRegion --> Coordinates : usa
+    MapFactory --> Map : cria
+    MapOperations ..> Map : opera sobre
+    MapAnalysis ..> Map : analisa
+
+    %% Estilos
+    style Map fill:#99ccff,stroke:#003366,stroke-width:2px
+    style Coordinates fill:#ccffcc,stroke:#006600,stroke-width:2px
+    style Projection fill:#ccffcc,stroke:#006600,stroke-width:2px
+    style MapMetadata fill:#ccffcc,stroke:#006600,stroke-width:2px
+    style MapOperations fill:#ffcccc,stroke:#cc0000,stroke-width:2px
+    style MapAnalysis fill:#ffcccc,stroke:#cc0000,stroke-width:2px
+    style MapFactory fill:#ffffcc,stroke:#cccc00,stroke-width:2px
+    style MapRegion fill:#ffddcc,stroke:#cc6600,stroke-width:2px

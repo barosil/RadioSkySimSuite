@@ -1,0 +1,86 @@
+---
+title: RadioSkySim — Classes principais
+---
+%% Diagrama de classes + sequência (SkyMap, Beam, Simulation)
+classDiagram
+  class SkyMap {
+    +SkyMap(dataset, nside, unit, frame, freq_ghz, field)
+    +data() : np.ndarray
+    +nside() : NSide
+    +alm(lmax=None) : np.ndarray
+    +apply_mask(mask) : SkyMap
+  }
+  class Simulation {
+    +Simulation(satellites, time_range, geometry, signal_factory, tod_simulator)
+    +run() : SimulationResult
+  }
+  class Satellite {
+    +norad_id:int
+    +name:str
+    +epoch:datetime
+  }
+  class SatelliteAssembled {
+    +name:str
+    +tracks:xr.Dataset
+    +signals:xr.Dataset
+    +angle() : xr.DataArray
+    +range() : xr.DataArray
+    +psd() : xr.DataArray
+  }
+  class Tracks {
+    +dataset:xr.Dataset
+    +from_xr(ds) : Tracks
+  }
+  class SatSignal {
+    +signal:Any
+    +psd:Any
+  }
+  class Beam {
+    +Beam(dataset)
+    +evaluate(frequency, angle, polarization=None) : xr.DataArray
+    +params() : BeamParamsDomain
+  }
+  class TODSimulator {
+    +TODSimulator(beam, gain)
+    +simulate(...) : xr.Dataset
+  }
+  class NoiseSimulator {
+    +NoiseSimulator(rng_seed=42)
+    +simulate(tod, tsys, bandwidth, time_constant) : xr.Dataset
+  }
+  class RFIDetector {
+    +RFIDetector(threshold_sigma=5.0)
+    +detect(tod, reference_spectrum=None) : list~RFIEvent~
+  }
+  class SimulationResult {
+    +dataset:xr.Dataset
+    +satellites:list~Satellite~
+    +time_range:TimeRange
+  }
+  class SimulationService {
+    +run_by_constellations(...): SimulationResult
+    +run_by_ids(...): SimulationResult
+  }
+  class SimOrchestrator {
+    +from_settings(telescope): SimOrchestrator
+    +run(...): SimulationResult
+  }
+  class TrackFactory {
+    +build(sat_blocks): Tracks
+  }
+  class GeometryProvider {
+    +compute(tracks, observer, sat_blocks): xr.Dataset
+  }
+  class SignalFactory {
+    +build(sat_blocks): dict
+  }
+
+  SkyMap <-- SkyMapDataset
+  Simulation --> SatelliteAssembled
+  Simulation --> TODSimulator
+  SatelliteAssembled --> Tracks
+  SatelliteAssembled --> SatSignal
+  TrackFactory --> Tracks
+  SimOrchestrator --> SimulationService
+  Beam --> BeamParamsDomain
+  RFIDetector --> RFIEvent

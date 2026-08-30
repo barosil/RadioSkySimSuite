@@ -1,0 +1,88 @@
+---
+title: RadioSkySim — Arquitetura Hexagonal (Ports & Adapters)
+---
+%%=============================================================================
+%% RadioSkySim — Diagrama UML Completo
+%% Arquitetura Hexagonal (Ports & Adapters) + DDD
+%% Gerado em: 2026-07-17
+%%=============================================================================
+
+%%=============================================================================
+%% 1. DIAGRAMA DE ARQUITETURA HEXAGONAL (VISÃO GERAL)
+%%=============================================================================
+
+flowchart TB
+    subgraph Entrypoints["🎮 Entrypoints (Interfaces)"]
+        CLI["CLI<br/><em>satellite_cli.py, generate.py</em>"]
+        API["API<br/><em>satellite_controller.py</em>"]
+        GUI["GUI (Panel)<br/><em>beam_visualizer.py<br/>satellite_panel.py</em>"]
+        NB["Notebooks Jupyter"]
+    end
+
+    subgraph Bootstrap["⚙️ Bootstrap (Composition Root)"]
+        CR["Composition Root<br/><em>bootstrap/composition.py</em>"]
+        BD["Builders<br/><em>bootstrap/builders.py</em>"]
+    end
+
+    subgraph Application["📋 Application Layer"]
+        direction TB
+        UC["Use Cases<br/><em>radiosources_use_cases.py</em>"]
+        SVC["Services<br/><em>sim_orchestrator.py<br/>satellite_service.py<br/>tod_services.py<br/>noise_services.py<br/>rfi_services.py<br/>catalog_services.py<br/>local_sources_service.py<br/>radiotelescope_services.py</em>"]
+        PORTS["Ports (ABCs)<br/><em>application/ports/<br/>beam.py, geometry.py,<br/>skymap.py, satellite.py,<br/>radiosources.py, localsources.py</em>"]
+    end
+
+    subgraph Domain["🧠 Domain Layer<br/><small>6 Bounded Contexts</small>"]
+        direction TB
+        CTX_SAT["🛰️ Satellite<br/><em>Satellite, OrbitalElement,<br/>SatelliteFactory, TLESelector</em>"]
+        CTX_BEAM["📡 Beam<br/><em>Beam, BeamParamsDomain,<br/>BeamOps, Polarization</em>"]
+        CTX_SKY["🌌 SkyMap<br/><em>SkyMap, NSide,<br/>SkyMapDataset, SkyMapFactory</em>"]
+        CTX_TOD["📊 TOD<br/><em>TOD, TODSimulator</em>"]
+        CTX_SRC["⭐ RadioSources<br/><em>RadioSource, SpectralModel</em>"]
+        CTX_SIM["⚡ Simulation<br/><em>Simulation, SimulationResult</em>"]
+        CTX_NOISE["🔊 Noise<br/><em>Noise, SystemTemperature</em>"]
+        CTX_RFI["📶 RFI<br/><em>RFI, RFIDetector</em>"]
+        CTX_LOCAL["☀️ LocalSources<br/><em>SolarFlux, LocalSource</em>"]
+        CTX_GEO["🌍 Geometry<br/><em>GeometryProvider (ABC)</em>"]
+        CTX_SIG["📻 Signal<br/><em>SatSignal, SignalFactory</em>"]
+        CTX_TRACK["🛤️ Tracks<br/><em>Tracks, TrackFactory</em>"]
+        CTX_RADIO["🔭 Radiotelescope<br/><em>Radiotelescope, Antenna,<br/>SpectrometerBackend</em>"]
+        CTX_COMMON["📐 Common<br/><em>FrequencyRange, TimeRange,<br/>Observer, DomainError</em>"]
+    end
+
+    subgraph Infrastructure["🔧 Infrastructure Layer"]
+        direction TB
+        DB["🗄️ Database<br/><em>db/engine.py<br/>SatelliteRepository<br/>SignalRepository<br/>SolarFluxRepository</em>"]
+        BEAMS["📐 Beam Loaders<br/><em>beams/loaders/<br/>CSV, LIT, Custom</em>"]
+        SKYMAP_IO["🌌 SkyMap IO<br/><em>skymap/healpy_provider.py<br/>skymap/providers/pysm.py<br/>skymap/providers/hips.py</em>"]
+        SKYMAP_CACHE["💾 SkyMap Cache<br/><em>skymap/io/cache*.py</em>"]
+        EXT["🌐 External<br/><em>CelestrakClient<br/>SolarFluxDownloader<br/>SkyfieldLocalSourceTrackProvider</em>"]
+        CFG["⚙️ Config<br/><em>config/config_loader.py<br/>settings.py</em>"]
+        LOG["📝 Logging<br/><em>logging_config.py</em>"]
+    end
+
+    %% Conexões
+    Entrypoints --> Bootstrap
+    Bootstrap --> Application
+    Application --> Domain
+    Application --> PORTS
+    PORTS -.->|"implementado por"| Infrastructure
+    Domain --> Infrastructure
+    Infrastructure --> DB
+    Infrastructure --> EXT
+    Infrastructure --> BEAMS
+    Infrastructure --> SKYMAP_IO
+
+    %% Estilo
+    classDef entrypoint fill:#e1f5fe,stroke:#0288d1,color:#01579b
+    classDef bootstrap fill:#f3e5f5,stroke:#7b1fa2,color:#4a148c
+    classDef application fill:#fff3e0,stroke:#ef6c00,color:#bf360c
+    classDef domain fill:#e8f5e9,stroke:#2e7d32,color:#1b5e20
+    classDef infra fill:#fce4ec,stroke:#c62828,color:#b71c1c
+    classDef ports fill:#fff8e1,stroke:#f9a825,color:#f57f17
+
+    class CLI,API,GUI,NB entrypoint
+    class CR,BD bootstrap
+    class UC,SVC application
+    class PORTS ports
+    class CTX_SAT,CTX_BEAM,CTX_SKY,CTX_TOD,CTX_SRC,CTX_SIM,CTX_NOISE,CTX_RFI,CTX_LOCAL,CTX_GEO,CTX_SIG,CTX_TRACK,CTX_RADIO,CTX_COMMON domain
+    class DB,BEAMS,SKYMAP_IO,SKYMAP_CACHE,EXT,CFG,LOG infra

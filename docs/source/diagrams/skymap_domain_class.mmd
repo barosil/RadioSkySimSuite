@@ -1,0 +1,60 @@
+---
+title: Domínio SkyMap (DDD)
+---
+classDiagram
+  direction LR
+
+  class NSide{
+    +int value
+    +int npix
+  }
+
+  class SkyMapDataset{
+    +dataset
+    +shape
+    +ndim
+    +size
+    +to_numpy()
+  }
+
+  class SkyMap{
+    +data
+    +nside
+    +nside_value
+    +npix
+    +copy()
+    +apply_mask(mask)
+    +alm(lmax)
+  }
+
+  class SkyMapFactory{
+    +create(dataset, nside, freq_ghz, unit, frame, field)
+  }
+
+  class HealpySkyMapProvider{
+    +read_map(path)
+    +read_header(path)
+    +write_map(skymap, path)
+    +smooth(skymap, fwhm_rad)
+    +rotate(skymap, rot)
+    +downgrade(skymap, target_nside)
+  }
+
+  class SkyMapRecord{
+    +int id
+    +int nside
+    +int npix
+    +string unit
+    +string frame
+    +string field
+    +float freq_ghz
+    +bytes data_blob
+    +from_skymap(skymap)
+    +to_skymap()
+  }
+
+  NSide --> SkyMap : nside
+  SkyMapDataset --> SkyMap : dataset
+  SkyMapFactory --> SkyMap : cria
+  HealpySkyMapProvider ..> SkyMap : opera
+  SkyMapRecord ..> SkyMap : persiste

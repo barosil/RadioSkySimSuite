@@ -1,0 +1,141 @@
+---
+title: RadioSkySim — Bounded Contexts e Relações
+---
+flowchart LR
+    subgraph Common["📐 Common"]
+        FR[FrequencyRange]
+        TR[TimeRange]
+        O[Observer]
+        DE[DomainError]
+    end
+
+    subgraph Satellite["🛰️ Satellite"]
+        SAT[Satellite]
+        OE[OrbitalElement]
+        SFA[SatelliteFactory]
+        SA[SatelliteAssembler]
+        TS[TLESelector]
+    end
+
+    subgraph Tracks["🛤️ Tracks"]
+        TRK[Tracks]
+        TF[TrackFactory]
+    end
+
+    subgraph Signal["📻 Signal"]
+        SS[SatSignal]
+        SF[SignalFactory]
+    end
+
+    subgraph Geometry["🌍 Geometry"]
+        GP[GeometryProvider]
+    end
+
+    subgraph Beam["📡 Beam"]
+        BM[Beam]
+        BPD[BeamParamsDomain]
+        POL[Polarization]
+        BOP[BeamOps]
+    end
+
+    subgraph TOD["📊 TOD"]
+        TODM[TOD]
+        TSIM[TODSimulator]
+    end
+
+    subgraph SkyMap["🌌 SkyMap"]
+        SM[SkyMap]
+        NS[NSide]
+        SMD[SkyMapDataset]
+        SMF[SkyMapFactory]
+    end
+
+    subgraph RadioSources["⭐ RadioSources"]
+        RS[RadioSource]
+        SPM[SpectralModel]
+        RFS[RadioSourceFluxSample]
+    end
+
+    subgraph LocalSources["☀️ LocalSources"]
+        SOL[SolarFlux]
+        LST[LocalSourceTrack]
+        LS[LocalSources]
+    end
+
+    subgraph Noise["🔊 Noise"]
+        NSM[Noise]
+        ST[SystemTemperature]
+        EF[Efficiency]
+        NSS[NoiseService]
+    end
+
+    subgraph RFI["📶 RFI"]
+        RFI[RFI]
+        RD[RFIDetector]
+        RSE[RFIService]
+    end
+
+    subgraph Simulation["⚡ Simulation"]
+        SIM[Simulation]
+        SR[SimulationResult]
+    end
+
+    subgraph Radiotelescope["🔭 Radiotelescope"]
+        RT[Radiotelescope]
+        RTS[RadiotelescopeSpec]
+        ANT[Antenna]
+        SB[SpectrometerBackend]
+    end
+
+    %% Relações entre bounded contexts
+    Satellite --> Tracks
+    Satellite --> Signal
+    Tracks --> Geometry
+    Satellite -->|SatelliteAssembler| SatelliteAssembled[SatelliteAssembled]
+    SatelliteAssembled --> Tracks
+    SatelliteAssembled --> Signal
+    Simulation --> SatelliteAssembled
+    Simulation --> Geometry
+    Simulation --> TODSimulator
+    TODSimulator --> Beam
+    Beam --> BeamParamsDomain
+    RadioSources --> SpectralModel
+    LocalSources --> SolarFlux
+    LocalSources --> LocalSourceTrack
+    Radiotelescope --> Antenna
+    Radiotelescope --> SpectrometerBackend
+    Noise --> SystemTemperature
+    Noise --> Efficiency
+    RFI --> RFIDetector
+    SkyMap --> NSide
+    SkyMap --> SkyMapDataset
+
+    classDef common fill:#e3f2fd,stroke:#1565c0
+    classDef satellite fill:#fce4ec,stroke:#c62828
+    classDef tracks fill:#f3e5f5,stroke:#7b1fa2
+    classDef signal fill:#e8f5e9,stroke:#2e7d32
+    classDef geometry fill:#fff3e0,stroke:#ef6c00
+    classDef beam fill:#e0f7fa,stroke:#00838f
+    classDef tod fill:#f1f8e9,stroke:#558b2f
+    classDef skymap fill:#ede7f6,stroke:#4527a0
+    classDef source fill:#fbe9e7,stroke:#d84315
+    classDef local fill:#fff8e1,stroke:#f9a825
+    classDef noise fill:#fce4ec,stroke:#ad1457
+    classDef rfi fill:#e8eaf6,stroke:#283593
+    classDef sim fill:#e0f2f1,stroke:#00695c
+    classDef radio fill:#efebe9,stroke:#4e342e
+
+    class FR,TR,O,DE common
+    class SAT,OE,SFA,SA,TS satellite
+    class TRK,TF tracks
+    class SS,SF signal
+    class GP geometry
+    class BM,BPD,POL,BOP beam
+    class TODM,TSIM tod
+    class SM,NS,SMD,SMF skymap
+    class RS,SPM,RFS source
+    class SOL,LST,LS local
+    class NSM,ST,EF,NSS noise
+    class RFI,RD,RSE rfi
+    class SIM,SR sim
+    class RT,RTS,ANT,SB radio

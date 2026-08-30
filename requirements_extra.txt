@@ -1,0 +1,9 @@
+aiomonitor
+folium
+jupyter_bokeh==4.0.5
+linkify
+msgpack
+fastapi
+hvplot
+pydantic-settings
+structlog

@@ -1,0 +1,25 @@
+# Example minimal settings for a TOD export run
+
+[time_range]
+start = "2026-08-01T00:00:00Z"
+end = "2026-08-01T00:10:00Z"
+cadence = 1.0  # seconds
+
+[frequency_range]
+start_mhz = 980.0
+end_mhz = 1260.0
+nchan = 4
+
+[radiotelescope]
+name = "example_rt"
+latitude = -7.0
+longitude = -38.0
+altitude = 100.0
+
+[sources.sun]
+enabled = true
+
+[output]
+outdir = "data/TOD/"
+format = "netcdf"  # or 'zarr'
+filename_template = "tod_result_{timestamp}.nc"

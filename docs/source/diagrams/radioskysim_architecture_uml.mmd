@@ -1,0 +1,302 @@
+---
+title: RadioSkySim - Arquitetura de Classes (UML)
+---
+classDiagram
+    direction TB
+
+    %% ============================================================
+    %% DOMAIN LAYER - Core
+    %% ============================================================
+    
+    namespace Domain {
+        class NSide {
+            -int _value
+            +value: int
+            +npix: int
+            +validate()
+        }
+        
+        class SkyMapDataset {
+            -Any _dataset
+            -tuple _shape
+            -int _ndim
+            +dataset: Any
+            +shape: tuple
+            +ndim: int
+            +size: int
+            +to_numpy()
+        }
+        
+        class SkyMap {
+            -SkyMapDataset _dataset
+            -NSide _nside
+            +unit: str
+            +frame: str
+            +freq_ghz: float
+            +data: np.ndarray
+            +nside: NSide
+            +npix: int
+            +copy(): SkyMap
+            +apply_mask(mask)
+            +alm(lmax)
+        }
+        
+        class BeamParamsDomain {
+            +polarizations: list
+            +frequencies: list
+            +has_phase: bool
+            +fwhm: np.ndarray
+            +directivity: float
+        }
+        
+        class Satellite {
+            +norad_id: int
+            +name: str
+            +constellation: str
+            +epoch: datetime
+            +element: OrbitalElement
+            +validate_epoch_interval()
+        }
+        
+        class OrbitalElement {
+            +epoch: datetime
+            +semi_major_axis: float
+            +eccentricity: float
+            +inclination: float
+        }
+        
+        class SatelliteAssembled {
+            -dict _angle
+            -dict _range
+            -dict _psd
+            +angle: xr.DataArray
+            +range: xr.DataArray
+            +psd: xr.DataArray
+        }
+        
+        class SatSignal {
+            +name: str
+            +modulation: str
+            +center_frequency: float
+            +bandwidth: float
+        }
+        
+        class TOD {
+            +data: xr.DataArray
+            +metadata: dict
+        }
+        class Tracks {
+            +dataset: xr.Dataset
+            +satellite_names: list[str]
+            +time_range: tuple[str, str]
+            +from_xr(ds): Tracks
+        }
+        class SimulationResult {
+            +dataset: xr.Dataset
+            +satellites: list[Satellite]
+            +time_range: TimeRange
+        }
+        
+        class Radiotelescope {
+            +earth_location_lat: float
+            +earth_location_lon: float
+            +earth_location_alt: float
+            +frequency_min: float
+            +frequency_max: float
+            +beam_id: int
+        }
+        
+        class TimeRange {
+            +start: datetime
+            +end: datetime
+            +duration: timedelta
+            +validate()
+        }
+        
+        class FrequencyRange {
+            +start: float
+            +end: float
+            +validate()
+        }
+    }
+
+    %% ============================================================
+    %% FACTORIES & SERVICES
+    %% ============================================================
+    
+    namespace DomainServices {
+        class SkyMapFactory {
+            -str _unit
+            -str _frame
+            -str _field
+            +create(dataset, nside, ...): SkyMap
+        }
+        
+        class SatelliteFactory {
+            +build(tr, repository, ...): dict
+        }
+        
+        class SignalFactory {
+            -FrequencyRange _fr
+            -SignalRepository _repo
+            +build(sats): SatSignal
+        }
+        
+        class SatelliteAssembler {
+            -SignalFactory _signal_factory
+            -TrackFactory _track_factory
+            +assemble(satellites, ...): SatelliteAssembled
+        }
+        class TrackFactory {
+            +build(satellites_block, scheduler): Tracks
+        }
+        class TODSimulator {
+            +beam
+            +gain: float
+            +simulate(...): xr.Dataset
+        }
+        class Simulation {
+            +run(): SimulationResult
+        }
+        
+        class MapOperations {
+            +smooth(map, kernel): Map
+            +regrid(map, shape): Map
+            +rotate(map, rotation): Map
+        }
+        
+        class MapAnalysis {
+            +mean(map): float
+            +std(map): float
+            +statistics(map): dict
+        }
+    }
+
+    %% ============================================================
+    %% APPLICATION LAYER
+    %% ============================================================
+    
+    namespace Application {
+        class GenerateSkyMapUseCase {
+            -SkyMapGeneratorPort _generator
+            +execute(InputDTO): OutputDTO
+        }
+        
+        class GenerateSkyMapInputDTO {
+            +nside: int
+            +components: list
+            +frequency_ghz: float
+        }
+        
+        class GenerateSkyMapOutputDTO {
+            +nside: int
+            +npix: int
+            +map_data: np.ndarray
+        }
+        
+        class SkyMapGeneratorPort {
+            <<interface>>
+            +generate(...): SkyMap
+        }
+        class SatelliteService {
+            +get_by_ids(ids): list[Satellite]
+            +get_by_constellations(names): list[Satellite]
+        }
+        class SimulationService {
+            -SatelliteService _satellite_service
+            -GeometryProvider _geometry
+            -SignalFactory _signal_factory
+            -TODSimulator _tod_simulator
+            +run_by_constellations(constellations, time_range): SimulationResult
+            +run_by_ids(norad_ids, time_range): SimulationResult
+        }
+        class SimOrchestrator {
+            -SimulationContext _ctx
+            +from_settings(telescope): SimOrchestrator
+            +run(constellations, time_range): SimulationResult
+        }
+    }
+
+    %% ============================================================
+    %% INFRASTRUCTURE LAYER
+    %% ============================================================
+    
+    namespace Infrastructure {
+        class BeamParamsDB {
+            <<SQLModel>>
+            +id: int
+            +polarizations: str (JSON)
+            +frequencies: str (JSON)
+            +from_domain(BeamParamsDomain)
+            +to_domain(): BeamParamsDomain
+        }
+        
+        class SatelliteRepository {
+            -Session _session
+            +get_by_id(id): Satellite
+            +list_by_constellation(name): list
+            +save(satellite): void
+        }
+        
+        class SignalRepository {
+            +get_signal_definition(name): SatSignal
+        }
+        
+        class HealpySkyMapProvider {
+            <<Adapter>>
+            +read_map(path): SkyMap
+            +write_map(skymap, path): void
+            +smooth(skymap, fwhm): SkyMap
+            +rotate(skymap, rot): SkyMap
+        }
+    }
+
+    %% ============================================================
+    %% RELACIONAMENTOS
+    %% ============================================================
+    
+    %% Domain Relations
+    SkyMap --> NSide : usa
+    SkyMap --> SkyMapDataset : contém
+    SkyMapFactory --> SkyMap : cria
+    
+    Satellite --> OrbitalElement : contém
+    SatelliteFactory --> Satellite : cria
+    SatelliteAssembler --> SatelliteAssembled : cria
+    SatelliteAssembler --> SignalFactory : usa
+    SatelliteAssembler --> TrackFactory : usa
+    
+    SignalFactory --> SatSignal : cria
+    SignalFactory --> FrequencyRange : usa
+    
+    TOD --> xrDataArray : encapsula
+    Tracks --> xrDataset : encapsula
+    Simulation --> SatelliteAssembled : consome
+    Simulation --> TOD : usa
+    Simulation --> SimulationResult : retorna
+    
+    MapOperations ..> SkyMap : opera sobre
+    MapAnalysis ..> SkyMap : analisa
+    
+    %% Application Relations
+    GenerateSkyMapUseCase --> GenerateSkyMapInputDTO : recebe
+    GenerateSkyMapUseCase --> GenerateSkyMapOutputDTO : retorna
+    GenerateSkyMapUseCase --> SkyMapGeneratorPort : usa
+    SimulationService --> Simulation : orquestra
+    SimulationService --> SatelliteService : usa
+    SimOrchestrator --> SimulationService : usa
+    
+    %% Infrastructure Relations
+    BeamParamsDB ..> BeamParamsDomain : mapeia
+    SatelliteRepository ..> Satellite : persiste
+    SignalRepository ..> SatSignal : persiste
+    
+    %% Port Implementation
+    SkyMapGeneratorPort <|.. HealpySkyMapProvider : implementa
+    
+    %% Styling
+    style SkyMap fill:#e1f5ff,stroke:#01579b,stroke-width:2px
+    style Satellite fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    style SkyMapFactory fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    style GenerateSkyMapUseCase fill:#e8f5e9,stroke:#1b5e20,stroke-width:2px
+    style SkyMapGeneratorPort fill:#fce4ec,stroke:#880e4f,stroke-width:2px

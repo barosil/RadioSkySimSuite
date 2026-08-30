@@ -1,0 +1,27 @@
+[submodule "packages/radioskysims-core"]
+	path = packages/radioskysims-core
+	url = git@github.com:barosil/radioskysims-core.git
+[submodule "packages/radioskysims-viz"]
+	path = packages/radioskysims-viz
+	url = git@github.com:barosil/radioskysims-viz.git
+[submodule "packages/radioskysims-beam"]
+	path = packages/radioskysims-beam
+	url = git@github.com:barosil/radioskysims-beam.git
+[submodule "packages/radioskysims-skymap"]
+	path = packages/radioskysims-skymap
+	url = git@github.com:barosil/radioskysims-skymap.git
+[submodule "packages/radioskysims-sources"]
+	path = packages/radioskysims-sources
+	url = git@github.com:barosil/radioskysims-sources.git
+[submodule "packages/radioskysims-radiotelescope"]
+	path = packages/radioskysims-radiotelescope
+	url = git@github.com:barosil/radioskysims-radiotelescope.git
+[submodule "packages/gnsstools4astro"]
+	path = packages/gnsstools4astro
+	url = git@github.com:barosil/gnsstools4astro.git
+[submodule "packages/radioskysims-simulation"]
+	path = packages/radioskysims-simulation
+	url = git@github.com:barosil/radioskysims-simulation.git
+[submodule "packages/radioskysims-waterfall"]
+	path = packages/radioskysims-waterfall
+	url = git@github.com:barosil/radioskysims-waterfall.git

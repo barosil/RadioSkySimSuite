@@ -1,0 +1,131 @@
+---
+title: RadioSkySim - Fluxo de Simulação (Diagrama de Sequências)
+---
+sequenceDiagram
+    actor User
+    participant App as Application<br/>Layer
+    participant UC as GenerateSkyMapUseCase
+    participant Factory as SkyMapFactory
+    participant Domain as Domain<br/>(SkyMap)
+    participant Validation as Validação<br/>Científica
+    participant Infra as Infrastructure<br/>(HealpyProvider)
+    participant DB as Database<br/>(Repository)
+
+    User->>App: request_skymap(nside=128, freq=70GHz)
+    
+    App->>UC: execute(InputDTO)
+    
+    rect rgb(200, 150, 255)
+    Note over UC,Domain: FASE 1: Validação de Aplicação
+    UC->>UC: validate_frequency_range()
+    alt Frequência inválida
+        UC-->>App: raise ValueError
+    end
+    UC->>UC: validate_components_list()
+    end
+    
+    rect rgb(150, 200, 255)
+    Note over Factory,Validation: FASE 2: Criação no Domínio
+    UC->>Factory: create_skymap(nside, freq, unit, frame)
+    Factory->>Validation: create_nside(value)
+    Validation->>Validation: npix = 12 * value^2
+    Validation-->>Factory: NSide(value)
+    
+    Factory->>Validation: validate_parameters()
+    Validation->>Validation: check_frame in {galactic, equatorial, ecliptic}
+    Validation-->>Factory: OK
+    end
+    
+    rect rgb(150, 255, 200)
+    Note over Factory,Domain: FASE 3: Construção da Entidade
+    Factory->>Domain: SkyMap(dataset, nside, unit, frame, freq)
+    Domain->>Domain: _validate(dataset, nside, unit, frame, field)
+    Domain->>Domain: dataset.ndim == 1?
+    Domain->>Domain: npix matches nside?
+    Domain->>Domain: frame in allowed list?
+    Domain-->>Factory: SkyMap instance
+    Factory-->>UC: SkyMap
+    end
+    
+    rect rgb(255, 200, 150)
+    Note over UC,Infra: FASE 4: Geração de Dados (Infrastructure)
+    UC->>Infra: generate_healpix_map(nside, freq, components)
+    Infra->>Infra: call_pysm3(nside, freq)
+    Infra->>Infra: load_pysm_components()
+    Infra->>Infra: evaluate_at_frequency(freq)
+    Infra-->>UC: np.ndarray (HEALPix data)
+    end
+    
+    rect rgb(200, 255, 150)
+    Note over UC,DB: FASE 5: Persistência (Opcional)
+    UC->>DB: save_skymap_metadata()
+    DB->>DB: serialize to JSON
+    DB->>DB: INSERT INTO skymap_records
+    DB-->>UC: skymap_id
+    end
+    
+    rect rgb(255, 150, 150)
+    Note over UC,App: FASE 6: Assemblar Output DTO
+    UC->>UC: create_output_dto()
+    UC->>UC: copy_map_data()
+    Note over UC: Cópia defensiva:<br/>dados não mutáveis<br/>externamente
+    UC->>App: GenerateSkyMapOutputDTO
+    end
+    
+    App-->>User: SkyMap gerado com sucesso<br/>nside=128, npix=196608, freq=70GHz
+
+    Note over User,DB: Fluxo Alternativo: Erro em Validação Científica
+    alt Órbita inválida
+        Validation->>Domain: raise ValueError
+        Domain->>App: exception
+        App->>User: "Error: Invalid parameters"
+    end
+
+    Note over User,DB: Fluxo Alternativo: Cache Hit
+    alt Mapa já existe no cache
+        UC->>DB: check_cache(nside, freq)
+        alt Cache hit
+            DB-->>UC: cached_skymap
+            UC->>App: retorna do cache
+        end
+    end
+
+---
+
+## Detalhes das Fases
+
+### FASE 1: Validação de Aplicação
+- Verifica range de frequência (0.1 - 100 GHz plausível?)
+- Valida lista de componentes (ex: cmb, dust, synchrotron)
+- Valida tipo de dados de entrada
+- **Responsável:** Application Use Case
+
+### FASE 2: Criação no Domínio
+- Instancia Value Objects (NSide, Coordinates)
+- Calcula propriedades derivadas (npix = 12 * nside²)
+- Valida invariantes de domínio
+- **Responsável:** Domain Factory
+
+### FASE 3: Construção da Entidade
+- Encapsula dados e metadados
+- Aplica regras de negócio (frame, unit, field)
+- Garante imutabilidade externa
+- **Responsável:** Domain Entity (SkyMap)
+
+### FASE 4: Geração de Dados
+- Chama bibliotecas externas (PySM3, HEALPy)
+- Realiza cálculos científicos
+- Retorna array de dados brutos
+- **Responsável:** Infrastructure Adapter
+
+### FASE 5: Persistência
+- Serializa metadados
+- Armazena em banco de dados
+- Mantém auditoria de criação
+- **Responsável:** Infrastructure Repository
+
+### FASE 6: Assemblar Output
+- Cria DTO para aplicação
+- Cópia defensiva de dados
+- Serializa para formato esperado
+- **Responsável:** Application Output DTO

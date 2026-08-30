@@ -1,0 +1,95 @@
+# ================================================================
+# Journal of Astronomical Instrumentation
+# Publication figure style
+# ================================================================
+
+
+# ----------------------------------------------------------------
+# Typography
+# ----------------------------------------------------------------
+
+font.family         : serif
+font.serif          : Times New Roman, Times, Nimbus Roman, STIXGeneral
+font.size           : 8.0
+
+mathtext.fontset    : stix
+
+
+# ----------------------------------------------------------------
+# Axes
+# ----------------------------------------------------------------
+
+axes.labelsize      : 8.0
+axes.titlesize      : 8.0
+axes.linewidth      : 0.6
+
+axes.spines.top     : True
+axes.spines.right   : True
+
+axes.grid           : False
+
+
+# ----------------------------------------------------------------
+# Lines
+# ----------------------------------------------------------------
+
+lines.linewidth     : 1.0
+lines.markersize    : 4.0
+lines.markeredgewidth : 0.6
+
+
+# ----------------------------------------------------------------
+# Ticks
+# ----------------------------------------------------------------
+
+xtick.labelsize     : 7.0
+ytick.labelsize     : 7.0
+
+xtick.direction     : in
+ytick.direction     : in
+
+xtick.top           : True
+ytick.right         : True
+
+xtick.major.size    : 3.0
+ytick.major.size    : 3.0
+
+xtick.minor.size    : 1.5
+ytick.minor.size    : 1.5
+
+xtick.major.width   : 0.6
+ytick.major.width   : 0.6
+
+xtick.minor.width   : 0.5
+ytick.minor.width   : 0.5
+
+
+# ----------------------------------------------------------------
+# Legend
+# ----------------------------------------------------------------
+
+legend.fontsize     : 7.0
+legend.frameon      : False
+legend.handlelength : 2.0
+legend.borderaxespad: 0.5
+
+
+# ----------------------------------------------------------------
+# Figure
+# ----------------------------------------------------------------
+
+figure.dpi          : 120
+
+figure.autolayout   : False
+
+
+# ----------------------------------------------------------------
+# Saving
+# ----------------------------------------------------------------
+
+savefig.dpi         : 600
+savefig.bbox        : tight
+savefig.pad_inches  : 0.02
+
+pdf.fonttype        : 42
+ps.fonttype         : 42

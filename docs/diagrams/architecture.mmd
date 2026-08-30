@@ -1,0 +1,23 @@
+%% Diagrama de pacotes / contexts - RadioSkySim
+graph LR
+  application[application] --> domain[domain]
+  application --> interfaces[interfaces]
+  application --> infrastructure[infrastructure]
+  domain --> skymap[skymap]
+  domain --> beam[beam]
+  domain --> satellite[satellite]
+  domain --> tracks[tracks]
+  domain --> signal[signal]
+  domain --> tod[tod]
+  domain --> geometry[geometry]
+  domain --> common[common]
+  domain --> map[map]
+  domain --> noise[noise]
+  domain --> rfi[rfi]
+  domain --> simulation[simulation]
+  infrastructure --> beams[beams loaders/adapters]
+  infrastructure --> db[db repositories]
+  infrastructure --> config[config/logging]
+  interfaces --> gui[gui]
+
+%% Uso: render em ferramentas compatíveis com Mermaid

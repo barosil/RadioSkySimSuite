@@ -1,0 +1,34 @@
+---
+title: "RadioSkySim — Sequência: Simulação TOD GNSS"
+---
+sequenceDiagram
+  actor User
+  participant Orch as SimOrchestrator
+  participant SimSvc as SimulationService
+  participant SatSvc as SatelliteService
+  participant TrackF as TrackFactory
+  participant Geo as GeometryProvider
+  participant SigF as SignalFactory
+  participant TOD as TODSimulator
+  participant Sim as Simulation
+
+  User->>Orch: run(constellations, time_range)
+  Orch->>SatSvc: get_by_constellations(constellations)
+  SatSvc-->>Orch: satellites
+  Orch->>SimSvc: run_by_constellations_from_settings(constellations, time_range)
+
+  SimSvc->>TrackF: build(sat_blocks)
+  TrackF-->>SimSvc: Tracks
+
+  SimSvc->>Geo: compute(tracks, observer, sat_blocks)
+  Geo-->>SimSvc: geometry_ds
+
+  SimSvc->>SigF: build(sat_blocks)
+  SigF-->>SimSvc: sat_signals
+
+  SimSvc->>Sim: run(satellites_assembled, time_range, geometry, SigF, TOD)
+  Sim->>TOD: simulate(sat, angle, mueller)
+  TOD-->>Sim: tod_ds
+  Sim-->>SimSvc: SimulationResult
+  SimSvc-->>Orch: SimulationResult
+  Orch-->>User: SimulationResult (TOD Dataset)

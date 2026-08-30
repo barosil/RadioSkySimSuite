@@ -1,0 +1,42 @@
+---
+title: "RadioSkySim — Sequência: Fluxo satellite → tracks → signal → assembled"
+---
+sequenceDiagram
+  participant Repo as SatelliteRepository
+  participant SatF as SatelliteFactory
+  participant Sel as TLESelector
+  participant Asm as SatelliteAssembler
+  participant TrackF as TrackFactory
+  participant SigF as SignalFactory
+  participant Geo as GeometryProvider
+  participant Sim as Simulation
+  participant Result as SatelliteAssembled
+
+  Note over SatF,Result: 1. OBTENÇÃO DOS SATÉLITES
+  SatF->>Repo: load_elements(norad_ids)
+  Repo-->>SatF: SatID[ ] (com TLE)
+  SatF->>Sel: select(satids, epoch_jd)
+  Sel-->>SatF: Satélites com TLE mais próximo
+  SatF-->>SatF: Satellite(norad_id, name, element)
+
+  Note over TrackF,Geo: 2. CÁLCULO DE TRACKS
+  Asm->>TrackF: build(sat_blocks)
+  TrackF->>TrackF: _compute_xyz_km_tle(tle1, tle2, tt_jd)
+  TrackF-->>TrackF: Block datasets (lazy, dask)
+  TrackF->>TrackF: _build_track_ds() concatena blocos
+  TrackF-->>Asm: Tracks(xr.Dataset)
+
+  Note over Geo: 3. GEOMETRIA OBSERVACIONAL
+  Asm->>Geo: compute(tracks, observer)
+  Geo-->>Asm: geometry(xr.Dataset: theta, range, az, el)
+
+  Note over SigF,SigF: 4. GERAÇÃO DE SINAIS
+  Asm->>SigF: build(sat_blocks)
+  SigF->>SigF: _simulate_psd(modulation, fc)
+  Note right of SigF: BPSK / QPSK / BOC / CBOC\n+ Welch PSD\n+ Interpolação no grid
+  SigF-->>Asm: dict[int, list[SatSignal]]
+
+  Note over Asm,Result: 5. MONTAGEM FINAL
+  Asm->>Asm: _build_psd_blocks(signals, sat_ids, freq)
+  Asm->>Asm: _build_signal_assembled(psd_blocks, ...)
+  Asm-->>Result: SatelliteAssembled(name, tracks, signals)

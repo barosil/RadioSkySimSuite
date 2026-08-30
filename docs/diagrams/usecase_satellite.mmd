@@ -1,0 +1,21 @@
+---
+title: Casos de uso — Satélites (tracks e geometria)
+---
+%% Use Case - Satellite
+flowchart LR
+    A[("Cientista /\nOperador")]
+    B[("Sistema")]
+    ST[("SpaceTrack")]
+    SKYFIELD[("Ephemeris\n(Skyfield/de421.bsp)")]
+
+    A --> UC1["Selecionar constelações\n(GPS, GALILEO, BEIDOU, GLONASS)"]
+    A --> UC2["Buscar/atualizar TLEs"]
+    A --> UC3["Gerar tracks (TrackFactory)"]
+    A --> UC4["Calcular geometria\n(ra/dec/alt/az vs observer)"]
+    A --> UC5["Simular sinal GNSS\n(SatelliteSignalSource)"]
+
+    B --> UC2
+    B --> UC4
+    UC2 --> ST
+    UC4 --> SKYFIELD
+    UC5 --> UC4

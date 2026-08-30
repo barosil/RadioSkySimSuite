@@ -1,0 +1,613 @@
+---
+title: RadioSkySim — Diagrama de Classes Detalhado
+---
+classDiagram
+
+    %% =========================================================================
+    %% BOUNDED CONTEXT: COMMON
+    %% =========================================================================
+    class FrequencyRange {
+        +float fmin
+        +float fmax
+        +float step
+        +channels() int
+        +to_array() np.ndarray
+    }
+
+    class TimeRange {
+        +str start
+        +str end
+        +int step_seconds
+        +to_mjd() tuple
+        +num_steps() int
+    }
+
+    class Observer {
+        +float lat
+        +float lon
+        +float height
+        +to_skyfield() EarthLocation
+    }
+
+    class DomainError {
+        +str message
+    }
+
+    %% =========================================================================
+    %% BOUNDED CONTEXT: SATELLITE
+    %% =========================================================================
+    class Satellite {
+        +int norad_id
+        +str name
+        +datetime epoch
+        +str constellation
+        +float inclination
+        +float raan
+        +float eccentricity
+        +float arg_perigee
+        +float mean_anomaly
+        +float mean_motion
+        +int bstar
+        +xr.Dataset orbital_elements
+    }
+
+    class OrbitalElement {
+        +int norad_id
+        +str tle_line1
+        +str tle_line2
+        +datetime epoch
+        +to_satrec() Satrec
+    }
+
+    class SatelliteFactory {
+        +build_from_tle(norad_id, tle) Satellite
+        +build_from_celestrak(data) list~Satellite~
+    }
+
+    class SatelliteAssembled {
+        +str name
+        +xr.Dataset tracks
+        +xr.Dataset signals
+        +xr.DataArray angle()
+        +xr.DataArray range()
+        +xr.DataArray psd()
+    }
+
+    class TLESelector {
+        +select_best(tle_list) OrbitalElement
+        +filter_by_constellation(sats, const) list~Satellite~
+    }
+
+    class SatelliteAssembler {
+        +assemble(satellite, tracks, signals) SatelliteAssembled
+    }
+
+    %% =========================================================================
+    %% BOUNDED CONTEXT: TRACKS
+    %% =========================================================================
+    class Tracks {
+        +xr.Dataset dataset
+        +from_xr(ds) Tracks
+        +to_dataframe() pd.DataFrame
+    }
+
+    class TrackFactory {
+        +build(sat_blocks, observer, time_range) Tracks
+    }
+
+    %% =========================================================================
+    %% BOUNDED CONTEXT: SIGNAL
+    %% =========================================================================
+    class SatSignal {
+        +str modulation
+        +float carrier_freq
+        +float bandwidth
+        +float power
+        +compute_psd(freq) xr.DataArray
+    }
+
+    class SignalFactory {
+        +build(sat_blocks, frequency_range) dict~int, SatSignal~
+        +modulation_bpsk(f, fc, bw) xr.DataArray
+        +modulation_qpsk(f, fc, bw) xr.DataArray
+        +modulation_boc(f, fc, bw, sub_rate) xr.DataArray
+    }
+
+    %% =========================================================================
+    %% BOUNDED CONTEXT: GEOMETRY
+    %% =========================================================================
+    class GeometryProvider {
+        <<Abstract>>
+        +compute(tracks, observer, sat_blocks)* xr.Dataset
+        +calculate_position(time, norad_id)* tuple
+        +calculate_range(observer, sat_pos)* xr.DataArray
+    }
+
+    class SkyfieldGeometryProvider {
+        +compute(tracks, observer, sat_blocks) xr.Dataset
+        +calculate_position(time, norad_id) tuple
+        +calculate_range(observer, sat_pos) xr.DataArray
+    }
+
+    %% =========================================================================
+    %% BOUNDED CONTEXT: BEAM
+    %% =========================================================================
+    class Beam {
+        +xr.Dataset dataset
+        +evaluate(frequency, angle, polarization) xr.DataArray
+        +params() BeamParamsDomain
+        +plot() plt.Figure
+    }
+
+    class BeamParamsDomain {
+        +float frequency
+        +float hpbw
+        +float directivity
+        +float gain_max
+        +float sidelobe_level
+    }
+
+    class Polarization {
+        <<Enum>>
+        +HORIZONTAL
+        +VERTICAL
+        +CIRCULAR_LEFT
+        +CIRCULAR_RIGHT
+    }
+
+    class BeamOps {
+        +normalize(beam) Beam$
+        +slice(beam, freq, angle) xr.DataArray$
+        +interpolate(beam, new_freq) Beam$
+        +symmetrize(beam) Beam$
+    }
+
+    %% =========================================================================
+    %% BOUNDED CONTEXT: TOD
+    %% =========================================================================
+    class TOD {
+        +xr.Dataset dataset
+        +antenna_temperature() xr.DataArray
+        +power() xr.DataArray
+    }
+
+    class TODSimulator {
+        +Beam beam
+        +float gain
+        +simulate(sat, angle, mueller_matrix) xr.Dataset
+        +compute_antenna_temperature(psd, beam_pattern) xr.DataArray
+    }
+
+    %% =========================================================================
+    %% BOUNDED CONTEXT: SKYMAP
+    %% =========================================================================
+    class SkyMap {
+        +SkyMapDataset dataset
+        +NSide nside
+        +str unit
+        +str frame
+        +data() np.ndarray
+        +alm(lmax) np.ndarray
+        +apply_mask(mask) SkyMap
+        +copy() SkyMap
+    }
+
+    class NSide {
+        +int n
+        +npix() int$
+        +pixel_area() float$
+    }
+
+    class SkyMapDataset {
+        +np.ndarray data
+        +np.ndarray weights
+        +to_xarray() xr.DataArray
+    }
+
+    class SkyMapFactory {
+        +from_healpix(data, nside, unit) SkyMap
+        +from_pysm(model, nside, freq) SkyMap
+    }
+
+    %% =========================================================================
+    %% BOUNDED CONTEXT: RADIOSOURCES
+    %% =========================================================================
+    class RadioSource {
+        +str name
+        +float ra
+        +float dec
+        +float flux
+        +float frequency
+        +SpectralModel spectral_model
+        +position() SkyCoord
+    }
+
+    class SpectralModel {
+        +str model_type
+        +float alpha
+        +float reference_freq
+        +evaluate(freq) float
+    }
+
+    class RadioSourceFluxSample {
+        +str source_name
+        +float frequency
+        +float flux
+        +float uncertainty
+    }
+
+    %% =========================================================================
+    %% BOUNDED CONTEXT: LOCALSOLAR
+    %% =========================================================================
+    class SolarFlux {
+        +datetime date
+        +float f107
+        +float f107a
+        +float uncertainty
+    }
+
+    class LocalSourceTrack {
+        +str source_name
+        +xr.DataArray azimuth
+        +xr.DataArray elevation
+        +xr.DataArray range
+    }
+
+    class LocalSources {
+        +list~LocalSource~ sources
+        +compute_tracks(observer, time_range) list~LocalSourceTrack~
+    }
+
+    %% =========================================================================
+    %% BOUNDED CONTEXT: NOISE
+    %% =========================================================================
+    class Noise {
+        +float t_sys
+        +float efficiency
+        +float bandwidth
+        +float time_constant
+    }
+
+    class SystemTemperature {
+        +float value
+        +str unit
+        +to_kelvin() float
+    }
+
+    class Efficiency {
+        +float value
+        +aperture() float
+    }
+
+    class NoiseService {
+        +compose_noise(tod, tsys, bandwidth) xr.Dataset
+        +estimate_sensitivity(tsys, bandwidth, t_int) float
+    }
+
+    %% =========================================================================
+    %% BOUNDED CONTEXT: RFI
+    %% =========================================================================
+    class RFI {
+        +float frequency
+        +float amplitude
+        +float bandwidth
+        +str source_type
+    }
+
+    class RFIDetector {
+        +float threshold_sigma
+        +detect(tod, reference_spectrum) list~RFIEvent~
+    }
+
+    class RFIService {
+        +flag_rfi(tod, detector) xr.Dataset
+        +mitigate(tod, flagged) xr.Dataset
+        +report(events) dict
+    }
+
+    %% =========================================================================
+    %% BOUNDED CONTEXT: SIMULATION
+    %% =========================================================================
+    class Simulation {
+        +list~Satellite~ satellites
+        +TimeRange time_range
+        +GeometryProvider geometry
+        +SignalFactory signal_factory
+        +TODSimulator tod_simulator
+        +run() SimulationResult
+    }
+
+    class SimulationResult {
+        +xr.Dataset dataset
+        +list~Satellite~ satellites
+        +TimeRange time_range
+        +to_netcdf(path)
+        +summary() dict
+    }
+
+    %% =========================================================================
+    %% BOUNDED CONTEXT: RADIOTELESCOPE
+    %% =========================================================================
+    class Radiotelescope {
+        +str name
+        +Observer observer
+        +Antenna antenna
+        +SpectrometerBackend backend
+    }
+
+    class RadiotelescopeSpec {
+        +str name
+        +float lat
+        +float lon
+        +float height
+        +list~float~ frequency_range
+        +float bandwidth
+        +int num_channels
+        +float T_sys
+    }
+
+    class Antenna {
+        +str name
+        +list~float~ frequency_range
+        +str pointing_mode
+        +float alt_deg
+        +float az_deg
+    }
+
+    class SpectrometerBackend {
+        +str type
+        +list~float~ frequency_range
+        +float bandwidth
+        +float sampling_rate
+        +float integration_time
+        +int num_channels
+        +float T_sys
+    }
+
+    %% =========================================================================
+    %% APPLICATION PORTS (ABCs)
+    %% =========================================================================
+    class BeamLoaderPort {
+        <<ABC>>
+        +load(path)* Beam
+    }
+
+    class BeamEvaluatorPort {
+        <<ABC>>
+        +evaluate(beam, freq, angle)* xr.DataArray
+        +compute_properties(beam)* BeamParamsDomain
+    }
+
+    class BeamCreatorPort {
+        <<ABC>>
+        +create(params)* Beam
+    }
+
+    class GeometryProviderPort {
+        <<ABC>>
+        +compute(tracks, observer, sat_blocks)* xr.Dataset
+        +calculate_position(time, norad_id)* tuple
+        +calculate_range(observer, sat_pos)* xr.DataArray
+    }
+
+    class SatelliteRepositoryPort {
+        <<ABC>>
+        +query_sats(norad_ids)* list~Satellite~
+        +query_constellation(name)* list~Satellite~
+        +update_orbital_elements_sync(sats)* int
+        +update_satellites_from_celestrak()* int
+        +verify()* bool
+        +reset()* None
+    }
+
+    class SkyMapIOPort {
+        <<ABC>>
+        +read_map(path)* SkyMap
+        +write_map(skymap, path)* None
+    }
+
+    class SkyMapTransformPort {
+        <<ABC>>
+        +smooth(skymap, fwhm)* SkyMap
+        +rotate(skymap, rot)* SkyMap
+        +downgrade(skymap, nside_out)* SkyMap
+    }
+
+    class CatalogIngestPort {
+        <<ABC>>
+        +ingest_from_tap(query, url)* list~RadioSource~
+        +ingest_from_file(path)* list~RadioSource~
+    }
+
+    class RadioSourcesRepositoryPort {
+        <<ABC>>
+        +save_sources(sources)* int
+        +list_sources_in_region(ra, dec, radius)* list~RadioSource~
+    }
+
+    class SolarFluxDownloaderPort {
+        <<ABC>>
+        +fetch(start_date, end_date)* list~SolarFlux~
+    }
+
+    class SolarFluxRepositoryPort {
+        <<ABC>>
+        +load_interval(start, end)* list~SolarFlux~
+        +save(fluxes)* int
+    }
+
+    class LocalSourceTrackProviderPort {
+        <<ABC>>
+        +compute_track(source_name, observer, time_range)* LocalSourceTrack
+    }
+
+    class SignalRepositoryPort {
+        <<ABC>>
+        +get_signals_by_norad_ids(norad_ids)* dict~int, SatSignal~
+    }
+
+    %% =========================================================================
+    %% APPLICATION SERVICES
+    %% =========================================================================
+    class SimOrchestrator {
+        +from_settings(telescope) SimOrchestrator$
+        +run(constellations, time_range) SimulationResult
+    }
+
+    class SimulationService {
+        +run_by_constellations(sats, time_range) SimulationResult
+        +run_by_ids(norad_ids, time_range) SimulationResult
+        +run_by_constellations_from_settings(consts, tr) SimulationResult
+    }
+
+    class SatelliteService {
+        +get_all() list~Satellite~
+        +get_by_ids(ids) list~Satellite~
+        +get_by_constellations(consts) list~Satellite~
+        +update_orbital_elements() int
+        +update_from_celestrak() int
+    }
+
+    class LocalSourcesService {
+        +fetch_solar_flux(start, end) list~SolarFlux~
+        +compute_tracks(time_range) list~LocalSourceTrack~
+    }
+
+    %% =========================================================================
+    %% INFRASTRUCTURE — ADAPTERS
+    %% =========================================================================
+    class CSVBeamLoader {
+        +load(path) Beam
+    }
+
+    class LITBeamLoader {
+        +load(path) Beam
+    }
+
+    class CustomBeamLoader {
+        +load(path) Beam
+    }
+
+    class HealpySkyMapProvider {
+        +read_map(path) SkyMap
+        +write_map(skymap, path)
+        +smooth(skymap, fwhm) SkyMap
+        +rotate(skymap, rot) SkyMap
+        +downgrade(skymap, nside_out) SkyMap
+    }
+
+    class CelestrakClient {
+        +fetch_tles(constellation) str
+        +parse_tle(data) list~OrbitalElement~
+    }
+
+    class SatelliteRepository {
+        +query_sats(norad_ids) list~Satellite~
+        +query_constellation(name) list~Satellite~
+        +update_orbital_elements_sync(sats) int
+        +update_satellites_from_celestrak() int
+        +verify() bool
+        +reset()
+    }
+
+    class SignalRepository {
+        +get_signals_by_norad_ids(norad_ids) dict~int, SatSignal~
+    }
+
+    class SolarFluxDownloader {
+        +fetch(start_date, end_date) list~SolarFlux~
+    }
+
+    class SolarFluxRepository {
+        +load_interval(start, end) list~SolarFlux~
+        +save(fluxes) int
+    }
+
+    class SkyfieldLocalSourceTrackProvider {
+        +compute_track(source_name, observer, time_range) LocalSourceTrack
+    }
+
+    class Database {
+        +SQLModel engine
+        +Session session
+        +create_tables()
+        +drop_tables()
+    }
+
+    %% =========================================================================
+    %% RELACIONAMENTOS — DOMAIN
+    %% =========================================================================
+    SatelliteFactory --> Satellite : creates
+    Satellite --> OrbitalElement : has
+    SatelliteAssembler --> Satellite : assembles
+    SatelliteAssembler --> Tracks : uses
+    SatelliteAssembler --> SatSignal : uses
+    TrackFactory --> Tracks : creates
+    SignalFactory --> SatSignal : creates
+    SkyfieldGeometryProvider ..|> GeometryProvider : implements
+    SkyfieldGeometryProvider --> Tracks : uses
+
+    Beam --> BeamParamsDomain : has
+    BeamOps --> Beam : operates on
+    TODSimulator --> Beam : uses
+    Simulation --> TODSimulator : uses
+    Simulation --> SatelliteAssembled : contains
+    Simulation --> GeometryProvider : uses
+    Simulation --> SignalFactory : uses
+    Simulation --> SimulationResult : produces
+
+    SkyMap *--> SkyMapDataset : contains
+    SkyMap *--> NSide : contains
+    SkyMapFactory --> SkyMap : creates
+
+    RadioSource --> SpectralModel : has
+    RadioSourceFluxSample --> RadioSource : belongs to
+
+    NoiseService --> Noise : uses
+    NoiseService --> TOD : processes
+    RFIDetector --> RFI : detects
+    RFIService --> RFIDetector : uses
+    RFIService --> RFI : mitigates
+
+    Radiotelescope *--> Antenna : contains
+    Radiotelescope *--> SpectrometerBackend : contains
+    Radiotelescope --> Observer : has
+
+    %% =========================================================================
+    %% RELACIONAMENTOS — APPLICATION PORTS → ADAPTERS
+    %% =========================================================================
+    CSVBeamLoader ..|> BeamLoaderPort : implements
+    LITBeamLoader ..|> BeamLoaderPort : implements
+    CustomBeamLoader ..|> BeamLoaderPort : implements
+    HealpySkyMapProvider ..|> SkyMapIOPort : implements
+    HealpySkyMapProvider ..|> SkyMapTransformPort : implements
+    SatelliteRepository ..|> SatelliteRepositoryPort : implements
+    SignalRepository ..|> SignalRepositoryPort : implements
+    SolarFluxDownloader ..|> SolarFluxDownloaderPort : implements
+    SolarFluxRepository ..|> SolarFluxRepositoryPort : implements
+    SkyfieldLocalSourceTrackProvider ..|> LocalSourceTrackProviderPort : implements
+
+    %% =========================================================================
+    %% RELACIONAMENTOS — APPLICATION SERVICES
+    %% =========================================================================
+    SimOrchestrator --> SimulationService : delegates
+    SimOrchestrator --> SatelliteService : delegates
+    SimOrchestrator --> LocalSourcesService : delegates
+    SimulationService --> SatelliteRepositoryPort : uses
+    SimulationService --> GeometryProviderPort : uses
+    SimulationService --> SignalFactory : uses
+    SimulationService --> Simulation : creates
+    SatelliteService --> SatelliteRepositoryPort : uses
+    LocalSourcesService --> SolarFluxDownloaderPort : uses
+    LocalSourcesService --> SolarFluxRepositoryPort : uses
+    LocalSourcesService --> LocalSourceTrackProviderPort : uses
+
+    %% =========================================================================
+    %% RELACIONAMENTOS — BOOTSTRAP
+    %% =========================================================================
+    SimOrchestrator --> ConfigLoader : from_settings
+
+    class ConfigLoader {
+        +load_config(path) Settings$
+        +build_radiotelescope_from_settings(cfg) Radiotelescope$
+    }

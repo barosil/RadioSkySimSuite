@@ -1,0 +1,163 @@
+---
+config:
+    mirrorActors: true
+    useMaxWidth: true
+---
+
+sequenceDiagram
+    participant User as User/<br/>CLI
+    participant SimSvc as SimulationService<br/>(App)
+    participant SatSvc as SatelliteService<br/>(App)
+    participant SkyFieldGeo as SkyFieldGeometry<br/>(Infra)
+    participant SignalFactory as SignalFactory<br/>(Domain)
+    participant BeamFactory as BeamFactory<br/>(Domain)
+    participant TODSim as TODSimulator<br/>(Domain)
+    participant Beam as Beam<br/>(Domain)
+    participant HealpyProv as HealpySkyMap<br/>Provider<br/>(Infra)
+    
+    rect rgb(200, 220, 255)
+    Note over User,HealpyProv: 1️⃣ FASE DE SETUP - Usuário solicita simulação
+    end
+    
+    User->>SimSvc: run_by_constellations(["GPS"], time_range)
+    activate SimSvc
+    
+    Note over SimSvc: 📋 Resolve dependências
+    
+    rect rgb(220, 255, 220)
+    Note over SimSvc,SatSvc: 2️⃣ PHASE - Buscar Satélites
+    end
+    
+    SimSvc->>SatSvc: get_by_constellations(["GPS"])
+    activate SatSvc
+    
+    SatSvc->>SatSvc: Query database<br/>WHERE constellation='GPS'
+    
+    SatSvc-->>SimSvc: [Satellite{id:1,norad:20959,...},<br/>Satellite{id:2,norad:24793,...}, ...]
+    deactivate SatSvc
+    
+    rect rgb(255, 255, 220)
+    Note over SimSvc: 3️⃣ PHASE - Instanciar Simulation
+    end
+    
+    SimSvc->>SimSvc: simulation = Simulation(<br/>satellites=[...],<br/>time_range=TimeRange(t0,t1),<br/>geometry=SkyFieldGeometry,<br/>signal_factory=SignalFactory,<br/>tod_simulator=TODSimulator)
+    
+    rect rgb(255, 240, 220)
+    Note over SimSvc,TODSim: 4️⃣ MAIN PHASE - Executar Simulação
+    end
+    
+    SimSvc->>SimSvc: result = simulation.run()
+    activate SimSvc
+    
+    loop Para cada Satélite
+        
+        rect rgb(240, 220, 255)
+        Note over SimSvc,SkyFieldGeo: 4.1 - Calcular Geometria Orbital
+        end
+        
+        SimSvc->>SkyFieldGeo: calculate_geometry(sat, time_range)
+        activate SkyFieldGeo
+        
+        SkyFieldGeo->>SkyFieldGeo: Load Skyfield ephemeris<br/>earth = load('de421.bsp')
+        
+        SkyFieldGeo->>SkyFieldGeo: Compute positions<br/>for each timestamp in time_range
+        
+        SkyFieldGeo->>SkyFieldGeo: Extract (θ, φ, r)<br/>from topocentric coordinates
+        
+        SkyFieldGeo-->>SimSvc: tracks: xr.Dataset<br/>{<br/>  'time': [t0, t1, ...],<br/>  'theta': [...],<br/>  'phi': [...],<br/>  'range': [...],<br/>  'elevation': [...],<br/>  'azimuth': [...] <br/>}
+        deactivate SkyFieldGeo
+        
+        rect rgb(220, 255, 255)
+        Note over SimSvc,SignalFactory: 4.2 - Gerar Sinais
+        end
+        
+        SimSvc->>SignalFactory: create_signal(sat)
+        activate SignalFactory
+        
+        SignalFactory->>SignalFactory: Get transmission specs<br/>from satellite metadata
+        
+        SignalFactory-->>SimSvc: signal: Signal<br/>{<br/>  'psd': PSD_func,<br/>  'frequencies': [...],<br/>  'bandwidth': bw <br/>}
+        deactivate SignalFactory
+        
+        rect rgb(255, 220, 240)
+        Note over SimSvc,BeamFactory: 4.3 - Criar Feixe Normalizado
+        end
+        
+        SimSvc->>BeamFactory: create_beam()
+        activate BeamFactory
+        
+        BeamFactory->>Beam: __init__(dataset=beam_xr)
+        activate Beam
+        
+        Beam->>Beam: Normalize beam<br/>∫ B(θ,φ,ν) dΩ = 1
+        
+        Beam-->>BeamFactory: beam_normalized: Beam
+        deactivate Beam
+        deactivate BeamFactory
+        
+        rect rgb(200, 255, 200)
+        Note over SimSvc,TODSim: 4.4 - CORE PHYSICS: Simular TOD
+        end
+        
+        SimSvc->>TODSim: simulate(sat, sky=None, noise=None)
+        activate TODSim
+        
+        Note over TODSim: 📐 Equação Radiométrica<br/>T_ant(t,ν) = G·B(θ(t),ν)·PSD(ν)·c²/[4πr(t)²ν²k_B]
+        
+        loop Para cada Frequência
+            
+            TODSim->>TODSim: freq ← signal.frequencies[i]
+            
+            TODSim->>Beam: evaluate(frequency=freq, angle=θ(t))
+            activate Beam
+            
+            Beam->>Beam: Interpolate B(θ,φ,ν)<br/>in (θ, φ, freq) domain
+            
+            Beam-->>TODSim: beam_pattern: ndarray[time]
+            deactivate Beam
+            
+            TODSim->>TODSim: Compute radiometric equation<br/>T_ant[t] = G · beam[t]<br/>             · PSD[freq]<br/>             · c² / (4π r[t]² freq² k_B)
+            
+            TODSim->>TODSim: tod_freq[t] = T_ant[t]<br/>units: [Kelvin]
+            
+        end
+        
+        TODSim-->>SimSvc: tod_dataset: xr.Dataset<br/>{<br/>  'time': [t0, t1, ...],<br/>  'frequency': [ν0, ν1, ...],<br/>  'data': ndarray[Nt × Nf],<br/>  'units': 'K' <br/>}
+        deactivate TODSim
+        
+        rect rgb(255, 240, 200)
+        Note over SimSvc: 4.5 - Agregar Resultados
+        end
+        
+        SimSvc->>SimSvc: Append to accumulator<br/>result.datasets.append(tod_dataset)
+        
+    end
+    
+    SimSvc-->>SimSvc: Consolidate all TODs<br/>into final xr.Dataset
+    
+    rect rgb(240, 200, 255)
+    Note over SimSvc: 5️⃣ FINAL PHASE - Retornar Resultado
+    end
+    
+    deactivate SimSvc
+    
+    SimSvc-->>SimSvc: result = SimulationResult(<br/>dataset=consolidated_xr,<br/>satellites=satellites,<br/>time_range=time_range)
+    
+    SimSvc-->>User: ✅ SimulationResult{<br/>  dataset: xr.Dataset,<br/>  satellites: [Satellite, ...],<br/>  time_range: TimeRange<br/>}
+    deactivate SimSvc
+    
+    rect rgb(200, 255, 200)
+    Note over User: 6️⃣ USER ACTION - Análise de Resultados
+    end
+    
+    User->>User: Visualize TOD<br/>Compute statistics<br/>Save to disk<br/>Plot maps
+
+    rect rgb(150, 200, 150)
+    Note over User,HealpyProv: 7️⃣ OPTIONAL - Persistência
+    end
+    
+    User->>HealpyProv: Persist TOD<br/>to HDF5 / NetCDF
+    activate HealpyProv
+    HealpyProv->>HealpyProv: Save xr.Dataset<br/>with metadata
+    HealpyProv-->>User: ✅ Saved to disk
+    deactivate HealpyProv

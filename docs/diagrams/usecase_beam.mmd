@@ -1,0 +1,23 @@
+---
+title: Casos de uso — Beam (padrão de feixe)
+---
+%% Use Case - Beam
+flowchart LR
+    A[("Cientista /\nInstrumentista")]
+    B[("Sistema")]
+    FILE[("Arquivos de padrão\n(CSV, LIT, xlsx)")]
+
+    A --> UC1["Carregar padrão de feixe\n(CSVBeamLoader / Analytical)"]
+    A --> UC2["Criar beam a partir de spec\n(BeamFactory)"]
+    A --> UC3["Avaliar beam em\nfrequência/ângulo/polarização"]
+    A --> UC4["Calcular propriedades\n(FWHM, directividade)"]
+    A --> UC5["Simular beam sintético\n(analítico)"]
+    A --> UC6["Visualizar padrão\n(beam panel)"]
+
+    B --> UC1
+    B --> UC5
+    UC1 --> FILE
+    UC2 --> UC1
+    UC3 --> UC2
+    UC4 --> UC3
+    UC6 --> UC4

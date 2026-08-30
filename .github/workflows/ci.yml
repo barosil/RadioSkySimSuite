@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    name: Lint + testes (uv workspace)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (com submódulos)
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup uv + Python
+        uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.11"
+          enable-cache: true
+
+      - name: Sync workspace (test + dev extras)
+        run: uv sync --extra test --extra dev
+
+      - name: Lint (ruff check)
+        run: uv run ruff check src/ tests/ scripts/ packages/*/src
+
+      - name: Testes do meta-pacote
+        run: uv run pytest tests/ -q
+
+      - name: Testes do pacote core
+        run: uv run --package radioskysims-core pytest packages/radioskysims-core/tests -q

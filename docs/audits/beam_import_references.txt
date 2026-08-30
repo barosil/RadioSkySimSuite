@@ -1,0 +1,227 @@
+src/radioskysims/application/services/simulation_service.py:15:from radioskysims.domain.beam import Beam, BeamOps
+src/radioskysims/application/ports/__init__.py:3:from .beam import BeamCreatorPort, BeamEvaluatorPort, BeamLoaderPort
+src/radioskysims/application/ports/beam.py:17:from radioskysims.domain.beam.models import Beam
+src/radioskysims/application/beam_panel.py:11:from radioskysims.beam.models import Beam
+src/radioskysims/bootstrap/builders.py:31:from radioskysims.infrastructure.beams.loaders.csv import CSVBeamLoader
+src/radioskysims/domain/beam/services.py:6:from radioskysims.domain.beam.models import Beam
+src/radioskysims/domain/beam/services.py:7:from radioskysims.domain.beam.properties import BeamProperties
+src/radioskysims/domain/beam/services.py:10:logger = get_logger("radioskysims.beam")
+src/radioskysims/domain/beam/models.py:132:        from radioskysims.domain.beam.properties import BeamProperties
+src/radioskysims/domain/tod/simulator.py:10:from radioskysims.domain.beam.operations import BeamOps
+src/radioskysims/interfaces/gui/beam_visualizer.py:4:from domain.beam import Beam
+src/radioskysims/beam/__init__.py:2:Pacote auxiliar `radioskysims.beam` usado por código legado que espera
+src/radioskysims/beam/factory.py:7:from radioskysims.domain.beam.models import Beam
+src/radioskysims/beam/models.py:2:Módulo compatível com o namespace legado `radioskysims.beam`.
+src/radioskysims/infrastructure/db/beam_db_model.py:20:from radioskysims.domain.beam.models import BeamParamsDomain
+src/radioskysims/infrastructure/db/beam_models.py:14:from radioskysims.domain.beam.models import BeamParamsDomain
+src/radioskysims/infrastructure/db/beam_repository.py:15:from radioskysims.domain.beam.models import BeamParamsDomain
+src/radioskysims/infrastructure/db/beam_repository.py:17:from radioskysims.infrastructure.db.beam_db_model import BeamParamsDB
+src/radioskysims/infrastructure/db/models.py:10:from .beam_db_model import BeamParamsDB
+src/radioskysims/infrastructure/ports/beam.py:1:from radioskysims.application.ports.beam import *  # noqa: F403
+src/radioskysims/infrastructure/beams/loaders/custom.py:10:from radioskysims.domain.beam import Beam
+src/radioskysims/infrastructure/beams/loaders/custom.py:12:from ._utils import finalize_beam_dataset
+src/radioskysims/infrastructure/beams/loaders/lit.py:8:from radioskysims.domain.beam import Beam
+src/radioskysims/infrastructure/beams/loaders/lit.py:10:from ._utils import finalize_beam_dataset
+src/radioskysims/infrastructure/beams/loaders/csv.py:16:from radioskysims.domain.beam import Beam
+src/radioskysims/infrastructure/beams/loaders/csv.py:18:from ._utils import finalize_beam_dataset
+src/radioskysims/infrastructure/beams/loaders/base.py:13:from radioskysims.domain.beam import Beam
+src/radioskysims/infrastructure/beams/loaders/base.py:14:from radioskysims.infrastructure.ports.beam import BeamLoaderPort
+src/radioskysims/infrastructure/logging_config.py:202:        name: Nome do módulo/componente (ex: "radioskysims.beam").
+src/radioskysims/infrastructure/logging_config.py:208:        logger = get_logger("radioskysims.beam")
+src/radioskysims/infrastructure/files/lit_loader.py:13:from radioskysims.domain.beam.models import Beam
+src/radioskysims/infrastructure/files/beam_loader.py:10:from radioskysims.domain.beam.models import Beam
+src/radioskysims/infrastructure/files/custom_loader.py:10:from radioskysims.domain.beam.models import Beam
+src/radioskysims/infrastructure/files/csv_loader.py:4:from radioskysims.domain.beam.models import Beam
+tests/domain/beam/test_beam_properties.py:4:from radioskysims.domain.beam.services import BeamProperties
+tests/domain/beam/test_beam_operations.py:5:from radioskysims.domain.beam.services import BeamOperation
+tests/domain/beam/test_beam_operations.py:6:from radioskysims.domain.beam.models import Beam
+tests/test_beam_pipeline.py:8:from radioskysims.domain.beam.models import Beam
+tests/test_beam_pipeline.py:9:from radioskysims.infrastructure.db.beam_db_model import BeamParamsDB as BeamParams
+tests/test_beam_pipeline.py:10:from radioskysims.infrastructure.db.beam_repository import BeamRepository
+tests/beam_panel_test.py:6:from radioskysims.beam.models import Beam
+tests/infrastructure/test_custom_loader.py:8:from radioskysims.domain.beam.models import Beam
+tests/infrastructure/ports/test_port_contracts.py:23:from radioskysims.domain.beam.models import Beam
+tests/infrastructure/ports/test_port_contracts.py:24:from radioskysims.infrastructure.ports.beam import (
+tests/infrastructure/ports/test_ports_contract.py:32:from radioskysims.infrastructure.ports.beam import (
+tests/infrastructure/ports/test_ports_contract.py:268:        mod = importlib.import_module("radioskysims.infrastructure.beams.loaders")
+tests/infrastructure/ports/test_ports_contract.py:282:        from radioskysims.domain.beam.services import BeamProperties
+tests/infrastructure/ports/test_ports_contract.py:290:        from radioskysims.domain.beam.services import BeamProperties
+tests/infrastructure/ports/test_ports_contract.py:309:        from radioskysims.beam.factory import BeamFactory
+tests/infrastructure/ports/test_ports_contract.py:319:        from radioskysims.beam.factory import BeamFactory
+tests/infrastructure/test_beam_repository.py:7:from radioskysims.domain.beam.models import BeamParamsDomain
+tests/infrastructure/test_beam_repository.py:9:from radioskysims.infrastructure.db.beam_db_model import BeamParamsDB
+tests/infrastructure/test_beam_repository.py:10:from radioskysims.infrastructure.db.beam_repository import BeamRepository
+tests/infrastructure/test_csv_loader.py:6:from radioskysims.domain.beam.models import Beam
+tests/test_logging_integration.py:26:Beam = pytest.importorskip("radioskysims.domain.beam.models").Beam
+tests/test_logging_integration.py:27:BeamOperation = pytest.importorskip("radioskysims.domain.beam.services").BeamOperation
+tests/test_logging_integration.py:130:            logger_beam = get_logger("radioskysims.beam")
+tests/performance/test_beam_interpolation_speed.py:10:from radioskysims.domain.beam.models import Beam
+tests/performance/test_beam_interpolation_speed.py:11:from radioskysims.domain.beam.services import BeamOperation
+docs/reports/26_PROJECT_TECHNICAL_ASSESSMENT.md:24:4. **Módulo legado `src/radioskysims/beam/` corrigido** — `factory.py` importava `radioskysims.beam.models` inexistente; criados `models.py` e `__init__.py` com `Beam` legado e aviso de depreciação para facilitar migração gradual.
+docs/reports/25_stabilization_final_report.md:70:- Module: radioskysims.beam.factor — file: src/radioskysims/beam/factory.py — kind: import_error
+docs/reports/25_stabilization_final_report.md:80:ModuleNotFoundError: No module named 'radioskysims.beam.factor'
+docs/reports/25_stabilization_final_report.md:552:    from domain.beam import Beam
+docs/reports/24_stabilization_diagnosis.md:9:- há módulos e caminhos que não existem como importáveis em um ambiente Python padrão (`radioskysims.beam`, `application.services.*`, `domain.satellite.main`, `infrastructure.satellite_repository`);
+docs/reports/24_stabilization_diagnosis.md:37:4. `src/radioskysims/interfaces/gui/beam_visualizer.py` usa `from domain.beam import Beam`, uma importação absoluta inválida em contexto de pacote padrão.
+docs/reports/24_stabilization_diagnosis.md:41:5. `src/radioskysims/application/beam_panel.py` usa `from radioskysims.beam.models import Beam`, mas não existe um pacote `src/radioskysims/beam/__init__.py`.
+docs/reports/24_stabilization_diagnosis.md:109:6. `domain.beam` e `radioskysims.beam` são usados como caminhos de importação inconsistentes; o pacote `src/radioskysims/beam` não possui `__init__.py`, portanto não é um pacote válido.
+docs/reports/24_stabilization_diagnosis.md:120:- `radioskysims.domain.beam.models <-> radioskysims.domain.beam.services`
+docs/reports/24_stabilization_diagnosis.md:136:- `radioskysims.domain.beam.operations`
+docs/reports/24_stabilization_diagnosis.md:137:- `radioskysims.domain.beam.properties`
+docs/reports/24_stabilization_diagnosis.md:182:| Crítica | imports inválidos em `main.py`, `domain/satellite/main.py`, `application/beam_panel.py`; ausência de pacote `radioskysims.beam`; import inexistente `async_engine`; falha de inicialização de pacote padrão |
+docs/reports/20_import_fixes.md:33:   - Kept `Beam` import from the compatible `radioskysims.beam` namespace.
+docs/reports/20_import_fixes.md:36:   - Changed broken `from domain.beam import Beam` to `from radioskysims.domain.beam import Beam`.
+docs/reports/20_import_fixes.md:64:    - Created a lightweight `radioskysims.beam` package and compatible `Beam` model for legacy import paths.
+docs/reports/21_package_initialization.md:52:   - Adicionei um pequeno `radioskysims.beam` compatível (shim) para suportar imports legados `from radioskysims.beam import Beam` usados em vários lugares do código (sem alterar lógica de domínio). Isso removeu um erro de import recorrente.
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.models.rst:1::py:mod:`radioskysims.domain.beam.models`
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.models.rst:4:.. py:module:: radioskysims.domain.beam.models
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.models.rst:6:.. autodoc2-docstring:: radioskysims.domain.beam.models
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.models.rst:19:   * - :py:obj:`Beam <radioskysims.domain.beam.models.Beam>`
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.models.rst:20:     - .. autodoc2-docstring:: radioskysims.domain.beam.models.Beam
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.models.rst:27:   :canonical: radioskysims.domain.beam.models.Beam
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.models.rst:29:   .. autodoc2-docstring:: radioskysims.domain.beam.models.Beam
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.models.rst:33:   .. autodoc2-docstring:: radioskysims.domain.beam.models.Beam.__init__
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.models.rst:36:      :canonical: radioskysims.domain.beam.models.Beam.evaluate
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.models.rst:38:      .. autodoc2-docstring:: radioskysims.domain.beam.models.Beam.evaluate
+docs/source/apidocs/radioskysims/radioskysims.domain.rst:20:   radioskysims.domain.beam
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.rst:1::py:mod:`radioskysims.domain.beam`
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.rst:4:.. py:module:: radioskysims.domain.beam
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.rst:6:.. autodoc2-docstring:: radioskysims.domain.beam
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.rst:16:   radioskysims.domain.beam.properties
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.rst:17:   radioskysims.domain.beam.models
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.rst:18:   radioskysims.domain.beam.operations
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.rst:30:   * - :py:obj:`__all__ <radioskysims.domain.beam.__all__>`
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.rst:31:     - .. autodoc2-docstring:: radioskysims.domain.beam.__all__
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.rst:38:   :canonical: radioskysims.domain.beam.__all__
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.rst:41:   .. autodoc2-docstring:: radioskysims.domain.beam.__all__
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.operations.rst:1::py:mod:`radioskysims.domain.beam.operations`
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.operations.rst:4:.. py:module:: radioskysims.domain.beam.operations
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.operations.rst:6:.. autodoc2-docstring:: radioskysims.domain.beam.operations
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.operations.rst:19:   * - :py:obj:`BeamOps <radioskysims.domain.beam.operations.BeamOps>`
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.operations.rst:20:     - .. autodoc2-docstring:: radioskysims.domain.beam.operations.BeamOps
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.operations.rst:27:   :canonical: radioskysims.domain.beam.operations.BeamOps
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.operations.rst:29:   .. autodoc2-docstring:: radioskysims.domain.beam.operations.BeamOps
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.operations.rst:31:   .. py:method:: normalize(beam: radioskysims.domain.beam.models.Beam) -> radioskysims.domain.beam.models.Beam
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.operations.rst:32:      :canonical: radioskysims.domain.beam.operations.BeamOps.normalize
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.operations.rst:35:      .. autodoc2-docstring:: radioskysims.domain.beam.operations.BeamOps.normalize
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.operations.rst:37:   .. py:method:: slice_angle(beam: radioskysims.domain.beam.models.Beam, amin: float, amax: float) -> radioskysims.domain.beam.models.Beam
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.operations.rst:38:      :canonical: radioskysims.domain.beam.operations.BeamOps.slice_angle
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.operations.rst:41:      .. autodoc2-docstring:: radioskysims.domain.beam.operations.BeamOps.slice_angle
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.operations.rst:43:   .. py:method:: interpolate_angle(beam: radioskysims.domain.beam.models.Beam, new_angles: numpy.typing.NDArray[numpy.floating]) -> radioskysims.domain.beam.models.Beam
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.operations.rst:44:      :canonical: radioskysims.domain.beam.operations.BeamOps.interpolate_angle
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.operations.rst:47:      .. autodoc2-docstring:: radioskysims.domain.beam.operations.BeamOps.interpolate_angle
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.operations.rst:49:   .. py:method:: symmetrize(beam: radioskysims.domain.beam.models.Beam) -> radioskysims.domain.beam.models.Beam
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.operations.rst:50:      :canonical: radioskysims.domain.beam.operations.BeamOps.symmetrize
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.operations.rst:53:      .. autodoc2-docstring:: radioskysims.domain.beam.operations.BeamOps.symmetrize
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.properties.rst:1::py:mod:`radioskysims.domain.beam.properties`
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.properties.rst:4:.. py:module:: radioskysims.domain.beam.properties
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.properties.rst:6:.. autodoc2-docstring:: radioskysims.domain.beam.properties
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.properties.rst:19:   * - :py:obj:`BeamProperties <radioskysims.domain.beam.properties.BeamProperties>`
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.properties.rst:20:     - .. autodoc2-docstring:: radioskysims.domain.beam.properties.BeamProperties
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.properties.rst:27:   :canonical: radioskysims.domain.beam.properties.BeamProperties
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.properties.rst:29:   .. autodoc2-docstring:: radioskysims.domain.beam.properties.BeamProperties
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.properties.rst:31:   .. py:method:: compute(beam: radioskysims.domain.beam.models.Beam) -> radioskysims.domain.beam.models.Beam
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.properties.rst:32:      :canonical: radioskysims.domain.beam.properties.BeamProperties.compute
+docs/source/apidocs/radioskysims/radioskysims.domain.beam.properties.rst:35:      .. autodoc2-docstring:: radioskysims.domain.beam.properties.BeamProperties.compute
+docs/audits/beam_import_references.txt:1:src/radioskysims/application/services/simulation_service.py:15:from radioskysims.domain.beam import Beam, BeamOps
+docs/audits/beam_import_references.txt:2:src/radioskysims/application/ports/__init__.py:3:from .beam import BeamCreatorPort, BeamEvaluatorPort, BeamLoaderPort
+docs/audits/beam_import_references.txt:3:src/radioskysims/application/ports/beam.py:17:from radioskysims.domain.beam.models import Beam
+docs/audits/beam_import_references.txt:4:src/radioskysims/application/beam_panel.py:11:from radioskysims.beam.models import Beam
+docs/audits/beam_import_references.txt:5:src/radioskysims/bootstrap/builders.py:31:from radioskysims.infrastructure.beams.loaders.csv import CSVBeamLoader
+docs/audits/beam_import_references.txt:6:src/radioskysims/domain/beam/services.py:6:from radioskysims.domain.beam.models import Beam
+docs/audits/beam_import_references.txt:7:src/radioskysims/domain/beam/services.py:7:from radioskysims.domain.beam.properties import BeamProperties
+docs/audits/beam_import_references.txt:8:src/radioskysims/domain/beam/services.py:10:logger = get_logger("radioskysims.beam")
+docs/audits/beam_import_references.txt:9:src/radioskysims/domain/beam/models.py:132:        from radioskysims.domain.beam.properties import BeamProperties
+docs/audits/beam_import_references.txt:10:src/radioskysims/domain/tod/simulator.py:10:from radioskysims.domain.beam.operations import BeamOps
+docs/audits/beam_import_references.txt:11:src/radioskysims/interfaces/gui/beam_visualizer.py:4:from domain.beam import Beam
+docs/audits/beam_import_references.txt:12:src/radioskysims/beam/__init__.py:2:Pacote auxiliar `radioskysims.beam` usado por código legado que espera
+docs/audits/beam_import_references.txt:13:src/radioskysims/beam/factory.py:7:from radioskysims.domain.beam.models import Beam
+docs/audits/beam_import_references.txt:14:src/radioskysims/beam/models.py:2:Módulo compatível com o namespace legado `radioskysims.beam`.
+docs/audits/beam_import_references.txt:15:src/radioskysims/infrastructure/db/beam_db_model.py:20:from radioskysims.domain.beam.models import BeamParamsDomain
+docs/audits/beam_import_references.txt:16:src/radioskysims/infrastructure/db/beam_models.py:14:from radioskysims.domain.beam.models import BeamParamsDomain
+docs/audits/beam_import_references.txt:17:src/radioskysims/infrastructure/db/beam_repository.py:15:from radioskysims.domain.beam.models import BeamParamsDomain
+docs/audits/beam_import_references.txt:18:src/radioskysims/infrastructure/db/beam_repository.py:17:from radioskysims.infrastructure.db.beam_db_model import BeamParamsDB
+docs/audits/beam_import_references.txt:19:src/radioskysims/infrastructure/db/models.py:10:from .beam_db_model import BeamParamsDB
+docs/audits/beam_import_references.txt:20:src/radioskysims/infrastructure/ports/beam.py:1:from radioskysims.application.ports.beam import *  # noqa: F403
+docs/audits/beam_import_references.txt:21:src/radioskysims/infrastructure/beams/loaders/custom.py:10:from radioskysims.domain.beam import Beam
+docs/audits/beam_import_references.txt:22:src/radioskysims/infrastructure/beams/loaders/custom.py:12:from ._utils import finalize_beam_dataset
+docs/audits/beam_import_references.txt:23:src/radioskysims/infrastructure/beams/loaders/lit.py:8:from radioskysims.domain.beam import Beam
+docs/audits/beam_import_references.txt:24:src/radioskysims/infrastructure/beams/loaders/lit.py:10:from ._utils import finalize_beam_dataset
+docs/audits/beam_import_references.txt:25:src/radioskysims/infrastructure/beams/loaders/csv.py:16:from radioskysims.domain.beam import Beam
+docs/audits/beam_import_references.txt:26:src/radioskysims/infrastructure/beams/loaders/csv.py:18:from ._utils import finalize_beam_dataset
+docs/audits/beam_import_references.txt:27:src/radioskysims/infrastructure/beams/loaders/base.py:13:from radioskysims.domain.beam import Beam
+docs/audits/beam_import_references.txt:28:src/radioskysims/infrastructure/beams/loaders/base.py:14:from radioskysims.infrastructure.ports.beam import BeamLoaderPort
+docs/audits/beam_import_references.txt:29:src/radioskysims/infrastructure/logging_config.py:202:        name: Nome do módulo/componente (ex: "radioskysims.beam").
+docs/audits/beam_import_references.txt:30:src/radioskysims/infrastructure/logging_config.py:208:        logger = get_logger("radioskysims.beam")
+docs/audits/beam_import_references.txt:31:src/radioskysims/infrastructure/files/lit_loader.py:13:from radioskysims.domain.beam.models import Beam
+docs/audits/beam_import_references.txt:32:src/radioskysims/infrastructure/files/beam_loader.py:10:from radioskysims.domain.beam.models import Beam
+docs/audits/beam_import_references.txt:33:src/radioskysims/infrastructure/files/custom_loader.py:10:from radioskysims.domain.beam.models import Beam
+docs/audits/beam_import_references.txt:34:src/radioskysims/infrastructure/files/csv_loader.py:4:from radioskysims.domain.beam.models import Beam
+docs/audits/beam_import_references.txt:35:tests/domain/beam/test_beam_properties.py:4:from radioskysims.domain.beam.services import BeamProperties
+docs/audits/beam_import_references.txt:36:tests/domain/beam/test_beam_operations.py:5:from radioskysims.domain.beam.services import BeamOperation
+docs/audits/beam_import_references.txt:37:tests/domain/beam/test_beam_operations.py:6:from radioskysims.domain.beam.models import Beam
+docs/audits/beam_import_references.txt:38:tests/test_beam_pipeline.py:8:from radioskysims.domain.beam.models import Beam
+docs/audits/beam_import_references.txt:39:tests/test_beam_pipeline.py:9:from radioskysims.infrastructure.db.beam_db_model import BeamParamsDB as BeamParams
+docs/audits/beam_import_references.txt:40:tests/test_beam_pipeline.py:10:from radioskysims.infrastructure.db.beam_repository import BeamRepository
+docs/audits/beam_import_references.txt:41:tests/beam_panel_test.py:6:from radioskysims.beam.models import Beam
+docs/audits/beam_import_references.txt:42:tests/infrastructure/test_custom_loader.py:8:from radioskysims.domain.beam.models import Beam
+docs/audits/beam_import_references.txt:43:tests/infrastructure/ports/test_port_contracts.py:23:from radioskysims.domain.beam.models import Beam
+docs/audits/beam_import_references.txt:44:tests/infrastructure/ports/test_port_contracts.py:24:from radioskysims.infrastructure.ports.beam import (
+docs/audits/beam_import_references.txt:45:tests/infrastructure/ports/test_ports_contract.py:32:from radioskysims.infrastructure.ports.beam import (
+docs/audits/beam_import_references.txt:46:tests/infrastructure/ports/test_ports_contract.py:268:        mod = importlib.import_module("radioskysims.infrastructure.beams.loaders")
+docs/audits/beam_import_references.txt:47:tests/infrastructure/ports/test_ports_contract.py:282:        from radioskysims.domain.beam.services import BeamProperties
+docs/audits/beam_import_references.txt:48:tests/infrastructure/ports/test_ports_contract.py:290:        from radioskysims.domain.beam.services import BeamProperties
+docs/audits/beam_import_references.txt:49:tests/infrastructure/ports/test_ports_contract.py:309:        from radioskysims.beam.factory import BeamFactory
+docs/audits/beam_import_references.txt:50:tests/infrastructure/ports/test_ports_contract.py:319:        from radioskysims.beam.factory import BeamFactory
+docs/audits/beam_import_references.txt:51:tests/infrastructure/test_beam_repository.py:7:from radioskysims.domain.beam.models import BeamParamsDomain
+docs/audits/beam_import_references.txt:52:tests/infrastructure/test_beam_repository.py:9:from radioskysims.infrastructure.db.beam_db_model import BeamParamsDB
+docs/audits/beam_import_references.txt:53:tests/infrastructure/test_beam_repository.py:10:from radioskysims.infrastructure.db.beam_repository import BeamRepository
+docs/audits/beam_import_references.txt:54:tests/infrastructure/test_csv_loader.py:6:from radioskysims.domain.beam.models import Beam
+docs/audits/beam_import_references.txt:55:tests/test_logging_integration.py:26:Beam = pytest.importorskip("radioskysims.domain.beam.models").Beam
+docs/audits/beam_import_references.txt:56:tests/test_logging_integration.py:27:BeamOperation = pytest.importorskip("radioskysims.domain.beam.services").BeamOperation
+docs/audits/beam_import_references.txt:57:tests/test_logging_integration.py:130:            logger_beam = get_logger("radioskysims.beam")
+docs/audits/beam_import_references.txt:58:tests/performance/test_beam_interpolation_speed.py:10:from radioskysims.domain.beam.models import Beam
+docs/audits/beam_import_references.txt:59:tests/performance/test_beam_interpolation_speed.py:11:from radioskysims.domain.beam.services import BeamOperation
+docs/audits/beam_import_references.txt:60:docs/reports/26_PROJECT_TECHNICAL_ASSESSMENT.md:24:4. **Módulo legado `src/radioskysims/beam/` corrigido** — `factory.py` importava `radioskysims.beam.models` inexistente; criados `models.py` e `__init__.py` com `Beam` legado e aviso de depreciação para facilitar migração gradual.
+docs/audits/beam_import_references.txt:61:docs/reports/25_stabilization_final_report.md:70:- Module: radioskysims.beam.factor — file: src/radioskysims/beam/factory.py — kind: import_error
+docs/audits/beam_import_references.txt:62:docs/reports/25_stabilization_final_report.md:80:ModuleNotFoundError: No module named 'radioskysims.beam.factor'
+docs/audits/beam_import_references.txt:63:docs/reports/25_stabilization_final_report.md:552:    from domain.beam import Beam
+docs/audits/beam_import_references.txt:64:docs/reports/24_stabilization_diagnosis.md:9:- há módulos e caminhos que não existem como importáveis em um ambiente Python padrão (`radioskysims.beam`, `application.services.*`, `domain.satellite.main`, `infrastructure.satellite_repository`);
+docs/audits/beam_import_references.txt:65:docs/reports/24_stabilization_diagnosis.md:37:4. `src/radioskysims/interfaces/gui/beam_visualizer.py` usa `from domain.beam import Beam`, uma importação absoluta inválida em contexto de pacote padrão.
+docs/audits/beam_import_references.txt:66:docs/reports/24_stabilization_diagnosis.md:41:5. `src/radioskysims/application/beam_panel.py` usa `from radioskysims.beam.models import Beam`, mas não existe um pacote `src/radioskysims/beam/__init__.py`.
+docs/audits/beam_import_references.txt:67:docs/reports/24_stabilization_diagnosis.md:109:6. `domain.beam` e `radioskysims.beam` são usados como caminhos de importação inconsistentes; o pacote `src/radioskysims/beam` não possui `__init__.py`, portanto não é um pacote válido.
+docs/audits/beam_import_references.txt:68:docs/reports/24_stabilization_diagnosis.md:120:- `radioskysims.domain.beam.models <-> radioskysims.domain.beam.services`
+docs/audits/beam_import_references.txt:69:docs/reports/24_stabilization_diagnosis.md:136:- `radioskysims.domain.beam.operations`
+docs/audits/beam_import_references.txt:70:docs/reports/24_stabilization_diagnosis.md:137:- `radioskysims.domain.beam.properties`
+docs/audits/beam_import_references.txt:71:docs/reports/24_stabilization_diagnosis.md:182:| Crítica | imports inválidos em `main.py`, `domain/satellite/main.py`, `application/beam_panel.py`; ausência de pacote `radioskysims.beam`; import inexistente `async_engine`; falha de inicialização de pacote padrão |
+docs/audits/beam_import_references.txt:72:docs/reports/20_import_fixes.md:33:   - Kept `Beam` import from the compatible `radioskysims.beam` namespace.
+docs/audits/beam_import_references.txt:73:docs/reports/20_import_fixes.md:36:   - Changed broken `from domain.beam import Beam` to `from radioskysims.domain.beam import Beam`.
+docs/audits/beam_import_references.txt:74:docs/reports/20_import_fixes.md:64:    - Created a lightweight `radioskysims.beam` package and compatible `Beam` model for legacy import paths.
+docs/audits/beam_import_references.txt:75:docs/reports/21_package_initialization.md:52:   - Adicionei um pequeno `radioskysims.beam` compatível (shim) para suportar imports legados `from radioskysims.beam import Beam` usados em vários lugares do código (sem alterar lógica de domínio). Isso removeu um erro de import recorrente.
+docs/audits/beam_import_references.txt:76:docs/source/apidocs/radioskysims/radioskysims.domain.beam.models.rst:1::py:mod:`radioskysims.domain.beam.models`
+docs/audits/beam_import_references.txt:77:docs/source/apidocs/radioskysims/radioskysims.domain.beam.models.rst:4:.. py:module:: radioskysims.domain.beam.models
+docs/audits/beam_import_references.txt:78:docs/source/apidocs/radioskysims/radioskysims.domain.beam.models.rst:6:.. autodoc2-docstring:: radioskysims.domain.beam.models
+docs/audits/beam_import_references.txt:79:docs/source/apidocs/radioskysims/radioskysims.domain.beam.models.rst:19:   * - :py:obj:`Beam <radioskysims.domain.beam.models.Beam>`
+docs/audits/beam_import_references.txt:80:docs/source/apidocs/radioskysims/radioskysims.domain.beam.models.rst:20:     - .. autodoc2-docstring:: radioskysims.domain.beam.models.Beam
+docs/audits/beam_import_references.txt:81:docs/source/apidocs/radioskysims/radioskysims.domain.beam.models.rst:27:   :canonical: radioskysims.domain.beam.models.Beam
+docs/audits/beam_import_references.txt:82:docs/source/apidocs/radioskysims/radioskysims.domain.beam.models.rst:29:   .. autodoc2-docstring:: radioskysims.domain.beam.models.Beam
+docs/audits/beam_import_references.txt:83:docs/source/apidocs/radioskysims/radioskysims.domain.beam.models.rst:33:   .. autodoc2-docstring:: radioskysims.domain.beam.models.Beam.__init__
+docs/audits/beam_import_references.txt:84:docs/source/apidocs/radioskysims/radioskysims.domain.beam.models.rst:36:      :canonical: radioskysims.domain.beam.models.Beam.evaluate
+docs/audits/beam_import_references.txt:85:docs/source/apidocs/radioskysims/radioskysims.domain.beam.models.rst:38:      .. autodoc2-docstring:: radioskysims.domain.beam.models.Beam.evaluate
+docs/audits/beam_import_references.txt:86:docs/source/apidocs/radioskysims/radioskysims.domain.rst:20:   radioskysims.domain.beam
+docs/audits/beam_import_references.txt:87:docs/source/apidocs/radioskysims/radioskysims.domain.beam.rst:1::py:mod:`radioskysims.domain.beam`
+docs/audits/beam_import_references.txt:88:docs/source/apidocs/radioskysims/radioskysims.domain.beam.rst:4:.. py:module:: radioskysims.domain.beam
+docs/audits/beam_import_references.txt:89:docs/source/apidocs/radioskysims/radioskysims.domain.beam.rst:6:.. autodoc2-docstring:: radioskysims.domain.beam
+docs/audits/beam_import_references.txt:90:docs/source/apidocs/radioskysims/radioskysims.domain.beam.rst:16:   radioskysims.domain.beam.properties
+docs/audits/beam_import_references.txt:91:docs/source/apidocs/radioskysims/radioskysims.domain.beam.rst:17:   radioskysims.domain.beam.models
+docs/audits/beam_import_references.txt:92:docs/source/apidocs/radioskysims/radioskysims.domain.beam.rst:18:   radioskysims.domain.beam.operations
+docs/audits/beam_import_references.txt:93:docs/source/apidocs/radioskysims/radioskysims.domain.beam.rst:30:   * - :py:obj:`__all__ <radioskysims.domain.beam.__all__>`
+docs/audits/beam_import_references.txt:94:docs/source/apidocs/radioskysims/radioskysims.domain.beam.rst:31:     - .. autodoc2-docstring:: radioskysims.domain.beam.__all__
+docs/audits/beam_import_references.txt:95:docs/source/apidocs/radioskysims/radioskysims.domain.beam.rst:38:   :canonical: radioskysims.domain.beam.__all__
+docs/audits/beam_import_references.txt:96:docs/source/apidocs/radioskysims/radioskysims.domain.beam.rst:41:   .. autodoc2-docstring:: radioskysims.domain.beam.__all__
+docs/audits/beam_import_references.txt:97:docs/source/apidocs/radioskysims/radioskysims.domain.beam.operations.rst:1::py:mod:`radioskysims.domain.beam.operations`
+docs/audits/beam_import_references.txt:98:docs/source/apidocs/radioskysims/radioskysims.domain.beam.operations.rst:4:.. py:module:: radioskysims.domain.beam.operations
+docs/audits/beam_import_references.txt:99:docs/source/apidocs/radioskysims/radioskysims.domain.beam.operations.rst:6:.. autodoc2-docstring:: radioskysims.domain.beam.operations
+docs/audits/beam_import_references.txt:100:docs/source/apidocs/radioskysims/radioskysims.domain.beam.operations.rst:19:   * - :py:obj:`BeamOps <radioskysims.domain.beam.operations.BeamOps>`
+docs/audits/beam_import_references.txt:101:docs/source/apidocs/radioskysims/radioskysims.domain.beam.operations.rst:20:     - .. autodoc2-docstring:: radioskysims.domain.beam.operations.BeamOps
+docs/audits/beam_import_references.txt:102:docs/source/apidocs/radioskysims/radioskysims.domain.beam.operations.rst:27:   :canonical: radioskysims.doma

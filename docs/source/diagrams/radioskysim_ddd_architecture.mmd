@@ -1,0 +1,123 @@
+---
+config:
+    look: handDrawn
+    layout: elk
+    fontSize: 16
+---
+
+graph TB
+    subgraph DOMAIN["🔵 DOMAIN LAYER (Lógica Pura)"]
+        subgraph SkyMapDomain["SkyMap Aggregate"]
+            NSide["<b>NSide</b><br/>Value Object<br/>━━━━━━━<br/>-value: int<br/>+npix: int<br/>+__hash__()"]
+            SkyMapDataset["<b>SkyMapDataset</b><br/>Value Object<br/>━━━━━━━<br/>-dataset: Any<br/>-shape: tuple<br/>+to_numpy(): ndarray"]
+            SkyMap["<b>SkyMap</b><br/>Entity (Root)<br/>━━━━━━━<br/>-_dataset: SkyMapDataset<br/>-_nside: NSide<br/>+unit: str<br/>+frame: str<br/>+apply_mask(): SkyMap<br/>+alm(): ndarray"]
+            SkyMapFactory["<b>SkyMapFactory</b><br/>Factory<br/>━━━━━━━<br/>+create()$: SkyMap<br/>+from_array()$: SkyMap"]
+            
+            NSide --> SkyMapDataset
+            SkyMapDataset --> SkyMap
+            SkyMapFactory -.create.-> SkyMap
+        end
+        
+        subgraph SatelliteDomain["Satellite Aggregate"]
+            OrbitalElement["<b>OrbitalElement</b><br/>Value Object<br/>━━━━━━━<br/>+epoch: datetime<br/>+validate()"]
+            Satellite["<b>Satellite</b><br/>Entity (Root)<br/>━━━━━━━<br/>+norad_id: int<br/>+name: str<br/>+constellation: str<br/>+element: OrbitalElement<br/>+validate_epoch()"]
+            SatelliteAssembled["<b>SatelliteAssembled</b><br/>Entity<br/>━━━━━━━<br/>+name: str<br/>+tracks: xr.Dataset<br/>+signals: xr.Dataset"]
+            SatelliteFactory["<b>SatelliteFactory</b><br/>Factory<br/>━━━━━━━<br/>+create()$: Satellite"]
+            
+            OrbitalElement --> Satellite
+            SatelliteFactory -.create.-> Satellite
+            Satellite --> SatelliteAssembled
+        end
+        
+        subgraph BeamDomain["Beam Aggregate"]
+            BeamParams["<b>BeamParamsDomain</b><br/>Value Object<br/>━━━━━━━<br/>+polarizations: list<br/>+frequencies: list<br/>+fwhm: ndarray"]
+            Beam["<b>Beam</b><br/>Entity (Root)<br/>━━━━━━━<br/>+dataset: xr.Dataset<br/>+evaluate(freq, angle)<br/>+params()"]
+            BeamFactory["<b>BeamFactory</b><br/>Factory<br/>━━━━━━━<br/>+create()$: Beam"]
+            
+            BeamParams --> Beam
+            BeamFactory -.create.-> Beam
+        end
+        
+        subgraph TODDomain["TOD (Time-Ordered Data)"]
+            TODSimulator["<b>TODSimulator</b><br/>Domain Service<br/>━━━━━━━<br/>-beam: Beam<br/>-gain: float<br/>+simulate(sat, sky, noise)<br/>→ xr.Dataset"]
+            
+            Beam --> TODSimulator
+        end
+        
+        subgraph SimulationDomain["Simulation Aggregate"]
+            TimeRange["<b>TimeRange</b><br/>Value Object"]
+            SimulationResult["<b>SimulationResult</b><br/>Value Object<br/>━━━━━━━<br/>+dataset: xr.Dataset<br/>+satellites: list<br/>+time_range: TimeRange"]
+            Simulation["<b>Simulation</b><br/>Entity (Root)<br/>━━━━━━━<br/>-satellites: list<br/>-time_range: TimeRange<br/>-geometry: Provider<br/>-signal_factory: Factory<br/>-tod_simulator: Simulator<br/>+run(): SimulationResult"]
+            
+            TimeRange --> SimulationResult
+            Simulation --> SimulationResult
+        end
+    end
+    
+    subgraph INFRASTRUCTURE["🟢 INFRASTRUCTURE LAYER (Técnico)"]
+        subgraph Ports["Ports (Interfaces)"]
+            SkyMapProviderPort["<b>SkyMapProviderPort</b><br/>Port<br/>━━━━━━━<br/>+read_map()<br/>+write_map()<br/>+smooth()"]
+            GeometryPort["<b>GeometryPort</b><br/>Port<br/>━━━━━━━<br/>+calculate_position()<br/>+calculate_range()"]
+        end
+        
+        subgraph Adapters["Adapters (Implementações)"]
+            HealpyProvider["<b>HealpySkyMapProvider</b><br/>Adapter<br/>━━━━━━━<br/>+read_map(): SkyMap<br/>+write_map(skymap)<br/>+smooth(skymap, fwhm)<br/>+rotate(skymap)<br/>+downgrade(skymap)"]
+            PySMProvider["<b>PySMSkyMapProvider</b><br/>Adapter<br/>━━━━━━━<br/>+generate(): SkyMap"]
+            SkyFieldGeometry["<b>SkyFieldGeometryProvider</b><br/>Adapter<br/>━━━━━━━<br/>+calculate_position()<br/>+calculate_range()"]
+        end
+        
+        subgraph Persistence["Persistence (Database)"]
+            SkyMapRecord["<b>SkyMapRecord</b><br/>SQLModel<br/>━━━━━━━<br/>-id: int<br/>-data_blob: bytes<br/>+from_skymap()$<br/>+to_skymap()"]
+            BeamParamsDB["<b>BeamParamsDB</b><br/>SQLModel<br/>━━━━━━━<br/>-id: int<br/>-polarizations: str<br/>-frequencies: str<br/>+from_domain()$<br/>+to_domain()"]
+        end
+        
+        SkyMapProviderPort -.implements.-> HealpyProvider
+        SkyMapProviderPort -.implements.-> PySMProvider
+        GeometryPort -.implements.-> SkyFieldGeometry
+        SkyMap -.persists.-> SkyMapRecord
+        BeamParams -.persists.-> BeamParamsDB
+    end
+    
+    subgraph APPLICATION["🟡 APPLICATION LAYER (Orquestração)"]
+        SimulationService["<b>SimulationService</b><br/>Service<br/>━━━━━━━<br/>+run_by_ids()<br/>+run_by_constellations()<br/>+run(satellites)"]
+        SatelliteService["<b>SatelliteService</b><br/>Service<br/>━━━━━━━<br/>+get_by_ids()<br/>+get_by_constellations()"]
+        MapServices["<b>MapServices</b><br/>Service<br/>━━━━━━━<br/>+get_skymap_by_name()<br/>+list_available_maps()"]
+        
+        SimulationService --> Simulation
+        SatelliteService --> Satellite
+        MapServices --> SkyMap
+    end
+    
+    subgraph EXTERNAL["🔴 EXTERNAL SYSTEMS"]
+        FITS["FITS Files<br/>(HEALPix Maps)"]
+        SpaceTrack["SpaceTrack API<br/>(Orbital Data)"]
+        SkyField["Skyfield<br/>(Ephemeris)"]
+        
+        HealpyProvider -.reads/writes.-> FITS
+        SkyFieldGeometry -.queries.-> SkyField
+        SatelliteService -.fetches.-> SpaceTrack
+    end
+    
+    %% Relationships
+    TODSimulator --> Simulation
+    BeamFactory --> Beam
+    SatelliteFactory --> Satellite
+    SkyMapFactory --> SkyMap
+    
+    Simulation -.uses.-> TODSimulator
+    Simulation -.uses.-> Beam
+    Simulation -.uses.-> Satellite
+    SimulationService -.orchestrates.-> Simulation
+    
+    HealpyProvider -.provides.-> SkyMap
+    SkyFieldGeometry -.provides.-> Satellite
+    
+    style DOMAIN fill:#e1f5ff,stroke:#01579b,stroke-width:3px
+    style INFRASTRUCTURE fill:#e8f5e9,stroke:#1b5e20,stroke-width:3px
+    style APPLICATION fill:#fff3e0,stroke:#e65100,stroke-width:3px
+    style EXTERNAL fill:#f3e5f5,stroke:#4a148c,stroke-width:3px
+    
+    style SkyMap fill:#fff9c4,stroke:#f57f17,stroke-width:2px
+    style Satellite fill:#fff9c4,stroke:#f57f17,stroke-width:2px
+    style Beam fill:#fff9c4,stroke:#f57f17,stroke-width:2px
+    style Simulation fill:#fff9c4,stroke:#f57f17,stroke-width:2px

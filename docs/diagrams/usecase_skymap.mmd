@@ -1,0 +1,26 @@
+---
+title: Casos de uso — SkyMap (mapas HEALPix)
+---
+%% Use Case - SkyMap
+flowchart LR
+    A[("Cientista /\nAnalista")]
+    B[("Sistema")]
+    HIPS[("Servidor HiPS\n(casda.csiro.au)")]
+    Pysm[("PySM3")]
+
+    A --> UC1["Gerar mapa sintético\n(SkyMapFactory)"]
+    A --> UC2["Validar/inspecionar NSide e\ndataset (NSide, SkyMapDataset)"]
+    A --> UC3["Aplicar operações\n(máscaras, suavização, alm)"]
+    A --> UC4["Analisar estatísticas\n(mean, rms, cls)"]
+    A --> UC5["Visualizar mapa\n(SkyMapVisualizer)"]
+    A --> UC6["Persistir/ler mapa\n(FITS/Zarr) + cache"]
+
+    B --> UC7["Gerar componente\nvia PySM3"]
+    B --> UC8["Baixar cutout\nvia HiPS/hips2fits"]
+    B --> UC9["Rodar fluxo end-to-end\n(generate + analyze + persistir)"]
+
+    UC7 --> Pysm
+    UC8 --> HIPS
+    UC9 --> UC1
+    UC9 --> UC4
+    UC9 --> UC6

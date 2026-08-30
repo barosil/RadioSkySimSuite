@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rinex-downloader"
+version = "0.1.0"
+description = "Download, extract, and process GNSS RINEX data from RBMC (IBGE) into NetCDF format"
+authors = [
+    { name = "Jordany Vieira", email = "jordanyv@gmail.com" }
+]
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+
+dependencies = [
+    "requests",
+    "xarray",
+    "numpy",
+    "georinex",
+]
+
+keywords = [
+    "GNSS",
+    "RINEX",
+    "RBMC",
+    "IBGE",
+    "geodesy",
+    "xarray",
+    "netcdf",
+    "GPS",
+]
+
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: GIS",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "black",
+]
+
+[project.urls]
+Homepage = "not yet"
+Repository = "not yet"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["rinex_downloader*"]
