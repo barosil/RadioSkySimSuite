@@ -188,3 +188,5 @@ benchmarks/results/
 # Decoupling: original monolith kept only as local reference
 # (nunca vai para o remoto)
 radioskysim_orig/
+
+.archived_docs*

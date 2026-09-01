@@ -4,6 +4,10 @@
 desenvolvimento (veja `AGENTS.md`). Detalhes por tópico ficam em
 `docs/architecture/` (bounded contexts, DI, entrypoints, dívidas técnicas).
 
+**Última revisão:** 2026-09-01 (sincronizado com
+[`relatorio_set_2026_v2.md`](relatorio_set_2026_v2.md), auditoria completa
+dos 9 pacotes de `packages/*`).
+
 ---
 
 ## 1. Visão geral
@@ -72,6 +76,8 @@ flowchart LR
     SIM --> SKYMAP
     SIM --> SRC
     SIM --> RT
+    GNSS --> CORE
+    GNSS --> SKYMAP
     UMB --> CORE & VIZ & BEAM & SKYMAP & RT & SRC & SIM & WF & GNSS
 ```
 
@@ -167,59 +173,106 @@ particionar fontes em batches com controle de memória e scheduler dask
 
 ## 6. Composition root (DI)
 
-`src/radioskysims/bootstrap/`:
-- `builders.py` — `build_configuration`, `build_logging`, `build_database`,
-  `build_repositories`, `build_domain_components`, `build_services`,
-  `build_local_sources_service`.
-- `composition.py` — `create_sim_orchestrator(telescope=...)`,
-  `create_simulation_context(...)`.
+**Atualização (Fase 5 do desacoplamento):** `src/radioskysims/bootstrap/` ficou
+**fino** e passou a delegar para os pacotes (strategy pattern), quebrando o
+ciclo lazy `sim_orchestrator ↔ composition` que existia quando tudo vivia no
+umbrella:
+
+- `builders.py` — re-exporta builders concretos dos pacotes:
+  `build_database`/`build_logging` (`radioskysims-core`),
+  `_load_beam_from_csv` (`radioskysims-beam`),
+  `build_configuration` (`radioskysims-radiotelescope`),
+  `build_domain_components`/`build_services`/
+  `build_simulation_context_dependencies`/`build_skymap_components`
+  (`radioskysims-simulation`),
+  `build_cosmology_components`/`build_local_sources_service`/
+  `build_radiosources_use_cases`/`build_repositories` (`radioskysims-sources`).
+- `composition.py` — reexporta `create_sim_orchestrator(telescope=...)` e
+  `create_simulation_context(...)` de
+  `radioskysims_simulation.bootstrap.composition`; **não contém lógica
+  própria**.
 
 Fluxo de inicialização (TOD viewer):
 `scripts/start_service.py` → `create_sim_orchestrator("default")` →
-`create_simulation_context` → builders → `SimOrchestrator.run()` → `TODPanel`.
+`create_simulation_context` (em `radioskysims_simulation.bootstrap`) →
+builders dos pacotes → `SimOrchestrator.run()` → `TODPanel`.
 
 ## 7. Estado arquitetural atual e dívidas técnicas
 
-Resumo da auditoria (`docs/architecture/current_architecture.md`,
-`module_dependencies.md`):
+**Atualização 2026-09-01** — resumo completo (9 pacotes auditados) em
+[`relatorio_set_2026_v2.md`](relatorio_set_2026_v2.md) e detalhamento tático
+em [`module_dependencies.md`](module_dependencies.md):
 
 **O que está consolidado**
-- Layout hexagonal com ports em `application/ports/` e composition root.
-- Módulos recentes seguem a separação (ex.: `simulation` com port
-  `SimulationRepositoryPort` + adapter `SimulationRepository`).
-- Infraestrutura → Domain: esperado (adapters implementam contratos de domínio).
+- Layout hexagonal com ports em `application/ports/` (por pacote) e
+  composition root fino no umbrella (delega para os pacotes, §6).
+- Grafo de dependências **entre pacotes** é acíclico e coerente (kernel →
+  domínios → orquestração → umbrella); nenhuma violação circular encontrada.
+- Itens historicamente resolvidos: **não há mais** `domain/satellite/main.py`
+  (concern de API web no domínio removido); **não há mais** duplicação de
+  loaders de beam (`infrastructure/files/*` foi eliminado, resta só
+  `infrastructure/beams/loaders/*`); **não há mais** namespace legado
+  `radioskysims/beam`; **credenciais do SpaceTrack não são mais versionadas**
+  em `settings.toml` (comentário explícito aponta para `credentials.env`,
+  gitignored).
 
-**Dívidas / riscos**
-- `application → infrastructure` e `domain → infrastructure` ainda ocorrem em
-  módulos centrais (ex.: `sim_orchestrator`, `simulation_service`, `domain/signal`,
-  `domain/tracks`, `domain/skymap`).
-- `domain/satellite/main.py` mistura concern de API web no domínio.
-- Dois caminhos de loaders de beam (`infrastructure/files/*` e
-  `infrastructure/beams/loaders/*`) e dois namespaces de beam
-  (`radioskysims/beam` legado vs `domain/beam`).
-- `domain/common` concentrado (risco de virar "god/common").
-- **Segurança**: `settings.toml` contém credenciais reais do SpaceTrack
-  versionadas — mover para `credentials.env`/variáveis de ambiente.
+**Dívidas / riscos ainda presentes** (ver `module_dependencies.md` para
+detalhe por pacote)
+- `application → infrastructure` e `domain → infrastructure` ainda ocorrem,
+  concentrados em `radioskysims-simulation` (`sim_orchestrator.py`,
+  `simulation.py`) e `radioskysims-sources` (`satelliterepository.py`,
+  `selector.py`, `catalog_services.py` e afins) — maior risco de manutenção
+  do monorepo hoje.
+- `GeometryProviderPort` definido em `application.ports.geometry` mas
+  implementado por provider em `domain` (`radioskysims-core`) — inversão de
+  dependência que destoa da regra estrita "domain não depende de
+  application".
+- `radioskysims_core.domain.common.models` concentrado (risco de virar
+  módulo "god/common"); 654 linhas e crescendo conforme mais pacotes
+  dependem dele.
+- `radioskysims-skymap` e `radioskysims-radiotelescope` são hoje os únicos
+  pacotes **sem** violação de camada detectada — referência de estrutura para
+  os demais.
 
-Detalhes: `docs/architecture/technical_debt.md` e `refactoring_roadmap.md`.
+Detalhes quantitativos (linhas, lint, formatação): `relatorio_set_2026_v2.md`
+e `code_quality.md`.
 
 ## 8. Diagramas
 
+**Atualização 2026-09-01**: diagramas em `docs/diagrams/` revisados para a
+estrutura pós-desacoplamento (9 pacotes). Ver detalhamento e histórico em
+[`relatorio_set_2026_v2.md §12`](relatorio_set_2026_v2.md).
+
 - Diagrama do **ecossistema de pacotes** (uv workspace) inline na §1.1 acima.
-- `docs/diagrams/uml_high_level.mmd` — visão de alto nível (camadas/pacotes).
-- `docs/diagrams/uml_detailed.mmd` — classes principais do domínio.
-- `docs/diagrams/usecase_*.mmd` — casos de uso (TOD, SkyMap, Satellite, Beam).
-- `docs/diagrams/architecture.mmd` — pacotes/camadas (visão simplificada).
+- `docs/diagrams/architecture.mmd` — visão suite-level (grafo de dependências
+  entre os 9 pacotes + umbrella).
+- `docs/diagrams/uml_high_level.mmd` — visão de alto nível (entrypoints →
+  bootstrap → pacotes → persistência).
+- `docs/diagrams/uml_packages_detailed.mmd` — **novo**: "Individual
+  Applications" — camadas hexagonais internas (domain/application/ports/
+  infrastructure/bootstrap) de cada um dos 9 pacotes + umbrella, com as
+  dependências inter-pacote resumidas.
+- `docs/diagrams/uml_detailed.mmd` — classes principais do domínio (visão
+  lógica por bounded context, independente de pacote).
+- `docs/diagrams/usecase_*.mmd` — casos de uso (TOD, SkyMap, Satellite, Beam),
+  cada um com nota indicando o pacote atual.
 - `docs/diagrams/uml_complete_*.mmd` — visão completa (arquitetura, bounded
-  contexts, classes detalhadas, sequência TOD GNSS).
+  contexts, classes detalhadas, sequência TOD GNSS), com notas de mapeamento
+  para pacotes adicionadas nesta rodada.
+- `docs/diagrams/usecase_*.mmd` e `classes_and_sequence_*.mmd` correspondem
+  aos fluxos dos notebooks — ver [`notebooks_usecases.md`](notebooks_usecases.md)
+  para o mapeamento explícito notebook → sequence diagram.
 - `docs/diagrams/classes_and_sequence_*.mmd` — classes e sequências (TOD GNSS,
   fluxo satellite→tracks→signal→assembled).
 
 ## 9. Referências
 
-- `docs/architecture/current_architecture.md` — auditoria atual
-- `docs/architecture/target_architecture.md` — arquitetura alvo (Fase 2)
+- `docs/architecture/relatorio_set_2026_v2.md` — relatório de auditoria completo (setembro/2026)
 - `docs/architecture/bounded_contexts.md` — contexts e contratos
-- `docs/architecture/dependency_injection.md` — DI
 - `docs/architecture/entrypoints.md` — entrypoints oficiais
 - `docs/architecture/module_dependencies.md` — análise de dependências
+- `docs/architecture/technical_debt.md` — dívida técnica histórica
+- `docs/architecture/code_quality.md` — métricas de lint, formatação, docstrings e tipagem
+- `docs/architecture/performance.md` — análise de eficiência e gargalos
+- `docs/architecture/logging.md` — convenções de logging estruturado
+- `docs/architecture/persistence.md` — persistência (PostgreSQL, HDF5/Zarr)

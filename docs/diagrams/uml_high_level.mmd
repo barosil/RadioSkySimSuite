@@ -1,65 +1,61 @@
 ---
-title: RadioSkySim — visão de alto nível (camadas e dependências)
+title: RadioSkySim — visão de alto nível (pacotes, camadas e dependências)
 ---
-%% UML de alto nível - RadioSkySim
-%% Diagrama de pacotes/camadas (arquitetura hexagonal + composition root)
+%% UML de alto nível - RadioSkySimSuite (pós-desacoplamento)
+%% Atualizado em: 2026-09-01. Cada subgrafo de pacote segue internamente
+%% a arquitetura hexagonal: interfaces -> application -> domain,
+%% bootstrap monta infrastructure via DI, infrastructure implementa ports.
 flowchart TB
-    subgraph ENTRY["Interfaces / Entrypoints"]
-        CLI["interfaces/cli"]
+    subgraph ENTRY["Interfaces / Entrypoints (umbrella)"]
+        CLI["interfaces/cli (radioskysims)"]
         GUI["interfaces/gui (TODPanel, skymap)"]
-        API["interfaces/api (FastAPI)"]
+        NBAPI["interfaces/api (fachada de notebook,\nNÃO é REST/FastAPI)"]
         SCRIPTS["scripts/ (start_service, check_db)"]
     end
 
     subgraph BOOT["Bootstrap (Composition Root)"]
-        COMP["bootstrap/composition"]
-        BUILD["bootstrap/builders"]
+        COMP["bootstrap/composition\n(delega para radioskysims_simulation)"]
+        BUILD["bootstrap/builders\n(re-exporta builders de cada pacote)"]
     end
 
-    subgraph APP["Application"]
-        ORCH["services/SimOrchestrator"]
-        SVC["services/* (SimulationService, SatelliteService,\n LocalSourcesService, RadioSourceCatalogService)"]
-        PORTS["ports/* (beam, geometry, localsources,\n radiosources, satellite, simulations, skymap)"]
-    end
-
-    subgraph DOM["Domain (regras de negócio)"]
-        COMMON["common (Observer, TimeRange, FrequencyRange)"]
-        BEAM["beam (Beam, BeamProperties)"]
-        SAT["satellite (Satellite, TLESelector)"]
-        SIGNAL["signal (SignalFactory, SignalSource)"]
-        GEOM["geometry (SkyfieldGeometryProvider)"]
-        TOD["tod (TODSimulator)"]
-        SKY["skymap (SkyMap, NSide, SkyMapFactory)"]
-        SIM["simulation (SimulationResult, Simulation)"]
-        TRACKS["tracks (TrackFactory)"]
-        RADIO["radiosources"]
-        LOCAL["localsources"]
-    end
-
-    subgraph INFRA["Infrastructure (Adapters)"]
-        DB["db (SQLModel, SimulationRepository,\n satellite/radiosource repositories)"]
-        CONFIG["config / logging"]
-        BEAMSAD["beams/loaders (CSV, Analytical, LIT)"]
-        SKYAD["skymap (Healpy, PySM3, HiPS, FITS)"]
-        PROC["processing/ResourceAwareProcessor (dask)"]
-        EXT["external (SpaceTrack, TAP/astroquery, httpx)"]
+    subgraph PKGS["Pacotes uv workspace (packages/*)"]
+        direction TB
+        CORE["radioskysims-core\n(kernel: config, db, logging, geometry comum)"]
+        VIZ["radioskysims-viz\n(PanelApplication, VisualizerPort)"]
+        BEAM["radioskysims-beam\n(Beam, loaders CSV/Analítico)"]
+        SKYMAP["radioskysims-skymap\n(SkyMap, Healpy, PySM3, HiPS)"]
+        RT["radioskysims-radiotelescope\n(Antenna, SpectrometerBackend)"]
+        SOURCES["radioskysims-sources\n(Satellite, LocalSources, RadioSources)"]
+        SIMULATION["radioskysims-simulation\n(SimOrchestrator, TOD, ResourceAwareProcessor)"]
+        WATERFALL["radioskysims-waterfall\n(autônomo: máscara, baseline, SED)"]
+        GNSS["gnsstools4astro\n(autônomo: RINEX/broadcast ephemeris)"]
     end
 
     subgraph DATASTORE["Persistência / Dados"]
-        PG[("PostgreSQL (data/DB)")]
+        PG[("PostgreSQL (metadados)")]
         FILES[("HDF5/Zarr (data/TOD, data/MAPS)")]
         AUX[("data/aux, data/catalog, data/hips, data/temp")]
     end
 
     ENTRY --> BOOT
-    BOOT --> APP
-    BOOT --> INFRA
-    APP --> DOM
-    APP --> PORTS
-    INFRA -. "implementa" .-> PORTS
-    INFRA --> DOM
-    ORCH --> PROC
-    PROC --> FILES
-    DB --> PG
-    SKYAD --> FILES
-    AUX -. "leitura/escrita" .- INFRA
+    BOOT --> PKGS
+    SIMULATION --> BEAM
+    SIMULATION --> SKYMAP
+    SIMULATION --> SOURCES
+    SIMULATION --> RT
+    SIMULATION --> CORE
+    SIMULATION --> VIZ
+    SOURCES --> SKYMAP
+    SOURCES --> CORE
+    BEAM --> CORE
+    BEAM --> VIZ
+    SKYMAP --> CORE
+    RT --> CORE
+    RT --> VIZ
+    GNSS --> CORE
+    GNSS --> SKYMAP
+    CORE --> DATASTORE
+    SIMULATION --> FILES
+    SKYMAP --> FILES
+    AUX -. "leitura/escrita" .- CORE
+

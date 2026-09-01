@@ -21,6 +21,7 @@ height = 530.0
 
 [[radiotelescopes.uirapuru.antennas]]
 name = "BINGO Horn"
+effective_area_m2 = 1.0
 frequency_range = [1000, 1250, 0.05]
 
 [radiotelescopes.uirapuru.antennas.pointing]
