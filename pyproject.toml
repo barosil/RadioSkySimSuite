@@ -18,6 +18,7 @@ readme = "README.md"
 requires-python = ">=3.11,<=3.14"
 authors = [
   { name = "Luciano Barosi", email = "lbarosi@df.ufcg.edu.br" },
+  { name = "Vanderson Cavalcante" },
 ]
 classifiers = [
   "Development Status :: 1 - Planning",
@@ -376,9 +377,22 @@ addopts = [
 xfail_strict = true
 markers = [
   "integration: tests that depend on external libraries or heavy IO",
+  "performance: performance and profiling tests (not run by default)",
 ]
 filterwarnings = [
   "error",
+  "ignore:Exception ignored in.*:pytest.PytestUnraisableExceptionWarning",
+  "ignore:.*read_text is deprecated.*:DeprecationWarning",
+  "ignore:.*open_text is deprecated.*:DeprecationWarning",
+  "ignore:.*is not a Python type.*:UserWarning:pydantic",
+  "ignore:structlog não instalado.*:ImportWarning:radioskysims.infrastructure.logging_config",
+  "ignore:numpy.core.*:DeprecationWarning",
+  "ignore:numpy.ndarray size changed.*binary incompatib:RuntimeWarning",
+  "ignore:.*radioskysims.beam.models.Beam.*:DeprecationWarning",
+  "ignore:.*vlen-utf8.*:UserWarning:zarr",
+  "ignore:.*dtype.*not part.*Zarr format.*:UserWarning:zarr",
+  "ignore:.*Consolidated metadata.*:UserWarning:zarr",
+  "ignore:.*return type of.*Dataset.dims.*:FutureWarning",
 ]
 log_cli_level = "INFO"
 testpaths = [
