@@ -1,22 +1,22 @@
 # TODO
 
-- Finalizar notebooks com casos de uso de simulação tod para mapa e mapa para tod
-- notebook demonstrando funcionalidades waterfall
-- linting amplo até eliminação
-- medir cobertura de testes 100% verdes, cobertura > 70%
-- Analisar entrypoints e experiencia de usuário, visando facilidade de uso
+- **Finalizar notebooks com casos de uso de simulação tod para mapa e mapa para tod**
+- **notebook demonstrando funcionalidades waterfall**
+- **linting amplo até eliminação**
+- **medir cobertura de testes 100% verdes, cobertura > 70%**
+- **Analisar entrypoints e experiencia de usuário, visando facilidade de uso**
 - Analisar módulos grandes demais e fazer plano para refatoração TOD simulator waterfall
-- remover completamente legado da arvore
-- remover completamente radioskysim_orig da arvore
-- Garantir consistencia nos loggers
-- construir plano de desacoplamento dos módulos na direção de GNSS4ASTRO
+- remover completamente legado da arvore (feito)
+- remover completamente radioskysim_orig da arvore (feito)
+- **Garantir consistencia nos loggers** 
+- construir plano de desacoplamento dos módulos na direção de GNSS4ASTRO (depois)
 - Considerar unifomizar a experiencia do usuário com o uso de:
-    - Orchestrator -> sources, maps, radiotelescope simulation
+    - **Orchestrator -> sources, maps, radiotelescope simulation**
     - Objetos criados tem métodos chainable e operações complexas são realizadas por um Processor (passado pelo Orchestrator??)
     - Isto seria uma mudança de nomenclatura de Manager -> Orchestrator nos notebooks
-    - Processor controla recursos do sistema e viabiliza a utilização dos recursos
-        - Dask pode criar automativamente ou por uma chamada do usuário, em qualquer caso, deve expor o dask dashjboard para ser utilizado.
-        - Incorpora barras de processo
-        - cache
-        - safe crash recovery
-        - openmpi (habilitar openmpi com PYSM3 e HEALPY)
+    - **Processor controla recursos do sistema e viabiliza a utilização dos recursos**
+        - **Dask pode criar automativamente ou por uma chamada do usuário, em qualquer caso, deve expor o dask dashjboard para ser utilizado.**
+        - *Incorpora barras de processo*
+        - cache (depois)
+        - safe crash recovery (depois)
+        - openmpi (habilitar openmpi com PYSM3 e HEALPY) - (depois)
