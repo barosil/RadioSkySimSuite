@@ -21,7 +21,9 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-
+from radioskysims_beam.application.ports.beam import (
+    BeamLoaderPort,
+)
 from radioskysims_skymap.application.skymap.ports import (
     SkyMapAnalyzerPort,
     SkyMapGeneratorPort,
@@ -29,10 +31,6 @@ from radioskysims_skymap.application.skymap.ports import (
 )
 from radioskysims_skymap.domain.skymap.models import SkyMap
 from radioskysims_skymap.domain.skymap.value_objects import NSide
-from radioskysims_beam.application.ports.beam import (
-    BeamLoaderPort,
-)
-from radioskysims.infrastructure.ports.geometry import GeometryProviderPort
 
 # =============================================================================
 # Imports dos Ports (interfaces)
@@ -47,6 +45,8 @@ from radioskysims_skymap.infrastructure.skymap.adapters.analysis import (
 # Imports das implementações (adapters)
 # =============================================================================
 from radioskysims_skymap.infrastructure.skymap.providers.healpy import HealpySkyMapProvider
+
+from radioskysims.infrastructure.ports.geometry import GeometryProviderPort
 
 # =============================================================================
 # Fixtures compartilhadas
@@ -288,7 +288,7 @@ class TestBeamEvaluatorPortContract:
         assert hasattr(bp, "compute_properties")
 
     def test_compute_properties_retorna_dict(self, dummy_skymap):
-        _ = (dummy_skymap)  # assinala uso (interface/reservado)
+        _ = dummy_skymap  # assinala uso (interface/reservado)
         from radioskysims_beam.domain.beam.properties import BeamProperties
 
         bp = BeamProperties()
@@ -363,7 +363,7 @@ class TestSkyMapMaskPortContract:
 
     def test_apply_assinatura(self, dummy_skymap):
         """SkyMap tem método apply_mask como operação de domínio."""
-        _ = (dummy_skymap)  # assinala uso (interface/reservado)
+        _ = dummy_skymap  # assinala uso (interface/reservado)
         import inspect
 
         # Verifica que a assinatura do contrato é respeitada
