@@ -165,7 +165,7 @@ background), a `JobHandle` to track/cancel a job, and an ipywidgets progress
 widget:
 
 ```python
-from radioskysims.interfaces.api import progress_widget, run_simulation
+from radioskysims.interfaces.notebook_api import progress_widget, run_simulation
 
 # Background: returns a JobHandle immediately (no blocking)
 handle = run_simulation(

@@ -55,10 +55,10 @@ consumidos como bibliotecas pelo umbrella ou por `radioskysims-sources`/
 
 | Localização | Finalidade | Estado | Recomendação |
 |---|---|---|---|
-| `interfaces/api/notebook.py` | `run_simulation(...)` para uso direto em notebooks — foreground (retorna resumo) ou background (`JobHandle`) | Oficial | Apesar do nome do diretório (`api/`), **não é uma API REST/FastAPI** — é uma fachada programática para notebooks. Renomear o diretório para `interfaces/notebook_api/` ou similar reduziria ambiguidade com o antigo `interfaces/api` do monólito (FastAPI, já removido). |
-| `interfaces/api/widget.py` | Widget auxiliar para acompanhamento de jobs em notebook | Experimental | — |
+| `interfaces/notebook_api/notebook.py` | `run_simulation(...)` para uso direto em notebooks — foreground (retorna resumo) ou background (`JobHandle`) | Oficial | Apesar do nome do diretório (`api/`), **não é uma API REST/FastAPI** — é uma fachada programática para notebooks. Renomear o diretório para `interfaces/notebook_api/` ou similar reduziria ambiguidade com o antigo `interfaces/notebook_api` do monólito (FastAPI, já removido). |
+| `interfaces/notebook_api/widget.py` | Widget auxiliar para acompanhamento de jobs em notebook | Experimental | — |
 
-**Nota:** o `interfaces/api` do monólito que expunha FastAPI
+**Nota:** o `interfaces/notebook_api` do monólito que expunha FastAPI
 (`satellite_controller.py`, mencionado no documento de 2026-07-16) **não
 existe mais** — confirmando que a violação "domain com responsabilidade de
 interface web" apontada nos relatórios anteriores foi removida.
@@ -110,9 +110,9 @@ pacote expõe `__main__`/CLI própria fora de testes/exemplos internos.
    reescrito para usar o composition root oficial — ele é o único entrypoint
    que ainda constrói infraestrutura (engine SQLite) fora de
    `radioskysims_core.db`/`settings.toml`.
-4. O diretório `interfaces/api/` deveria ser renomeado para deixar claro que
+4. O diretório `interfaces/notebook_api/` deveria ser renomeado para deixar claro que
    é uma fachada de notebook, não uma API REST (ambiguidade com o antigo
-   `interfaces/api` do monólito, já removido).
+   `interfaces/notebook_api` do monólito, já removido).
 5. `scripts/check_docs.py` cobre apenas o umbrella; estendê-lo para
    `packages/*/src` fecharia uma lacuna de qualidade citada em
    `relatorio_set_2026_v2.md`.

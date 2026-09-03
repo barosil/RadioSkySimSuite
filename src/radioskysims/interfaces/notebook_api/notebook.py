@@ -1,10 +1,15 @@
 """\
-Módulo: src/radioskysims/interfaces/api/notebook.py
+Módulo: src/radioskysims/interfaces/notebook_api/notebook.py
 
 Descrição:
     API de notebook para execução de simulações TOD (ticket TOD-007).
     ``run_simulation`` roda em foreground (retorna resumo) ou em background
     (retorna um ``JobHandle`` para acompanhar/cancelar).
+
+    Nota: o diretório é ``notebook_api`` (não ``api``) — é uma fachada
+    programática para notebooks, NÃO uma API REST. Em kernels Jupyter com
+    loop asyncio já ativo, pode ser necessário ``nest_asyncio.apply()``
+    antes de chamadas que aguardam tarefas assíncronas.
 
 Copyright BINGO Collaboration
 Last modified: 2026-08-30
@@ -17,10 +22,11 @@ import time
 from pathlib import Path
 from typing import Any, Callable
 
-from radioskysims_core.db.job_repository import DEFAULT_JOBS_DB, JobRepository
+from radioskysims_core.db.job_repository import JobRepository, default_jobs_db
 from radioskysims_core.db.jobs import JobStatus
 
 from radioskysims.interfaces.cli.commands.export_tod import (
+    ExportResult,
     execute_export_tod_command,
     launch_background_export,
 )
@@ -56,7 +62,7 @@ class JobHandle:
         self._repository_factory = repository_factory
 
     def _repo(self) -> JobRepository:
-        url = self._jobs_db or DEFAULT_JOBS_DB
+        url = self._jobs_db or default_jobs_db()
         return (self._repository_factory or JobRepository)(url)
 
     def refresh(self) -> dict[str, Any]:
@@ -137,11 +143,13 @@ def run_simulation(
     background: bool = False,
     jobs_db: str | None = None,
     progress_callback: Callable[[dict[str, Any]], None] | None = None,
-) -> JobHandle | str:
+) -> JobHandle | ExportResult:
     """Executa uma simulação TOD.
 
-    - ``background=False`` (default): roda em foreground e retorna o resumo
-      formatado; ``progress_callback`` é chamado com snapshots iniciais/finais.
+    - ``background=False`` (default): roda em foreground e retorna um
+      ``ExportResult`` (dataclass com ``output``/``sidecar``); ``str()`` dá o
+      resumo formatado. ``progress_callback`` é chamado com snapshots
+      iniciais/finais.
     - ``background=True``: cria o job, spawna o worker e retorna um
       ``JobHandle`` imediatamente.
     """
@@ -188,4 +196,4 @@ def run_simulation(
     return result
 
 
-__all__ = ["JobHandle", "run_simulation"]
+__all__ = ["ExportResult", "JobHandle", "run_simulation"]

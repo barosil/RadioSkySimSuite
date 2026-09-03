@@ -19,7 +19,7 @@ import time
 from pathlib import Path
 from typing import Any, Callable, TextIO
 
-from radioskysims_core.db.job_repository import DEFAULT_JOBS_DB, JobRepository
+from radioskysims_core.db.job_repository import JobRepository, default_jobs_db
 from radioskysims_core.db.jobs import Job, JobStatus
 
 from radioskysims.interfaces.cli.commands.progress import (
@@ -39,7 +39,7 @@ def _repo_for(
     repository_factory: Callable[..., JobRepository] | None,
 ) -> JobRepository:
     """Instancia o repositório (injetável em testes)."""
-    url = jobs_db or DEFAULT_JOBS_DB
+    url = jobs_db or default_jobs_db()
     return (repository_factory or JobRepository)(url)
 
 

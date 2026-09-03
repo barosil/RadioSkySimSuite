@@ -46,6 +46,44 @@ integration_time_s = 1
 num_channels = 5000
 T_sys_K = 50
 
+# ── DEFAULT profile (cópia de uirapuru) ───────────────────────────────────
+# Perfil usado pela CLI/notebooks quando nenhum --telescope é informado
+# (create_radiotelescope() e `radioskysims tod export` sem --telescope).
+[radiotelescopes.default]
+name = "UIRAPURU Telescope"
+
+[radiotelescopes.default.observer]
+lat = -7.211637
+lon = -35.90813
+height = 530.0
+
+[[radiotelescopes.default.antennas]]
+name = "BINGO Horn"
+effective_area_m2 = 1.0
+frequency_range = [1000, 1250, 0.05]
+
+[radiotelescopes.default.antennas.pointing]
+mode = "transit"
+alt_deg = 65
+az_deg = 0
+
+[radiotelescopes.default.antennas.beam]
+name = "BINGO Horn LIT"
+# polarizations = ["H_COPOL", "H_CROSS", "V_COPOL", "V_CROSS"]
+polarizations = ["H_COPOL"]
+beam_width_deg = 15.0
+pattern_file = "radioskysims/resources/beams/beampattern_horn01.csv"
+
+[radiotelescopes.default.antennas.backend]
+type = "spectrometer"
+frequency_range = [1000, 1250, 0.05]
+name = "UIRAPURU Backend"
+bandwidth_mhz = 250
+sampling_rate_mhz = 250
+integration_time_s = 1
+num_channels = 5000
+T_sys_K = 50
+
 [simulations]
 time_range = ["2025-02-27T00:00:00", "2025-02-28T00:00:00", 120]
 

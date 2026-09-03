@@ -19,18 +19,27 @@ from __future__ import annotations
 
 import subprocess
 import sys
+from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, Callable, TextIO
 
 from radioskysims_core.config.config_loader import resolve_settings_path
-from radioskysims_core.db.job_repository import DEFAULT_JOBS_DB, JobRepository
+from radioskysims_core.db.job_repository import JobRepository, default_jobs_db
 
-DEFAULT_OUTDIR = Path("data") / "TOD"
+
+def _project_data_dir() -> Path:
+    """Diretório ``data`` do projeto (raiz detectada), independente do CWD."""
+    from radioskysims_core.paths import get_project_root
+
+    return get_project_root() / "data"
+
+
+DEFAULT_OUTDIR = _project_data_dir() / "TOD"
 
 
 def _default_output_path() -> Path:
-    """Caminho padrão para o dataset exportado (timestamp UTC)."""
+    """Caminho padrão do dataset exportado (raiz do projeto, timestamp UTC)."""
     ts = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
     return DEFAULT_OUTDIR / f"tod_{ts}.nc"
 
@@ -51,6 +60,29 @@ def format_export_result(output: Path, sidecar: str) -> str:
             f"Sidecar (JSON): {sidecar}",
         ]
     )
+
+
+@dataclass(frozen=True)
+class ExportResult:
+    """Resultado estruturado de ``tod export`` (foreground).
+
+    Substitui o retorno puramente textual por um objeto com os artefatos
+    gerados (UX L2); ``str()``/``__repr__`` reproduzem o resumo amigável
+    exibido pela CLI.
+    """
+
+    output: Path
+    sidecar: str
+    message: str = "TOD exportado com sucesso"
+
+    def to_text(self) -> str:
+        return format_export_result(self.output, self.sidecar)
+
+    def __str__(self) -> str:
+        return self.to_text()
+
+    def __repr__(self) -> str:
+        return f"ExportResult(output={self.output!s}, message={self.message!r})"
 
 
 def execute_export_tod_command(
@@ -86,6 +118,20 @@ def execute_export_tod_command(
 
     print("Iniciando simulação TOD...", file=stderr)
 
+    if not include_satellites and not include_local_sources:
+        print(
+            "Aviso: simulação sem fontes (sem satélites e sem fontes locais) — "
+            "o TOD ficará vazio. Use --constellations (ex.: GPS GALILEO) e/ou "
+            "--local-sources.",
+            file=stderr,
+        )
+    elif not include_satellites:
+        print(
+            "Aviso: sem satélites (--constellations omitido). Use "
+            "'--constellations GPS GALILEO ...' para incluir GNSS.",
+            file=stderr,
+        )
+
     result = orchestrator.run(
         constellations=consts,
         include_satellites=include_satellites,
@@ -98,12 +144,12 @@ def execute_export_tod_command(
     sidecar = result.save_result(str(out_path))
 
     print(f"TOD gravado em: {out_path}", file=stderr)
-    return format_export_result(out_path, sidecar)
+    return ExportResult(output=out_path, sidecar=sidecar)
 
 
 def _resolve_jobs_db_url(jobs_db: str | None) -> str:
     """Resolve a URL do banco de jobs, criando o diretório se for SQLite em arquivo."""
-    url = jobs_db or DEFAULT_JOBS_DB
+    url = jobs_db or default_jobs_db()
     if url.startswith("sqlite:///"):
         Path(url[len("sqlite:///") :]).parent.mkdir(parents=True, exist_ok=True)
     return url
@@ -181,6 +227,7 @@ def launch_background_export(
 
 __all__ = [
     "DEFAULT_OUTDIR",
+    "ExportResult",
     "execute_export_tod_command",
     "format_export_result",
     "launch_background_export",

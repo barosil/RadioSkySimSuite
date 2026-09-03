@@ -8,7 +8,7 @@ from typing import Any
 
 from radioskysims_core.db.jobs import Job, JobStatus
 
-from radioskysims.interfaces.api.notebook import JobHandle, run_simulation
+from radioskysims.interfaces.notebook_api.notebook import JobHandle, run_simulation
 
 
 class FakeRepo:
@@ -81,7 +81,7 @@ def test_jobhandle_wait_final_immediately() -> None:
 def test_jobhandle_cancel(
     monkeypatch,
 ) -> None:
-    import radioskysims.interfaces.api.notebook as nb
+    import radioskysims.interfaces.notebook_api.notebook as nb
 
     called: dict[str, object] = {}
 
@@ -108,7 +108,7 @@ def test_jobhandle_cancel(
 def test_run_simulation_foreground(
     monkeypatch,
 ) -> None:
-    import radioskysims.interfaces.api.notebook as nb
+    import radioskysims.interfaces.notebook_api.notebook as nb
 
     executed: dict[str, object] = {}
 
@@ -134,7 +134,7 @@ def test_run_simulation_foreground(
 def test_run_simulation_background(
     monkeypatch,
 ) -> None:
-    import radioskysims.interfaces.api.notebook as nb
+    import radioskysims.interfaces.notebook_api.notebook as nb
 
     launched: dict[str, object] = {}
 

@@ -8,7 +8,7 @@ from typing import Any
 import pytest
 from ipywidgets import Button, FloatProgress, VBox
 
-from radioskysims.interfaces.api.widget import progress_widget
+from radioskysims.interfaces.notebook_api.widget import progress_widget
 
 
 class FakeHandle:

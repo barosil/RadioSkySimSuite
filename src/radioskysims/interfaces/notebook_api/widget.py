@@ -1,5 +1,5 @@
 """\
-Módulo: src/radioskysims/interfaces/api/widget.py
+Módulo: src/radioskysims/interfaces/notebook_api/widget.py
 
 Descrição:
     Widget de progresso para notebooks (ticket TOD-007): um VBox ipywidgets
@@ -16,7 +16,7 @@ import threading
 import time
 from typing import Any
 
-from radioskysims.interfaces.api.notebook import JobHandle
+from radioskysims.interfaces.notebook_api.notebook import JobHandle
 
 _FINAL_STATUSES = {"SUCCESS", "FAILED", "CANCELLED"}
 

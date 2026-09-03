@@ -9,7 +9,7 @@ flowchart TB
     subgraph ENTRY["Interfaces / Entrypoints (umbrella)"]
         CLI["interfaces/cli (radioskysims)"]
         GUI["interfaces/gui (TODPanel, skymap)"]
-        NBAPI["interfaces/api (fachada de notebook,\nNÃO é REST/FastAPI)"]
+        NBAPI["interfaces/notebook_api (fachada de notebook,\nNÃO é REST/FastAPI)"]
         SCRIPTS["scripts/ (start_service, check_db)"]
     end
 
