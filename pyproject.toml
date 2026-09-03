@@ -143,6 +143,7 @@ all = [
 dev = [
   "radioskysim[test]",
   "ipykernel",
+  "mypy>=2.3.1",
 ]
 
 

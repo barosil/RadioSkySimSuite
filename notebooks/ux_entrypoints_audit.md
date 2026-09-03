@@ -469,8 +469,11 @@ para os pacotes e seguem ativos.
   a docstring do pacote (consumidores importam do próprio pacote skymap).
 
 **Qualidade estática (Sprint 1/2 da auditoria de engenharia)**
-- [ ] **E12 — mypy**: `[tool.mypy]` strict configurado (cobre src/tests/packages), mas
-  o executável está ausente no ambiente/CI → instalar e rodar (gate real).
+- [x] **E12 — mypy** (2026-09-03, SETUP + baseline): `mypy>=2.3.1` instalado como
+  dev-dep (extra `dev`); rodado no meta-pacote → **184 erros em 34 arquivos**,
+  maioria `import-untyped` (pacotes do workspace sem `py.typed`) + GUI
+  (holoviews/panel). Limpeza full-strict do repo (py.typed por pacote +
+  correções) fica como trabalho contínuo.
 - [x] **E13 — ruff format** (2026-09-03): `ruff format` aplicado em
   `src/radioskysims` + `packages/*/src` (excl. `gnsstools4astro`, fora de
   escopo) — 141 arquivos; lint limpo; suítes verdes (radiotelescope: 1 falha
