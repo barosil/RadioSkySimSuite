@@ -350,6 +350,16 @@ limpo, `tod export` sem args funcionando, nenhuma simulação vazia silenciosa.
 ### Onda 3 — API pública de alto nível (R6 + "UX Changes")
 
 - [ ] **O3.1 · R6 — Uniformização semântica e fachadas de pacote**
+  - **Status (2026-09-03):** criados e expostos na raiz — `SatelliteOrchestrator`
+    (sources; TLE via banco — smoke 32 GPS), `LocalSourcesOrchestrator` (sources;
+    `create_sun`), `RadioSourcesOrchestrator` (sources; simulated/db/tap),
+    `ContinuumSourceOrchestrator` (sources; injetável), `MapMakingOrchestrator`
+    (simulation; injetável), `SkyMapOrchestrator`+`Mask` (skymap), `SimOrchestrator`
+    exposto na raiz (simulation), e tipos do kernel no `radioskysims_core`/hub
+    (`FrequencyRange`/`TimeRange`/`Observer`). Pendente: montagem default via
+    bootstrap para Continuum/MapMaking, integração RINEX (via `gnsstools4astro`),
+    conveniências de integração (`SkyMap.from_sources`/`to_tod`, `Sim.to_map`) e a
+    decisão do processor no core.
   - Anotado: *"facilitar interface de usuário e uso de orchestrators e
     processors; processor implícito (dask localcluster) vs explícito
     (distributed/mpi/gpu); habilitar MPI para pysm3 e healpy"*.
@@ -589,19 +599,19 @@ Legenda: ✅ importável hoje · 🟡 existe mas não exposto na fachada públic
 ```python
 # ── Meta-pacote (radioskysims / src/radioskysims/__init__.py) ──────────────
 from radioskysims import create_radiotelescope   # ✅ existe
-from radioskysims import FrequencyRange, TimeRange  # 🟡 existem (radioskysims_core.domain.common); reexportar
-from radioskysims import Observer                    # 🟡 idem (radioskysims_core.domain.common)
+from radioskysims import FrequencyRange, TimeRange  # ✅ reexportados (hub) 2026-09-03
+from radioskysims import Observer                    # ✅ reexportado (hub) 2026-09-03
 from radioskysims import Config                      # ✅ existe
 
 # ── radioskysims_core ─────────────────────────────────────────────────────
-# __init__ exporta só __version__. Decisão: expor FrequencyRange/TimeRange/
-# Observer/exceptions no core OU apenas no hub radioskysims (item 7 seção 7).
+from radioskysims_core import FrequencyRange, TimeRange, Observer  # ✅ expostos 2026-09-03
+# (Exceptions/NSide etc. continuam em radioskysims_core.domain.common)
 
 # ── radioskysims_sources ──────────────────────────────────────────────────
 from radioskysims_sources import SignalSource        # ✅ existe
 # SatelliteOrchestrator / LocalSourcesOrchestrator / RadioSourcesOrchestrator /
-#   ContinuumSourceOrchestrator  → ❌ criar (embrulham SatelliteManager/Sun/
-#   RadioSourcesManager e managers de application/services)
+#   ContinuumSourceOrchestrator  → ✅ criados 2026-09-03 (embrulham managers);
+#      integração RINEX do SatelliteOrchestrator pendente (via gnsstools4astro)
 # ➡️ RINEX/TLE devem vir do orchestrator:
 #    SatelliteOrchestrator.create_from_constellation(method="RINEX")  (ou from_RINEX)
 # ➡️ sun = LocalSourcesOrchestrator.create_sun(); sun.track(timerange).view(); sun.flux()
@@ -609,15 +619,17 @@ from radioskysims_sources import SignalSource        # ✅ existe
 
 # ── radioskysims_skymap ───────────────────────────────────────────────────
 from radioskysims_skymap import SkyMap, NSide, SkyMapManager  # ✅ existe
-# SkyMapOrchestrator (from_noise/from_sources/apply/load/save/to_tod) → ❌ criar
-# Mask → 🟡/❌ existe no domínio (skymap mask); expor na fachada
+from radioskysims_skymap import SkyMapOrchestrator, Mask  # ✅ criados 2026-09-03
+#   SkyMapOrchestrator: from_noise/from_coefficients/load/download/apply/
+#   smooth/rotate/save/view/statistics (encadeável). Pendentes: from_sources
+#   (composição com sources) e to_tod (projeção no simulation).
 # ➡️ usuário não deve conhecer factory/providers (pysm|healpy)/visualizer
 
 # ── radioskysims_simulation ───────────────────────────────────────────────
 from radioskysims_simulation import Simulation, SimulationResult, TODSimulator  # ✅ existe
-from radioskysims_simulation import SimOrchestrator  # 🟡 existe (application.services); expor na raiz
-# ➡️ simplificar chamada: SimOrchestrator(...).to_map()
-# MapMakingOrchestrator → ❌ criar (embrulha GenerateSkyMapsFromTODUseCase/MapMakingService)
+from radioskysims_simulation import MapMakingOrchestrator  # ✅ criado 2026-09-03 (injetável)
+from radioskysims_simulation import SimOrchestrator  # ✅ exposto na raiz (lazy) 2026-09-03
+# ➡️ simplificar chamada: SimOrchestrator(...).to_map() (pendente)
 
 # ── radioskysims_waterfall ────────────────────────────────────────────────
 from radioskysims_waterfall import (   # ✅ existe (raiz do pacote)
@@ -664,3 +676,13 @@ providers, paths, dotenv, db engine); *"Podemos simplificar a chamada"*
   (delega ao `bootstrap.skymap_gui`; decomposição dos módulos de GUI fica como
   trabalho contínuo). O2.8 — avaliação rich/typer registrada (manter argparse;
   rich incremental opcional). Onda 2 fechada (O2.1–O2.9).
+- 2026-09-03 (g) — **Onda 3 (fachadas, parte 1)**: criados e expostos na raiz
+  `SatelliteOrchestrator`, `LocalSourcesOrchestrator`, `RadioSourcesOrchestrator`,
+  `ContinuumSourceOrchestrator` (sources) e `MapMakingOrchestrator` (simulation).
+  Testes: sources 13 passed, simulation 3 passed. Pendente: fachadas de
+  core/skymap, hub no meta, montagens default e integração RINEX.
+- 2026-09-03 (h) — **Onda 3 (fachadas, parte 2)**: `SkyMapOrchestrator`+`Mask`
+  (skymap), `SimOrchestrator` exposto (simulation), `FrequencyRange`/`TimeRange`/
+  `Observer` no `radioskysims_core` e reexportados no hub `radioskysims`. Testes:
+  core 104, skymap 6. API pública do Anexo A quase completa (faltam montagens
+  default, RINEX e conveniências de integração).

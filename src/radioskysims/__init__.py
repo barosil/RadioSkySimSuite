@@ -16,6 +16,9 @@ import tomllib
 from pathlib import Path
 from typing import Any
 
+# Re-export dos tipos centrais do kernel no hub (UX Onda 3/R6):
+#    from radioskysims import FrequencyRange, TimeRange, Observer
+from radioskysims_core.domain.common import FrequencyRange, Observer, TimeRange
 from radioskysims_core.paths import get_project_root
 
 __version__ = "0.1.0"
@@ -114,3 +117,12 @@ class Config(dict):
         """Retorna o caminho absoluto do arquivo de configuração carregado."""
 
         return self._path
+
+
+__all__ = [
+    "Config",
+    "FrequencyRange",
+    "Observer",
+    "TimeRange",
+    "create_radiotelescope",
+]
