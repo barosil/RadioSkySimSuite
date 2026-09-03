@@ -3582,6 +3582,8 @@ waterfall = [
 dev = [
     { name = "ipykernel" },
     { name = "mypy" },
+    { name = "nbclient" },
+    { name = "nbformat" },
     { name = "radioskysim", extra = ["test"] },
 ]
 
@@ -3667,6 +3669,8 @@ provides-extras = ["all", "beam", "core", "dev", "docs", "gnss", "radiotelescope
 dev = [
     { name = "ipykernel" },
     { name = "mypy", specifier = ">=2.3.1" },
+    { name = "nbclient", specifier = ">=0.10.2" },
+    { name = "nbformat", specifier = ">=5.10.4" },
     { name = "radioskysim", extras = ["test"] },
 ]
 
