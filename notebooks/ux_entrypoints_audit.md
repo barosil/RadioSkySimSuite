@@ -446,8 +446,10 @@ para os pacotes e seguem ativos.
   quebrado por conceito — `frequency.py` (FrequencyRange), `angles.py`
   (AngularRange/parse_angle), `time.py` (TimeRange), `observer.py` (Observer) e
   `_lazy.py` (helpers lazy); `models.py` virou shim reexport (TD-012).
-- [ ] **E8 — `radioskysims_sources/infrastructure/db/satellite/
-  satelliterepository.py`** (~896 l.) — TD-011.
+- [x] **E8 — `radioskysims_sources/infrastructure/db/satellite/
+  satelliterepository.py`** (2026-09-03): ~890 l. decomposto por responsabilidade
+  em mixins (`_signals`/`_query`/`_process`/`_updates` + `_convert`); o módulo
+  virou casca com a classe pública `SatelliteRepository` (TD-011).
 
 **Drifts de API e legado no meta-pacote**
 - [x] **E9 — TD-005** (2026-09-03): API HTTP legada removida
@@ -487,14 +489,14 @@ os itens restantes ficam **registrados como pendentes/deferidos** (trabalho
 contínuo pós-push — não bloqueiam o push).
 
 - **Entregues ✅** — E1 (Domain→Application), E2 (Domain→Infrastructure),
-  E4 (leak sources→meta), E7 (TD-012 split models core), E9 (TD-005), E10
-  (TD-006/014 legado), E11 (TD-013), E13 (ruff format), E14 (check_docs),
-  E5-início (grids no domínio) e E3-catalog_services (port + bootstrap).
+  E4 (leak sources→meta), E7 (TD-012 split models core), E8 (TD-011 split
+  satelliterepository em mixins), E9 (TD-005), E10 (TD-006/014 legado), E11
+  (TD-013), E13 (ruff format), E14 (check_docs), E5-início (grids no domínio)
+  e E3-catalog_services (port + bootstrap).
 - **Pendentes/deferidos** — E3-simulation (processor/beam resolvers,
   consolidado com E5); E5 restante (hotspots grandes: `sim_orchestrator`,
   `simulation.py`, `simulator`, `resource_processor`); E6 (waterfall →
-  `radioskysims-waterfall`); E8 (`satelliterepository` ~896 l.); E12 (mypy
-  gate); E15 (cobertura de hotspots).
+  `radioskysims-waterfall`); E12 (mypy gate); E15 (cobertura de hotspots).
 
 ### 5.2 F3 — Evoluções científicas e validações
 
