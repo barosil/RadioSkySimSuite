@@ -353,13 +353,15 @@ limpo, `tod export` sem args funcionando, nenhuma simulação vazia silenciosa.
   - **Status (2026-09-03):** criados e expostos na raiz — `SatelliteOrchestrator`
     (sources; TLE via banco — smoke 32 GPS), `LocalSourcesOrchestrator` (sources;
     `create_sun`), `RadioSourcesOrchestrator` (sources; simulated/db/tap),
-    `ContinuumSourceOrchestrator` (sources; injetável), `MapMakingOrchestrator`
-    (simulation; injetável), `SkyMapOrchestrator`+`Mask` (skymap), `SimOrchestrator`
-    exposto na raiz (simulation), e tipos do kernel no `radioskysims_core`/hub
-    (`FrequencyRange`/`TimeRange`/`Observer`). Pendente: montagem default via
-    bootstrap para Continuum/MapMaking, integração RINEX (via `gnsstools4astro`),
-    conveniências de integração (`SkyMap.from_sources`/`to_tod`, `Sim.to_map`) e a
-    decisão do processor no core.
+    `ContinuumSourceOrchestrator` (sources; injetável e `default()` com PySM3),
+    `MapMakingOrchestrator` (simulation; injetável e `default()` com
+    `HealpyBinnedMapMakerAdapter`), `SkyMapOrchestrator`+`Mask` (skymap),
+    `SimOrchestrator` exposto na raiz (simulation), e tipos do kernel no
+    `radioskysims_core`/hub (`FrequencyRange`/`TimeRange`/`Observer`).
+    **Processor no core**: recomendação — migração incremental em F2/E5
+    (`ResourceAwareProcessor` é módulo central com testes sensíveis; evitar
+    refactor amplo na Onda 3). RINEX e conveniências (`SkyMap.from_sources`/
+    `to_tod`, `Sim.to_map`) seguem pendentes.
   - Anotado: *"facilitar interface de usuário e uso de orchestrators e
     processors; processor implícito (dask localcluster) vs explícito
     (distributed/mpi/gpu); habilitar MPI para pysm3 e healpy"*.
@@ -686,3 +688,7 @@ providers, paths, dotenv, db engine); *"Podemos simplificar a chamada"*
   `Observer` no `radioskysims_core` e reexportados no hub `radioskysims`. Testes:
   core 104, skymap 6. API pública do Anexo A quase completa (faltam montagens
   default, RINEX e conveniências de integração).
+- 2026-09-03 (i) — **Onda 3 (fachadas, parte 3)**: fábricas `default()` em
+  `ContinuumSourceOrchestrator` (PySM3) e `MapMakingOrchestrator`
+  (`HealpyBinnedMapMakerAdapter`). Processor no core → migração incremental em
+  F2/E5 (módulo central). RINEX e conveniências pendentes.
