@@ -453,12 +453,11 @@ para os pacotes e seguem ativos.
 - [x] **E9 — TD-005** (2026-09-03): API HTTP legada removida
   (`interfaces/api/satellite_controller.py` — sem uso, chamava métodos
   inexistentes do `SatelliteService`, que expõe `get_all`/`get_by_ids`).
-- [ ] **E10 — TD-006/TD-014**: `src/radioskysims/main.py` legado chama
-  `SatelliteFactory(repository=…, spacetrack_client=…)` que a factory atual
-  (só `repository`) não aceita → TypeError; remover/consolidar junto com
-  `src/radioskysims/application/gain_panel.py`, shims
-  `src/radioskysims/infrastructure/ports/{geometry,skymap}.py` e placeholder
-  `domain/map/models.py`.
+- [x] **E10 — TD-006/TD-014** (2026-09-03): removidos `src/radioskysims/main.py`
+  legado (TD-006), `application/gain_panel.py`, shims
+  `infrastructure/ports/{geometry,skymap,__init__}.py` e o placeholder
+  `domain/map/` (TD-014). Testes de ports passam a importar
+  `GeometryProviderPort` diretamente do `radioskysims-core`.
 - [x] **E11 — TD-013** (2026-09-03): `src/radioskysims/interfaces/__init__.py`
   não reexporta mais o adapter concreto (`PySMSkyMapGeneratorAdapter`); fica só
   a docstring do pacote (consumidores importam do próprio pacote skymap).

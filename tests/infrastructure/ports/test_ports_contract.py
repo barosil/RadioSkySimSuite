@@ -46,7 +46,7 @@ from radioskysims_skymap.infrastructure.skymap.adapters.analysis import (
 # =============================================================================
 from radioskysims_skymap.infrastructure.skymap.providers.healpy import HealpySkyMapProvider
 
-from radioskysims.infrastructure.ports.geometry import GeometryProviderPort
+from radioskysims_core.application.ports.geometry import GeometryProviderPort
 
 # =============================================================================
 # Fixtures compartilhadas

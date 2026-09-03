@@ -26,7 +26,7 @@ from radioskysims_beam.application.ports.beam import (
     BeamEvaluatorPort,
     BeamLoaderPort,
 )
-from radioskysims.infrastructure.ports.geometry import GeometryProviderPort
+from radioskysims_core.application.ports.geometry import GeometryProviderPort
 
 # SkyMap ports require healpy → astropy; skip if not available in this env.
 try:

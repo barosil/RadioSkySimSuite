@@ -41,7 +41,9 @@ class DocChecker(ast.NodeVisitor):
 
         # Verifica type hints no retorno
         if node.name != "__init__" and not node.returns:
-            self.issues.append(f"⚠️  Função '{node.name}' sem type hint de retorno (linha {node.lineno})")
+            self.issues.append(
+                f"⚠️  Função '{node.name}' sem type hint de retorno (linha {node.lineno})"
+            )
 
         self.generic_visit(node)
 
@@ -131,11 +133,11 @@ def main() -> None:
             for issue in issues:
                 print(f"   {issue}")
 
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print(f"✅ Arquivos verificados: {len(py_files)}")
     print(f"⚠️  Arquivos com problemas: {files_with_issues}")
     print(f"📊 Total de issues: {total_issues}")
-    print(f"{'='*60}\n")
+    print(f"{'=' * 60}\n")
 
     if files_with_issues == 0:
         print("🎉 Todos os arquivos estão bem documentados!")
