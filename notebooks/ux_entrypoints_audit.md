@@ -479,6 +479,23 @@ para os pacotes e seguem ativos.
 consolidação de dependências em `pyproject.toml` (uv workspace + extras +
 constraints).
 
+#### Status de encerramento F2 (2026-09-03)
+
+F2 **concluída nesta etapa** com os itens estruturais/fronteiras entregues;
+os itens restantes ficam **registrados como pendentes/deferidos** (trabalho
+contínuo pós-push — não bloqueiam o push).
+
+- **Entregues ✅** — E1 (Domain→Application), E2 (Domain→Infrastructure),
+  E4 (leak sources→meta), E7 (TD-012 split models core), E9 (TD-005), E11
+  (TD-013), E14 (check_docs), E5-início (grids no domínio) e
+  E3-catalog_services (port + bootstrap).
+- **Pendentes/deferidos** — E3-simulation (processor/beam resolvers,
+  consolidado com E5); E5 restante (hotspots grandes: `sim_orchestrator`,
+  `simulation.py`, `simulator`, `resource_processor`); E6 (waterfall →
+  `radioskysims-waterfall`); E8 (`satelliterepository` ~896 l.); E10
+  (TD-006/014: `main.py` legado, `gain_panel`, shims, `domain/map`); E12 (mypy
+  gate); E13 (ruff format ~153 arquivos); E15 (cobertura de hotspots).
+
 ### 5.2 F3 — Evoluções científicas e validações
 
 Fontes: `docs/audits/funcionalidade_fisica_1.md`, `mapmaking_binned_scaling.md`,
