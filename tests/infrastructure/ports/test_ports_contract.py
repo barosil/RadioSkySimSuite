@@ -308,7 +308,7 @@ class TestBeamCreatorPortContract:
     """Verifica que BeamFactory respeita o contrato BeamCreatorPort."""
 
     def test_implementa_interface(self):
-        from radioskysims_beam.domain.beam.factory import BeamFactory
+        from radioskysims_beam.application.services.beam_factory import BeamFactory
 
         factory = BeamFactory()
         # NOTA: BeamFactory não herda de BeamCreatorPort atualmente
@@ -318,7 +318,7 @@ class TestBeamCreatorPortContract:
     def test_create_assinatura(self):
         import inspect
 
-        from radioskysims_beam.domain.beam.factory import BeamFactory
+        from radioskysims_beam.application.services.beam_factory import BeamFactory
 
         factory = BeamFactory()
         # API atual: create_beam_from_file(filepath, name, ...)

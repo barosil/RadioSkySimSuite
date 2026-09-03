@@ -410,29 +410,35 @@ exemplo `run_simulation` do README); os demais itens foram **transportados**
 para os pacotes e seguem ativos.
 
 **Fronteiras DDD (TD-001/002/003)**
-- [ ] **E1 — Domain → Application**: `radioskysims_simulation/domain/simulation/
-  simulation.py` importa `application.services.simulation_service`
-  (`_compute_time_grid`); `radioskysims_core/domain/geometry/{interface,
-  skyfield_provider}.py` importam `application.ports.geometry`.
-- [ ] **E2 — Domain → Infrastructure**: `radioskysims_beam/domain/beam/factory.py`
-  (loader analítico), `radioskysims_sources/domain/satellite/selector.py`
-  (modelo de infra), `radioskysims_sources/domain/signal/factory.py`
-  (gnsstools_psd).
-- [ ] **E3 — Application → Infrastructure**: `sim_orchestrator.py` e
-  `simulation_service.py` resolvem `ResourceAwareProcessor` e beam loaders
-  concretos; `catalog_services.py` (sources). Mover para ports + bootstrap.
-- [ ] **E4 — Leak novo pós-decoupling**: `radioskysims_sources` importa
-  `radioskysims.application.ports` (composition root do meta-pacote) em
-  `satellite_service.py`, `infrastructure/db/satellite/repository_adapter.py` e
-  `satelliterepository.py` → inverte o isolamento e arrisca ciclo; substituir
-  por ports do próprio pacote.
+- [x] **E1 — Domain → Application** (2026-09-03): `_compute_time_grid` → domínio
+  (`simulation/domain/simulation/grids.py`); `GeometryProviderPort` canônico
+  movido p/ `core/domain/geometry/interface.py` (`application/ports/geometry.py`
+  reexporta por compat).
+- [x] **E2 — Domain → Infrastructure** (2026-09-03): `BeamFactory` movido p/
+  `beam/application/services/beam_factory.py` (sem uso de produção);
+  `sources/domain/satellite/selector.py` opera por Protocol
+  (`SatelliteElementsView`); `SignalFactory` (sources) recebe `psd_provider` por
+  DI — composition roots injetam `GnsstoolsAnalyticPsdProvider`.
+- [ ] **E3 — Application → Infrastructure** (2026-09-03, PARCIAL):
+  `catalog_services.py` (sources) movido a ports + bootstrap — novo port
+  `RadioSourceTrackProviderPort`; builders do simulation injeta o adapter
+  `SkyfieldRadioSourceTrackProvider`. Processor/beam resolvers concretos de
+  `sim_orchestrator.py`/`simulation_service.py` → consolidadas no E5 (migração
+  do processor para o port do core + extração de resolvers de beam).
+- [x] **E4 — Leak novo pós-decoupling** (2026-09-03): `radioskysims_sources`
+  importava `radioskysims.application.ports`; agora usa
+  `radioskysims_sources.application.ports.satellite` (contrato local). Meta
+  reexporta por compat.
 
 **Módulos grandes (TD-011/012, hotspots)**
-- [ ] **E5 — Decompor hotspots de simulação**: `domain/simulation/simulation.py`
-  (~1570 l.), `sim_orchestrator.py` (~1620 l.), `simulation_service.py`
-  (~1020 l.), `domain/tod/simulator.py` (~890 l.),
-  `infrastructure/processing/resource_processor.py` (~1230 l.) — todos em
-  `packages/radioskysims-simulation`.
+- [ ] **E5 — Decompor hotspots de simulação** (2026-09-03, INÍCIO):
+  `domain/simulation/{simulation.py, simulator, ...}` — helpers de grid
+  (`_compute_time_grid`/`_compute_freq_mhz`/`_beam_fwhm_deg`) extraídos p/
+  `domain/simulation/grids.py` (funções puras). Hotspots maiores
+  (`sim_orchestrator.py` ~1620 l., `simulation.py` ~1570 l.,
+  `simulation_service.py` ~1020 l., `domain/tod/simulator.py` ~890 l.,
+  `infrastructure/processing/resource_processor.py` ~1230 l.) seguem como
+  decomposição incremental (processor → port do core).
 - [ ] **E6 — `src/radioskysims/visualization/waterfall.py`** (~1250 l.) fora das
   fases do decoupling — integrar ao `radioskysims-waterfall` (decisão do plano
   de decoupling) e decompor.
@@ -452,8 +458,9 @@ para os pacotes e seguem ativos.
   `src/radioskysims/application/gain_panel.py`, shims
   `src/radioskysims/infrastructure/ports/{geometry,skymap}.py` e placeholder
   `domain/map/models.py`.
-- [ ] **E11 — TD-013**: `src/radioskysims/interfaces/__init__.py` reexporta
-  adapter concreto (`PySMSkyMapGeneratorAdapter`) → expor só contratos/fachadas.
+- [x] **E11 — TD-013** (2026-09-03): `src/radioskysims/interfaces/__init__.py`
+  não reexporta mais o adapter concreto (`PySMSkyMapGeneratorAdapter`); fica só
+  a docstring do pacote (consumidores importam do próprio pacote skymap).
 
 **Qualidade estática (Sprint 1/2 da auditoria de engenharia)**
 - [ ] **E12 — mypy**: `[tool.mypy]` strict configurado (cobre src/tests/packages), mas
