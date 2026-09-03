@@ -80,23 +80,48 @@ def check_file(filepath: Path) -> tuple[bool, list[str]]:
         return True, [f"❌ Erro ao processar: {e}"]
 
 
-def main() -> None:
-    """Executa verificação em todos os arquivos Python do projeto."""
+def iter_roots() -> list[Path]:
+    """Retorna as raízes de código a varrer (meta-pacote + packages)."""
     project_root = Path(__file__).parent.parent
-    src_dir = project_root / "src" / "radioskysims"
+    roots: list[Path] = []
 
-    if not src_dir.exists():
-        print(f"❌ Diretório não encontrado: {src_dir}")
+    meta_src = project_root / "src" / "radioskysims"
+    if meta_src.exists():
+        roots.append(meta_src)
+
+    packages_src = project_root / "packages"
+    if packages_src.exists():
+        for pkg in sorted(packages_src.iterdir()):
+            pkg_src = pkg / "src"
+            if pkg_src.exists() and pkg_src.is_dir():
+                roots.append(pkg_src)
+
+    return roots
+
+
+def main() -> None:
+    """Executa verificação em todos os arquivos Python do projeto.
+
+    Varre o meta-pacote (``src/radioskysims``) e, a partir do E14, também
+    todos os pacotes do workspace (``packages/*/src``).
+    """
+    roots = iter_roots()
+
+    if not roots:
+        print("❌ Nenhuma raiz de código encontrada (src/radioskysims ou packages/*/src).")
         return
 
-    py_files = list(src_dir.rglob("*.py"))
-    print(f"📋 Verificando {len(py_files)} arquivos Python...\n")
+    py_files: list[tuple[Path, Path]] = []  # (arquivo, rel_path)
+    for root in roots:
+        for py_file in sorted(root.rglob("*.py")):
+            py_files.append((py_file, py_file.relative_to(root)))
+
+    print(f"📋 Verificando {len(py_files)} arquivos Python ({len(roots)} raízes)...\n")
 
     files_with_issues = 0
     total_issues = 0
 
-    for py_file in sorted(py_files):
-        rel_path = py_file.relative_to(src_dir)
+    for py_file, rel_path in sorted(py_files, key=lambda item: str(item[1])):
         has_issues, issues = check_file(py_file)
 
         if has_issues:

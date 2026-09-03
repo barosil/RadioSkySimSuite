@@ -442,16 +442,17 @@ para os pacotes e seguem ativos.
 - [ ] **E6 — `src/radioskysims/visualization/waterfall.py`** (~1250 l.) fora das
   fases do decoupling — integrar ao `radioskysims-waterfall` (decisão do plano
   de decoupling) e decompor.
-- [ ] **E7 — `radioskysims_core/domain/common/models.py`** (~654 l.) — quebrar
-  por conceito (time/frequency/angles/observer) — TD-012.
+- [x] **E7 — `radioskysims_core/domain/common/models.py`** (2026-09-03): ~654 l.
+  quebrado por conceito — `frequency.py` (FrequencyRange), `angles.py`
+  (AngularRange/parse_angle), `time.py` (TimeRange), `observer.py` (Observer) e
+  `_lazy.py` (helpers lazy); `models.py` virou shim reexport (TD-012).
 - [ ] **E8 — `radioskysims_sources/infrastructure/db/satellite/
   satelliterepository.py`** (~896 l.) — TD-011.
 
 **Drifts de API e legado no meta-pacote**
-- [ ] **E9 — TD-005**: `radioskysims_sources/.../interfaces/api/
-  satellite_controller.py` (`get_all_satellites`/…) vs `application/services/
-  satellite_service.py` (`get_all`/`get_by_ids`/…) — drift preservado; alinhar
-  o contrato (ou remover a API HTTP, fora do fluxo atual).
+- [x] **E9 — TD-005** (2026-09-03): API HTTP legada removida
+  (`interfaces/api/satellite_controller.py` — sem uso, chamava métodos
+  inexistentes do `SatelliteService`, que expõe `get_all`/`get_by_ids`).
 - [ ] **E10 — TD-006/TD-014**: `src/radioskysims/main.py` legado chama
   `SatelliteFactory(repository=…, spacetrack_client=…)` que a factory atual
   (só `repository`) não aceita → TypeError; remover/consolidar junto com
@@ -467,8 +468,9 @@ para os pacotes e seguem ativos.
   o executável está ausente no ambiente/CI → instalar e rodar (gate real).
 - [ ] **E13 — ruff format**: ~153 arquivos a reformatar (`uv run ruff format
   --check src packages/*/src`) — aplicar de forma controlada por pacote.
-- [ ] **E14 — check_docs**: `scripts/check_docs.py` varre só `src/radioskysims`;
-  estender para `packages/*/src` e reduzir issues.
+- [x] **E14 — check_docs** (2026-09-03): `scripts/check_docs.py` agora varre o
+  meta-pacote E também `packages/*/src` (423 arquivos; 650 issues — redução
+  contínua).
 - [ ] **E15 — Cobertura de hotspots**: `SimulationService` ~17%; entrypoints/GUI
   ~0% — orientar novos testes por risco.
 
