@@ -96,11 +96,7 @@ def format_survey_result(
             indent=2,
         )
 
-    frequency_text = (
-        f"{frequency_ghz} GHz"
-        if frequency_ghz is not None
-        else "não informada"
-    )
+    frequency_text = f"{frequency_ghz} GHz" if frequency_ghz is not None else "não informada"
 
     return "\n".join(
         [
@@ -117,7 +113,8 @@ def format_survey_result(
             f"Tipo dos dados: {map_data.dtype}",
         ]
     )
-    
+
+
 def format_analyze_result(
     *,
     output: AnalyzeSkyMapOutputDTO,
@@ -134,29 +131,13 @@ def format_analyze_result(
 
     finite_cls = cls[np.isfinite(cls)]
 
-    cls_min = (
-        float(np.min(finite_cls))
-        if finite_cls.size
-        else None
-    )
+    cls_min = float(np.min(finite_cls)) if finite_cls.size else None
 
-    cls_max = (
-        float(np.max(finite_cls))
-        if finite_cls.size
-        else None
-    )
+    cls_max = float(np.max(finite_cls)) if finite_cls.size else None
 
-    cls_mean = (
-        float(np.mean(finite_cls))
-        if finite_cls.size
-        else None
-    )
+    cls_mean = float(np.mean(finite_cls)) if finite_cls.size else None
 
-    effective_lmax = (
-        int(output.lmax)
-        if output.lmax is not None
-        else max(int(cls.size) - 1, 0)
-    )
+    effective_lmax = int(output.lmax) if output.lmax is not None else max(int(cls.size) - 1, 0)
 
     payload: dict[str, object] = {
         "status": "success",

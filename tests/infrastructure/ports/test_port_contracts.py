@@ -19,13 +19,12 @@ from typing import Any
 import numpy as np
 import pytest
 import xarray as xr
-
-from radioskysims_beam.domain.beam.models import Beam
 from radioskysims_beam.application.ports.beam import (
     BeamCreatorPort,
     BeamEvaluatorPort,
     BeamLoaderPort,
 )
+from radioskysims_beam.domain.beam.models import Beam
 from radioskysims_core.application.ports.geometry import GeometryProviderPort
 
 # SkyMap ports require healpy → astropy; skip if not available in this env.
@@ -138,7 +137,7 @@ class TestBeamEvaluatorPortContract:
                 return xr.DataArray(np.zeros(angle.shape))
 
             def compute_properties(self, beam: Beam) -> dict[str, Any]:
-                _ = (beam)  # assinala uso (interface/reservado)
+                _ = beam  # assinala uso (interface/reservado)
                 return {"fwhm": 1.0}
 
         evaluator = MinimalEvaluator()
@@ -173,13 +172,16 @@ class TestBeamCreatorPortContract:
                 amplitudes: Any,
                 polarizations: list[str] | None = None,
             ) -> Beam:
-                _ = (amplitudes, angle, frequency, polarizations)  # assinala uso (interface/reservado)
+                _ = (
+                    amplitudes,
+                    angle,
+                    frequency,
+                    polarizations,
+                )  # assinala uso (interface/reservado)
                 return _make_minimal_beam()
 
         creator = MinimalCreator()
-        result = creator.create(
-            frequency=[1.0e8], angle=[0.0, 1.0], amplitudes=np.ones((1, 2))
-        )
+        result = creator.create(frequency=[1.0e8], angle=[0.0, 1.0], amplitudes=np.ones((1, 2)))
         assert isinstance(result, Beam)
 
 
@@ -206,9 +208,7 @@ class TestGeometryProviderPortContract:
 
     def test_concrete_subclass_must_implement_all_methods(self) -> None:
         class PartialGeometry(GeometryProviderPort):
-            def compute(
-                self, tracks: Any, observer: Any, sat_block: Any = None
-            ) -> xr.Dataset:
+            def compute(self, tracks: Any, observer: Any, sat_block: Any = None) -> xr.Dataset:
                 _ = (observer, sat_block, tracks)  # assinala uso (interface/reservado)
                 return xr.Dataset()
 
@@ -218,9 +218,7 @@ class TestGeometryProviderPortContract:
 
     def test_full_concrete_subclass_instantiates(self) -> None:
         class MinimalGeometry(GeometryProviderPort):
-            def compute(
-                self, tracks: Any, observer: Any, sat_block: Any = None
-            ) -> xr.Dataset:
+            def compute(self, tracks: Any, observer: Any, sat_block: Any = None) -> xr.Dataset:
                 _ = (observer, sat_block, tracks)  # assinala uso (interface/reservado)
                 return xr.Dataset()
 
@@ -231,7 +229,12 @@ class TestGeometryProviderPortContract:
                 observer_lat: float,
                 observer_lon: float,
             ) -> tuple[Any, Any, Any]:
-                _ = (observer_lat, observer_lon, satellite, time)  # assinala uso (interface/reservado)
+                _ = (
+                    observer_lat,
+                    observer_lon,
+                    satellite,
+                    time,
+                )  # assinala uso (interface/reservado)
                 return (0.0, 0.0, 0.0)
 
             def calculate_range(
@@ -241,7 +244,12 @@ class TestGeometryProviderPortContract:
                 observer_lat: float | None = None,
                 observer_lon: float | None = None,
             ) -> Any:
-                _ = (observer_lat, observer_lon, satellite, time)  # assinala uso (interface/reservado)
+                _ = (
+                    observer_lat,
+                    observer_lon,
+                    satellite,
+                    time,
+                )  # assinala uso (interface/reservado)
                 return 0.0
 
         geo = MinimalGeometry()
@@ -254,9 +262,7 @@ class TestGeometryProviderPortContract:
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.skipif(
-    not _skymap_ports_available, reason="healpy/astropy not available in test env"
-)
+@pytest.mark.skipif(not _skymap_ports_available, reason="healpy/astropy not available in test env")
 class TestSkyMapIOPortContract:
     """Verifica que SkyMapIOPort define o contrato correto."""
 
@@ -269,9 +275,7 @@ class TestSkyMapIOPortContract:
         assert "write_map" in abstracts
 
 
-@pytest.mark.skipif(
-    not _skymap_ports_available, reason="healpy/astropy not available in test env"
-)
+@pytest.mark.skipif(not _skymap_ports_available, reason="healpy/astropy not available in test env")
 class TestSkyMapTransformPortContract:
     """Verifica que SkyMapTransformPort define o contrato correto."""
 

@@ -4,7 +4,6 @@ Copyright BINGO Collaboration
 Last modified: 2026-07-23
 """
 
-
 from __future__ import annotations
 
 import panel as pn
@@ -20,10 +19,7 @@ def render_messages_markdown(state: SkyMapGuiState) -> str:
     if not state.messages:
         return "**Mensagens:** _(sem mensagens)_"
 
-    lines = [
-        f"- **{message.level.upper()}**: {message.text}"
-        for message in state.messages
-    ]
+    lines = [f"- **{message.level.upper()}**: {message.text}" for message in state.messages]
     return "**Mensagens:**\n" + "\n".join(lines)
 
 
@@ -34,11 +30,7 @@ def render_metadata_markdown(
     if vm is None:
         return "**Metadados:** _(nenhum mapa gerado)_"
 
-    lines = [
-        f"- `{key}`: {value}"
-        for key, value in vm.metadata.items()
-        if value != ""
-    ]
+    lines = [f"- `{key}`: {value}" for key, value in vm.metadata.items() if value != ""]
 
     content = "\n".join(lines) if lines else "_vazio_"
 
@@ -46,10 +38,7 @@ def render_metadata_markdown(
         if vm.valid_fraction is None:
             coverage = "_cobertura indisponível_"
         else:
-            coverage = (
-                f"- `valid_fraction`: {vm.valid_fraction:.6f} "
-                f"({vm.valid_pixels}/{vm.npix})"
-            )
+            coverage = f"- `valid_fraction`: {vm.valid_fraction:.6f} ({vm.valid_pixels}/{vm.npix})"
 
         content = "\n".join([content, coverage])
 
@@ -67,9 +56,7 @@ def render_metadata_markdown(
 
         content = "\n".join(lines)
 
-    return "**Metadados:**\n" + (
-        content
-    )
+    return "**Metadados:**\n" + (content)
 
 
 def build_messages_panel(
@@ -230,7 +217,6 @@ def build_analyze_placeholder_table() -> pn.pane.Markdown:
     )
 
 
-
 def build_histogram_plot(
     vm: GenerateViewModel | SurveyViewModel | AnalyzeViewModel | None,
 ):
@@ -306,10 +292,7 @@ def build_map_plot(
 
     map_preview = vm.map_preview
 
-    if (
-        hasattr(map_preview, "pixel_index")
-        and hasattr(map_preview, "pixel_value")
-    ):
+    if hasattr(map_preview, "pixel_index") and hasattr(map_preview, "pixel_value"):
         pixel_index = map_preview.pixel_index
         pixel_value = map_preview.pixel_value
     elif isinstance(map_preview, tuple) and len(map_preview) == 2:

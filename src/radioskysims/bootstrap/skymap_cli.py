@@ -58,9 +58,7 @@ def build_skymap_cli_use_cases() -> SkyMapCLIUseCases:
         generate_skymap=GenerateSkyMapUseCase(
             generator=generator,
         ),
-        continuum_survey_factory=(
-            build_continuum_survey_use_case
-        ),
+        continuum_survey_factory=(build_continuum_survey_use_case),
         analyze_skymap=AnalyzeSkyMapUseCase(
             analyzer=analyzer,
         ),

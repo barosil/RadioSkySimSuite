@@ -465,8 +465,10 @@ para os pacotes e seguem ativos.
 **Qualidade estática (Sprint 1/2 da auditoria de engenharia)**
 - [ ] **E12 — mypy**: `[tool.mypy]` strict configurado (cobre src/tests/packages), mas
   o executável está ausente no ambiente/CI → instalar e rodar (gate real).
-- [ ] **E13 — ruff format**: ~153 arquivos a reformatar (`uv run ruff format
-  --check src packages/*/src`) — aplicar de forma controlada por pacote.
+- [x] **E13 — ruff format** (2026-09-03): `ruff format` aplicado em
+  `src/radioskysims` + `packages/*/src` (excl. `gnsstools4astro`, fora de
+  escopo) — 141 arquivos; lint limpo; suítes verdes (radiotelescope: 1 falha
+  pré-existente em `test_view_returns_holoviews_curve`, não relacionada).
 - [x] **E14 — check_docs** (2026-09-03): `scripts/check_docs.py` agora varre o
   meta-pacote E também `packages/*/src` (423 arquivos; 650 issues — redução
   contínua).
@@ -485,15 +487,14 @@ os itens restantes ficam **registrados como pendentes/deferidos** (trabalho
 contínuo pós-push — não bloqueiam o push).
 
 - **Entregues ✅** — E1 (Domain→Application), E2 (Domain→Infrastructure),
-  E4 (leak sources→meta), E7 (TD-012 split models core), E9 (TD-005), E11
-  (TD-013), E14 (check_docs), E5-início (grids no domínio) e
-  E3-catalog_services (port + bootstrap).
+  E4 (leak sources→meta), E7 (TD-012 split models core), E9 (TD-005), E10
+  (TD-006/014 legado), E11 (TD-013), E13 (ruff format), E14 (check_docs),
+  E5-início (grids no domínio) e E3-catalog_services (port + bootstrap).
 - **Pendentes/deferidos** — E3-simulation (processor/beam resolvers,
   consolidado com E5); E5 restante (hotspots grandes: `sim_orchestrator`,
   `simulation.py`, `simulator`, `resource_processor`); E6 (waterfall →
-  `radioskysims-waterfall`); E8 (`satelliterepository` ~896 l.); E10
-  (TD-006/014: `main.py` legado, `gain_panel`, shims, `domain/map`); E12 (mypy
-  gate); E13 (ruff format ~153 arquivos); E15 (cobertura de hotspots).
+  `radioskysims-waterfall`); E8 (`satelliterepository` ~896 l.); E12 (mypy
+  gate); E15 (cobertura de hotspots).
 
 ### 5.2 F3 — Evoluções científicas e validações
 

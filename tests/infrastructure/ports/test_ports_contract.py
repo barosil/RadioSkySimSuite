@@ -24,6 +24,7 @@ import pytest
 from radioskysims_beam.application.ports.beam import (
     BeamLoaderPort,
 )
+from radioskysims_core.application.ports.geometry import GeometryProviderPort
 from radioskysims_skymap.application.skymap.ports import (
     SkyMapAnalyzerPort,
     SkyMapGeneratorPort,
@@ -45,8 +46,6 @@ from radioskysims_skymap.infrastructure.skymap.adapters.analysis import (
 # Imports das implementações (adapters)
 # =============================================================================
 from radioskysims_skymap.infrastructure.skymap.providers.healpy import HealpySkyMapProvider
-
-from radioskysims_core.application.ports.geometry import GeometryProviderPort
 
 # =============================================================================
 # Fixtures compartilhadas

@@ -14,6 +14,7 @@ from radioskysims.interfaces.cli.formatters import (
     format_generate_result,
 )
 
+
 def execute_generate_command(
     *,
     use_case: GenerateSkyMapUseCase,
