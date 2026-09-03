@@ -439,6 +439,10 @@ para os pacotes e seguem ativos.
   `simulation_service.py` ~1020 l., `domain/tod/simulator.py` ~890 l.,
   `infrastructure/processing/resource_processor.py` ~1230 l.) seguem como
   decomposição incremental (processor → port do core).
+  - 2026-09-03: `domain/tod/simulator.py` — `BeamHandlingMixin` extraído
+    (`_beam.py`: `_normalize_beam`/`_beam_fwhm_by_frequency`); os métodos
+    gigantes `simulate_from_source`/`simulate_from_maps` seguem como próximo
+    passo (fases bem delimitadas, decomponíveis preservando comportamento).
 - [ ] **E6 — `src/radioskysims/visualization/waterfall.py`** (~1250 l.) fora das
   fases do decoupling — integrar ao `radioskysims-waterfall` (decisão do plano
   de decoupling) e decompor.
