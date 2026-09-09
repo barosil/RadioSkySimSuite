@@ -1,6 +1,0 @@
-Audit branch: chore/project-maturity-roadmap
-Source branch: feature/skymap-mvp
-Source commit: c47fdb9e81179f917aed96b4f534685c99dbd0e8
-Audit started at: 2026-07-27T20:39:28-03:00
-Python: Python 3.11.14
-Pytest: pytest 8.4.2

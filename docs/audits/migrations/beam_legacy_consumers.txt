@@ -1,4 +1,0 @@
-src/radioskysims/application/beam_panel.py:11:from radioskysims.beam.models import Beam
-tests/beam_panel_test.py:6:from radioskysims.beam.models import Beam
-tests/infrastructure/ports/test_ports_contract.py:309:        from radioskysims.beam.factory import BeamFactory
-tests/infrastructure/ports/test_ports_contract.py:319:        from radioskysims.beam.factory import BeamFactory
