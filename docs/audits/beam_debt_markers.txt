@@ -1,9 +1,0 @@
-src/radioskysims/beam/factory.py:42:        except Exception:
-src/radioskysims/domain/beam/services.py:32:        except Exception as e:
-src/radioskysims/domain/beam/services.py:47:        except Exception as e:
-src/radioskysims/domain/beam/services.py:67:        except Exception as e:
-src/radioskysims/domain/beam/models.py:104:        except Exception:
-src/radioskysims/domain/beam/models.py:108:        except Exception:
-src/radioskysims/domain/beam/properties.py:103:        except Exception as e:
-src/radioskysims/infrastructure/beams/loaders/base.py:34:            NotImplementedError: Se não for implementado por subclasse.
-src/radioskysims/infrastructure/beams/loaders/base.py:36:        raise NotImplementedError
