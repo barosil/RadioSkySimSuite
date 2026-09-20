@@ -20,7 +20,7 @@
 
 | Comando | Pacote | Target | Estado | Observação |
 |---|---|---|---|---|
-| `radioskysims` | `radioskysim` (umbrella) | `radioskysims.bootstrap.skymap_cli:main` | Oficial | CLI principal; monta casos de uso de SkyMap/TOD via composition root. |
+| `radioskysims` | `radioskysim` (umbrella) | `radioskysims.bootstrap.cli:main` | Oficial | CLI principal; monta casos de uso de SkyMap/TOD via composition root. |
 | `radioskysim-sources` | `radioskysims-sources` | `radioskysims_sources.interfaces.cli.sources_cli:main` | Oficial | CLI própria do pacote de satélites/rádio-fontes/fontes locais — **novo desde o desacoplamento**, não existia antes da Fase 4. |
 | `gnss4astro` | `gnsstools4astro` | `gnsstools4astro.bootstrap.gnss4astro_cli:main` | Oficial | CLI de ferramentas GNSS/RINEX (download NAV/OBS, tracks por TLE). |
 
@@ -69,7 +69,8 @@ interface web" apontada nos relatórios anteriores foi removida.
 |---|---|---|---|
 | `bootstrap/composition.py` | Composition root oficial; **delega** para `radioskysims_simulation.bootstrap.composition` | Oficial | Bootstrap fino, sem lógica própria — referência de boa prática. |
 | `bootstrap/builders.py` | Builders auxiliares de composição | Oficial | — |
-| `bootstrap/skymap_cli.py` | Composition root + entrypoint da CLI de SkyMap (`radioskysims`) | Oficial | — |
+| `bootstrap/cli.py` | Composition root + entrypoint da CLI umbrella (`radioskysims`) | Oficial | Centraliza o wiring da CLI principal. |
+| `bootstrap/skymap_cli.py` | Wrapper de compatibilidade para o antigo entrypoint de SkyMap | Legado | Manter temporariamente para não quebrar imports existentes; novos fluxos devem usar `bootstrap/cli.py`. |
 | `bootstrap/skymap_gui.py` | Composition root da GUI | Oficial | — |
 
 ## 6. Scripts utilitários (`scripts/`)

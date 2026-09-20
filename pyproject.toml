@@ -156,7 +156,7 @@ Discussions = "https://github.com/barosil/RadioSkySim/discussions"
 Changelog = "https://github.com/barosil/RadioSkySim/releases"
 
 [project.scripts]
-radioskysims = "radioskysims.bootstrap.skymap_cli:main"
+radioskysims = "radioskysims.bootstrap.cli:main"
 gnss4astro = "gnsstools4astro.bootstrap.gnss4astro_cli:main"
 
 # ─────────────────────────────────────────────────────────────
