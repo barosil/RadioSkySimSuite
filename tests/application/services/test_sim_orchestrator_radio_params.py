@@ -276,7 +276,9 @@ def test_run_with_processor_passes_radio_query_values_to_assembler(monkeypatch) 
 
     class _FakeProcessor:
         def __init__(self, **kwargs):
-            _ = kwargs
+            # Contrato de ResourceAwareProcessor: expõe os recursos detectados
+            # (o orquestrador lê processor.resources após a construção).
+            self.resources = kwargs["resources"]
             self.summary = {}
 
         @staticmethod
