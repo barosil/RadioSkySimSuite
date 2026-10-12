@@ -14,7 +14,7 @@ com EIRP de satélites recalculado e fluxo solar do provider NoRP/NRO.
 | `INCLUDE_SATELLITES` / `INCLUDE_LOCAL_SOURCES` | **True** / **True** (Sol) |
 | `BEAM_PATTERN_PATH` | `src/radioskysims/resources/beams/beampattern_horn01.csv` |
 | `POINTING_ALT_DEG` / `POINTING_AZ_DEG` | **80.0°** / **9.0°** (fixo) |
-| janela temporal | 1 h, passo de 30 s (`2026-10-11T13:00Z` → `14:00Z`) |
+| janela temporal | **24 h**, passo de 120 s → 721 instantes (`2026-10-11T00:00Z` → `2026-10-12T00:00Z`) |
 | fluxo solar | **NoRP/NRO** (`solar_flux.source = "nro"`) |
 
 ## Conteúdo

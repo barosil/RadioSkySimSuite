@@ -13,6 +13,9 @@ Descrição:
     - EIRP dos satélites recalculado em ``signals.json`` (deste diretório);
     - fluxo solar do novo provider NoRP/NRO (XDR).
 
+    Janela: **24 h** (passo de 120 s → 721 instantes), configurável em
+    ``[simulations].time_range`` do ``settings_first_run.toml``.
+
     Executa em duas fases: (1) **estimativa** do tempo por extrapolação linear
     de execuções curtas; (2) **run** completa (com ``use_processor=True``,
     streaming a disco automático quando a saída excede a memória).
@@ -99,21 +102,29 @@ def _run_once(orch: SimOrchestrator, tr: TimeRange, *, use_processor: bool):
 
 
 def estimate_runtime(orch: SimOrchestrator, full: TimeRange) -> dict:
-    """Estima o tempo total por extrapolação linear (2 execuções curtas)."""
+    """Estima o tempo total e o tamanho de saída (2 execuções curtas)."""
     n_total = full.to_datetime64().shape[0]
     _log(f"Estimativa: {n_total} instantes; benchmark com {ESTIMATE_SAMPLES} amostras")
 
-    samples, timings = [], []
+    samples, timings, sizes = [], [], {}
     for n in ESTIMATE_SAMPLES:
         tr_n = _slice(full, n)
-        _, dt = _run_once(orch, tr_n, use_processor=False)
+        result, dt = _run_once(orch, tr_n, use_processor=False)
+        sizes = dict(result.simulation_result.dataset.sizes)
         samples.append(n)
         timings.append(dt)
-        _log(f"  benchmark n={n}: {dt:.1f}s")
+        _log(f"  benchmark n={n}: {dt:.1f}s | dims {sizes}")
 
     # Ajuste linear t(n) = a*n + b (b ≈ overhead fixo de montagem)
     a, b = np.polyfit(samples, timings, 1)
     est = a * n_total + b
+
+    # Tamanho projetado da saída: n_time × n_freq × n_pol × n_src × 8 bytes × 2 vars
+    n_freq = int(sizes.get("frequency", 0))
+    n_pol = int(sizes.get("polarization", 1))
+    n_src = int(sizes.get("source", 1))
+    projected_gb = (n_total * n_freq * n_pol * n_src * 8 * 2) / 1e9
+
     info = {
         "n_total_samples": int(n_total),
         "bench_samples": samples,
@@ -122,10 +133,16 @@ def estimate_runtime(orch: SimOrchestrator, full: TimeRange) -> dict:
         "fixed_overhead_s": round(float(b), 2),
         "estimated_total_s": round(float(est), 1),
         "estimated_total_min": round(float(est) / 60.0, 2),
+        "dataset_dims": sizes,
+        "projected_output_gb": round(float(projected_gb), 1),
     }
     _log(
         f"Estimativa: ~{info['estimated_total_min']} min "
         f"({info['per_sample_s']}s/amostra, overhead ~{info['fixed_overhead_s']}s)"
+    )
+    _log(
+        f"Saída projetada: ~{info['projected_output_gb']} GB "
+        f"({n_total}×{n_freq}×{n_pol}×{n_src} × 2 vars)"
     )
     return info
 
@@ -163,6 +180,17 @@ def main() -> int:
     estimate = None
     if not args.skip_estimate:
         estimate = estimate_runtime(orch, full)
+        import shutil
+
+        free_gb = shutil.disk_usage(str(PROJECT_ROOT)).free / 1e9
+        need_gb = float(estimate["projected_output_gb"])
+        _log(f"Disco livre: {free_gb:.1f} GB | saída projetada ~{need_gb:.1f} GB")
+        if need_gb > 0.6 * free_gb:
+            _log(
+                f"ABORTADO: saída projetada ({need_gb:.1f} GB) excede 60% do disco "
+                f"livre ({free_gb:.1f} GB). Aumente o passo em [simulations].time_range."
+            )
+            return 3
 
     _log("===== RUN (completa) =====")
     result, dt = _run_once(orch, full, use_processor=not args.no_processor)
