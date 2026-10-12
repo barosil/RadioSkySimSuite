@@ -3879,6 +3879,8 @@ dependencies = [
     { name = "pyvo" },
     { name = "radioskysims-core" },
     { name = "radioskysims-skymap" },
+    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "scipy", version = "1.18.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "sgp4" },
     { name = "xarray" },
 ]
@@ -3906,6 +3908,7 @@ requires-dist = [
     { name = "pyvo", specifier = ">=1.7" },
     { name = "radioskysims-core", editable = "packages/radioskysims-core" },
     { name = "radioskysims-skymap", editable = "packages/radioskysims-skymap" },
+    { name = "scipy", specifier = ">=1.11" },
     { name = "sgp4", specifier = ">=2.24" },
     { name = "xarray", specifier = ">=2022.3.1" },
 ]
