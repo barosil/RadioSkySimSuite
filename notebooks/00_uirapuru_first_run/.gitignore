@@ -1,0 +1,4 @@
+# Saídas geradas pela execução (logs, dataset, resumos).
+output/
+__pycache__/
+*.pyc
