@@ -21,7 +21,7 @@ height = 530.0
 
 [[radiotelescopes.uirapuru.antennas]]
 name = "BINGO Horn"
-effective_area_m2 = 1.0
+# effective_area_m2 ausente → A_e = λ²/Ω_A (Ω integrado do feixe); override opcional.
 frequency_range = [1000, 1250, 0.05]
 
 [radiotelescopes.uirapuru.antennas.pointing]
@@ -59,7 +59,7 @@ height = 530.0
 
 [[radiotelescopes.default.antennas]]
 name = "BINGO Horn"
-effective_area_m2 = 1.0
+# effective_area_m2 ausente → A_e = λ²/Ω_A (Ω integrado do feixe); override opcional.
 frequency_range = [1000, 1250, 0.05]
 
 [radiotelescopes.default.antennas.pointing]

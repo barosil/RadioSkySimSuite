@@ -26,10 +26,17 @@ Last modified: 2026-10-12
 
 from __future__ import annotations
 
+# ── Diagnóstico: dump do traceback de TODAS as threads em SIGUSR1 ────────
+# ``kill -USR1 <pid>`` → traceback vai para o stderr (o log do runner),
+# permitindo localizar exatamente onde o processo está gastando o tempo.
+import faulthandler  # noqa: E402
 import os
+import signal  # noqa: E402
 import sys
 import time
 from pathlib import Path
+
+faulthandler.register(signal.SIGUSR1, all_threads=True, chain=False)
 
 # ── Âncora de diretório: raiz do projeto (CWD-independente) ──────────────
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -45,6 +52,7 @@ except Exception:  # pragma: no cover
 
 import numpy as np  # noqa: E402
 from radioskysims_core.domain.common import TimeRange  # noqa: E402
+from radioskysims_core.logging_config import configure_logging  # noqa: E402
 from radioskysims_simulation import SimOrchestrator  # noqa: E402
 
 from radioskysims import create_radiotelescope  # noqa: E402
@@ -67,7 +75,12 @@ BEAM_PATTERN_PATH = Path("src/radioskysims/resources/beams/beampattern_horn01.cs
 POINTING_ALT_DEG = 80.0
 POINTING_AZ_DEG = 9.0
 
-ESTIMATE_SAMPLES = (3, 6)  # pontos da extrapolação linear
+ESTIMATE_SAMPLES = (6, 12, 24)  # pontos da extrapolação linear
+
+# Diretório de streaming (chunks): se definido, cada batch grava seu próprio
+# ``batch_<i>.nc`` e o dataset final é reaberto lazy. ``None`` = decisão
+# automática do processor (streaming só se a saída exceder a RAM).
+BATCH_OUTPUT_DIR: str | None = None
 
 
 def _log(msg: str) -> None:
@@ -97,6 +110,7 @@ def _run_once(orch: SimOrchestrator, tr: TimeRange, *, use_processor: bool):
         include_local_sources=INCLUDE_LOCAL_SOURCES,
         include_radio_sources=False,
         use_processor=use_processor,
+        batch_output_dir=BATCH_OUTPUT_DIR,
     )
     return result, time.monotonic() - t0
 
@@ -115,9 +129,16 @@ def estimate_runtime(orch: SimOrchestrator, full: TimeRange) -> dict:
         timings.append(dt)
         _log(f"  benchmark n={n}: {dt:.1f}s | dims {sizes}")
 
-    # Ajuste linear t(n) = a*n + b (b ≈ overhead fixo de montagem)
+    # Ajuste linear t(n) = a*n + b (b ≈ overhead fixo de montagem).
+    # Com poucos pontos o ajuste é degenerado (cache quente faz o segundo
+    # benchmark ser mais rápido → inclinação NEGATIVA e estimativa absurda),
+    # então caímos para a razão t/n mais pessimista observada.
     a, b = np.polyfit(samples, timings, 1)
-    est = a * n_total + b
+    if not np.isfinite(a) or a <= 0.0:
+        a = max(t / n for n, t in zip(samples, timings, strict=True))
+        b = 0.0
+    b = max(float(b), 0.0)
+    est = max(a * n_total + b, 0.0)
 
     # Tamanho projetado da saída: n_time × n_freq × n_pol × n_src × 8 bytes × 2 vars
     n_freq = int(sizes.get("frequency", 0))
@@ -153,9 +174,21 @@ def main() -> int:
     ap = argparse.ArgumentParser(description="Primeira execução do UIRAPURU")
     ap.add_argument("--skip-estimate", action="store_true", help="pula a fase de estimativa")
     ap.add_argument("--no-processor", action="store_true", help="roda sem ResourceAwareProcessor")
+    ap.add_argument(
+        "--batch-output-dir",
+        default=None,
+        help="Força o streaming por chunks neste diretório (batch_<i>.nc).",
+    )
     args = ap.parse_args()
 
+    global BATCH_OUTPUT_DIR
+    if args.batch_output_dir:
+        BATCH_OUTPUT_DIR = args.batch_output_dir
+
     OUTDIR.mkdir(parents=True, exist_ok=True)
+    # Habilita o logging estruturado (batch_start/batch_success/processor_*)
+    # para o progresso dos batches aparecer no log do runner.
+    configure_logging()
     _log("===== UIRAPURU first run =====")
     _log(
         f"LO={CENTRE_FREQUENCY_MHZ} MHz | {NUMBER_OF_CHANNELS} canais | "
