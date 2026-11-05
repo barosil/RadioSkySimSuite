@@ -1,7 +1,11 @@
 # Pontos de Entrada do Projeto — RadioSkySimSuite
 
-**Data:** 2026-09-01
+**Data:** 2026-11-05
 **Escopo:** `src/radioskysims` (umbrella), `packages/*` (9 pacotes) e `scripts/`.
+
+> **Atualização 2026-11-05:** adicionado o subcomando `gui` da CLI umbrella e
+> o script `interfaces/cli/generate.py` (experimental). Reflete a auditoria
+> consolidada de novembro ([`../audits/november_2026_audit_report.md`](../audits/november_2026_audit_report.md)).
 
 > **Status do documento:** substitui integralmente a versão de 2026-07-16, que
 > descrevia entrypoints do monólito pré-desacoplamento (ex.:
@@ -33,7 +37,8 @@ consumidos como bibliotecas pelo umbrella ou por `radioskysims-sources`/
 
 | Localização | Finalidade | Estado | Recomendação |
 |---|---|---|---|
-| `interfaces/cli/main.py` | Parser (argparse) que registra os subcomandos abaixo; ponto de entrada de `radioskysims` | Oficial | Grande (603 linhas) — candidato a subcomandos em módulos próprios (ver `relatorio_set_2026_v2.md §8.4`). |
+| `interfaces/cli/main.py` | Parser (argparse) que registra os subcomandos abaixo; ponto de entrada de `radioskysims` | Oficial | Grande (643 linhas) — candidato a subcomandos em módulos próprios (ver `relatorio_set_2026_v2.md §8.4`). |
+| `interfaces/cli/commands/gui_cmd.py` | Subcomando `gui` — abre a interface gráfica (Panel/SkyMap) via composition root do umbrella | Oficial | **Novo desde set/2026**; alternativa de baixo atrito ao `scripts/start_service.py`. |
 | `interfaces/cli/commands/generate_skymap.py` | Subcomando `generate` — cria mapa sintético/PySM3 | Oficial | Bom exemplo de DTO → caso de uso → formatter (`relatorio_set_2026.md §8.4`). |
 | `interfaces/cli/commands/analyze_skymap.py` | Subcomando `analyze` — estatística e `Cℓ` de mapas | Oficial | Usa `Protocol` para baixo acoplamento; referência de qualidade. |
 | `interfaces/cli/commands/fetch_survey.py` | Subcomando de aquisição contínua de survey (HiPS) | Oficial | — |
@@ -89,6 +94,7 @@ interface web" apontada nos relatórios anteriores foi removida.
 
 | Localização | Finalidade | Estado | Recomendação |
 |---|---|---|---|
+| `interfaces/cli/generate.py` | Script avulso (argparse) que gera mapa via PySM3, fazendo o wiring direto de `PySMSkyMapGeneratorAdapter` + `GenerateSkyMapUseCase` | Experimental | Duplica a lógica do subcomando `skymap generate` fora do composition root; considerar consolidar em `commands/generate_skymap.py` ou remover. |
 | `src/radioskysims/main.py` | Monta `SatelliteManager`/`SatelliteFactory`/`SatelliteRepository`/`SpaceTrackClient` e abre `SatellitePanel` manualmente (engine SQLite hardcoded) | **Obsoleto** | Não usar como referência de bootstrap: cria engine própria (`sqlite:///db.db`) fora do composition root e da configuração central (`settings.toml`/`radioskysims_core.db.engine`). Mesma classificação do documento histórico, agora com imports apontando para o pacote `radioskysims-sources` (pós-desacoplamento) em vez do monólito. |
 | `src/radioskysims/application/gain_panel.py` (bloco `main`) | Painel de ganho sintético para visualização manual | Experimental/Legado | Resíduo do umbrella pré-desacoplamento (ver `module_dependencies.md §5`); sem garantia de API estável. |
 | `src/radioskysims/infrastructure/db/init_db.py` (bloco `main`) | Inicialização de schema via SQLModel | Oficial (utilitário) | Manter como utilitário de setup de ambiente; equivalente ao `check_db.py` em escopo mais restrito. |

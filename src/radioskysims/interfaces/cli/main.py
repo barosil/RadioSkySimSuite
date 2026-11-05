@@ -314,7 +314,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--constellations",
         nargs="*",
         default=None,
-        help="Constelações GNSS (ex.: GPS GALILEO). Se omitido, sem satélites.",
+        help=(
+            "Constelações GNSS a simular. Exemplos: GPS, GALILEO, GLONASS, BEIDOU, "
+            "ou múltiplas (GPS GALILEO). Se omitido (default), nenhum satélite é "
+            "incluído (TOD apenas com fontes locais, se --local-sources)."
+        ),
     )
 
     export_parser.add_argument(

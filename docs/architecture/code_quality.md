@@ -6,6 +6,15 @@
 contagem estática (`wc -l`, `grep`) — sem execução de `mypy` (não instalado
 no ambiente auditado) nem cobertura real de testes (ver §5).
 
+> **Atualização 2026-11-05** — revalidação pela auditoria consolidada de
+> novembro ([`../audits/november_2026_audit_report.md`](../audits/november_2026_audit_report.md)
+> e [`../audits/metricas_tecnicas_2026.md`](../audits/metricas_tecnicas_2026.md)).
+> Deltas em relação aos números de setembro (abaixo): produção **669 arquivos /
+> 91.340 LOC**; lint ~**10 violações** (concentradas em `gnsstools4astro` e
+> legado); formatação **570/654 OK (87%)** → 84 arquivos pendentes; testes
+> **253+ funções** (contagem do meta-pacote; ~1.500 incluindo submódulos).
+> As conclusões estruturais (§4, §6) permanecem válidas.
+
 Este documento detalha a seção 8 de
 [`relatorio_set_2026_v2.md`](relatorio_set_2026_v2.md) e serve como
 referência viva para acompanhar a evolução da dívida de qualidade.

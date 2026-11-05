@@ -114,23 +114,19 @@ def execute_export_tod_command(
     )
 
     consts = list(constellations) if constellations else []
-    include_satellites = bool(consts)
+    
+    # T3.2: Se nenhuma fonte é selecionada, usar GPS como padrão
+    if not consts and not include_local_sources:
+        consts = ["GPS"]
+        include_satellites = True
+        print(
+            "Nenhuma fonte selecionada; usando padrão: GPS (satélites).",
+            file=stderr,
+        )
+    else:
+        include_satellites = bool(consts)
 
     print("Iniciando simulação TOD...", file=stderr)
-
-    if not include_satellites and not include_local_sources:
-        print(
-            "Aviso: simulação sem fontes (sem satélites e sem fontes locais) — "
-            "o TOD ficará vazio. Use --constellations (ex.: GPS GALILEO) e/ou "
-            "--local-sources.",
-            file=stderr,
-        )
-    elif not include_satellites:
-        print(
-            "Aviso: sem satélites (--constellations omitido). Use "
-            "'--constellations GPS GALILEO ...' para incluir GNSS.",
-            file=stderr,
-        )
 
     result = orchestrator.run(
         constellations=consts,
