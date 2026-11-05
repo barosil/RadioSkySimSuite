@@ -292,11 +292,11 @@ def test_run_with_processor_passes_radio_query_values_to_assembler(monkeypatch) 
             return _dataset()
 
     monkeypatch.setattr(
-        "radioskysims_simulation.application.services.sim_orchestrator.ProcessingResources.detect",
+        "radioskysims_simulation.infrastructure.processing.resource_processor.ProcessingResources.detect",
         lambda **_kwargs: _FakeResources(),
     )
     monkeypatch.setattr(
-        "radioskysims_simulation.application.services.sim_orchestrator.ResourceAwareProcessor",
+        "radioskysims_simulation.infrastructure.processing.resource_processor.ResourceAwareProcessor",
         _FakeProcessor,
     )
 
