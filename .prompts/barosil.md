@@ -18,32 +18,50 @@
 - Contexto técnico detalhado e atualizado em `/memories/repo/*` (importante
   consultar — contém pitfalls reais e APIs validadas).
 
-## Snapshot — 2026-09-08
+## Snapshot — 2026-11-05
 
-- `dev` (186e2c2): UX Ondas 1–3 (F1) + série E (F2, E1–E14) + notebooks 00/01/02
-  migrados p/ API de alto nível. `main` = baseline (release dev→main pendente).
-- HEAD local: `feat/orchestrator-processor-dask` = dev + finalização 02_sims +
-  showcase 03_waterfall; **WIP** no submódulo simulation (expor
-  `ResourceAwareProcessor` na API pública + testes de processor/dask movidos p/
-  dentro do pacote).
-- Submódulos: todos em `main` atualizados, exceto `radioskysims-simulation` em
-  `feat/orchestrator-processor-dask` (com WIP).
-- Detalhes/pendências por frente: ver `notebooks/ux_entrypoints_audit.md`
-  (plano F1/F2/F3, com status `[x]`/`[~]`/`[ ]`).
+- `dev` (97b18d3): Base consolidada; 3 frentes ativas (F1 50%, F2 30%, F3 60%).
+  Workspace `uv` funcional com 9 pacotes + umbrella; 91.340 LOC de produção;
+  253 testes; lint limpo.
+- Branches WIP: `feat/orchestrator-processor-dask` (simulation — notebooks 02/03),
+  `feat/tod-map-notebooks`, `feat/waterfall-notebook`.
+- Submódulos: todos em `main`, exceto `radioskysims-simulation` em
+  `feat/orchestrator-processor-dask`.
+- **Relatórios atualizados** (nov 5): `november_2026_audit_report.md`,
+  `frentes_status_consolidado.md`, `metricas_tecnicas_2026.md`.
+- Detalhes por frente: documentos de auditoria em `docs/audits/`.
+- Próxima ação crítica: validação TOD 24h; merge de formatação/logging.
 
-## Plano corrente — Consolidação de documentação e higiene (2026-09-08)
+---
 
-Objetivo: deixar só **trabalho corrente** na árvore, com rastreio único e
-localizações corretas de artefatos.
+### Cronologia recente
 
-| # | Tarefa | Detalhe | Status |
-|---|--------|---------|--------|
-| C1 | **Todo único com breakdown + indicadores** | Este arquivo (`.prompts/barosil.md`) é o todo-mestre; itemizado com indicador `[x]/[~]/[ ]` + data. | `[x]` criado 2026-09-08 |
-| C2 | **Remover `docs/TODO_DOCS.md` e unificar** | Conteúdo (33 l.) já realizado → superado pela doc atual (`docs/architecture/*`). Removido; sem perda. | `[x]` removido 2026-09-08 |
-| C3 | **Remover decoupling documentando o que passou/falta** | Fases 0–7 + planos movidos para **`docs/archive/decoupling/`** (histórico preservado); referências atualizadas (AGENTS.md, docs/source). Trabalho corrente vive em `.prompts/barosil.md` + `notebooks/ux_entrypoints_audit.md` (F1/F2/F3). | `[x]` arquivado 2026-09-08 |
-| C4 | **Auditar `docs/audits/` (manter só corrente)** | Mantidos os 6 relatórios `.md` que alimentam F2/F3; removidos dumps `.txt` exploratórios (rastreados no git → recuperáveis). | `[x]` 2026-09-08 |
-| C5 | **Corrigir localizações plots/dados** | Parar de gravar em `plots/` (raiz) e `notebooks/data/`; padronizar saída em `data/` (raiz) e `notebooks/plots/` — **independência de CWD no código** (viz/PathManager/notebooks) + reconciliar duplicatas. Diagnóstico: `save_figure`/`save_plot` (radioskysims-viz/io.py) usam `outdir="plots"` relativo ao CWD; notebooks usam `Path("data")` relativo ao CWD. Fix: notebooks ancoram `DATA_DIR=get_project_root()/"data"` e `PLOTS_DIR=get_project_root()/"notebooks"/"plots"` e passam `outdir=` explícito; migrar `notebooks/data/*` → `data/`; remover `plots/` (raiz, não rastreado). ⚠ Bloqueado por WIP dos notebooks (02_sims/03_waterfall) em `feat/orchestrator-processor-dask` — fazer em branch própria após resolver o WIP. | `[ ]` (próximo branch, após WIP) |
-| C6 | **Release dev→main** (fase seguinte, após C1–C5) | PR dev→main com dev limpo; release inicial. | `[ ]` (fora desta rodada) |
+| Data | Evento | Status |
+|------|--------|--------|
+| 2026-09-08 | Consolidação pós-desacoplamento; C1–C5 iniciados | Ref histórica |
+| 2026-09-20 | C1–C4 concluídos; dev em bom estado | ✓ |
+| 2026-10-15 | UIRAPURU 24h executado (primeiro teste); resultados em processamento | ✓ |
+| 2026-10-30 | Bump de submódulos; preparação para release | 🟡 |
+| 2026-11-02 | Teste de UIRAPURU com janela 24h (logs em `logs/`) | 🟡 |
+| 2026-11-05 | **Auditoria consolidada e atualização de relatórios** | ← **Aqui agora** |
+
+## Plano corrente — Consolidação F1/F2/F3 + Release (2026-11-05)
+
+Objetivo: completar frentes de trabalho paralelas, atualizar documentação,
+preparar release `dev → main` em dezembro.
+
+| # | Tarefa | Detalhe | Status | Deadline |
+|---|--------|---------|--------|----------|
+| D1 | **Atualizar relatórios de auditoria** | Criar `november_2026_audit_report.md`, `frentes_status_consolidado.md`, `metricas_tecnicas_2026.md`. | `[x]` 2026-11-05 | — |
+| F1a | **Consolidar UX — Logging JSON/humanizado** | R5: Separar logging estruturado (JSON) de output humano em CLI. Usar stderr para JSON, stdout para user. | `[ ]` | Nov 17 |
+| F1b | **Consolidar UX — Progress bars** | R6: Adicionar `tqdm` ou similar em operações > 5s (TOD gen, export, mapmaking). | `[ ]` | Nov 17 |
+| F1c | **Consolidar UX — README** | L1: "Getting started" com 3 exemplos mínimos. | `[ ]` | Nov 24 |
+| F2a | **DDD — Mover logging de domain** | Move logger imports de `domain/*/services.py` para application. | `[ ]` | Nov 17 |
+| F2b | **DDD — Refactoring orquestração** | Esquema DESIGN.md para decompor `sim_orchestrator.py` e `simulation.py`. | `[ ]` | Nov 24 |
+| F2c | **Lint — Ruff format** | Branch `chore/formatting`; `ruff format src packages`. | `[ ]` | Nov 17 |
+| F3a | **Ciência — TOD 24h** | Executar validação TOD 24h em hardware real. | `[ ]` | Nov 20 |
+| F3b | **Ciência — Satélites auditoria** | Auditoria formal de propagação TLE e contribuição em rádio. | `[ ]` | Nov 30 |
+| C6 | **Release dev→main** | PR com changelog F1/F2/F3; merge após aprovação. | `[ ]` | Dez 5 |
 
 ## Frentes de trabalho vigentes (referência)
 
