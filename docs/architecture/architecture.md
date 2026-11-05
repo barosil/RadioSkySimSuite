@@ -4,9 +4,10 @@
 desenvolvimento (veja `AGENTS.md`). Detalhes por tópico ficam em
 `docs/architecture/` (bounded contexts, DI, entrypoints, dívidas técnicas).
 
-**Última revisão:** 2026-09-01 (sincronizado com
-[`relatorio_set_2026_v2.md`](relatorio_set_2026_v2.md), auditoria completa
-dos 9 pacotes de `packages/*`).
+**Última revisão:** 2026-11-05 (sincronizado com a auditoria consolidada de
+novembro — [`november_2026_audit_report.md`](../audits/november_2026_audit_report.md)
+e [`frentes_status_consolidado.md`](../audits/frentes_status_consolidado.md);
+métricas históricas em [`metricas_tecnicas_2026.md`](../audits/metricas_tecnicas_2026.md)).
 
 ---
 
@@ -199,11 +200,46 @@ builders dos pacotes → `SimOrchestrator.run()` → `TODPanel`.
 
 ## 7. Estado arquitetural atual e dívidas técnicas
 
-**Atualização 2026-09-01** — resumo completo (9 pacotes auditados) em
-[`relatorio_set_2026_v2.md`](relatorio_set_2026_v2.md) e detalhamento tático
-em [`module_dependencies.md`](module_dependencies.md):
+**Atualização 2026-11-05** — auditoria completa em
+[`november_2026_audit_report.md`](../audits/november_2026_audit_report.md),
+com detalhe tático por pacote em [`module_dependencies.md`](module_dependencies.md)
+e histórico quantitativo em [`metricas_tecnicas_2026.md`](../audits/metricas_tecnicas_2026.md).
 
-**O que está consolidado**
+### 7.1 Indicadores (nov/2026)
+
+| Métrica | Ago/2026 | Nov/2026 | Tendência |
+|---|---:|---:|---|
+| Arquivos Python (produção) | 260 | 669 | ↑ +157% |
+| Linhas de produção | 36.950 | 91.340 | ↑ +147% |
+| Funções de teste | ~950 | 253+¹ | ↓¹ |
+| Lint (violações, ruleset ativo) | 1.062 | ~10 | ↓ -99% |
+| Formatação (% OK) | 56% | 87% | ↑ |
+| Type hints (cobertura) | 55% | 65% | ↑ (meta 80% em dez) |
+| Cobertura de testes (global) | 64% | ~64% | ✓ estável |
+| Branches WIP | 4 | 3 | ✓ controlado |
+
+Aderência **Hexagonal + DDD**: ~85%. Grafo de dependências **entre pacotes**
+permanece acíclico e coerente (kernel → domínios → orquestração → umbrella),
+sem violação circular.
+
+> ¹ A contagem de novembro (`253+`) cobre apenas `tests/` (meta-pacote);
+> incluindo `packages/*/tests` o total é ~1.500 funções (ver
+> [`metricas_tecnicas_2026.md`](../audits/metricas_tecnicas_2026.md)).
+
+### 7.2 Frentes de trabalho (nov–dez/2026)
+
+| Frente | Objetivo | Status |
+|---|---|---|
+| **F1 — UX entrypoints** | Ruído no startup, logging/progress, docs de uso | 50% (R1–R3 done; R4–R6 e L1–L3 em andamento) |
+| **F2 — Dívida técnica** | DDD (logging/providers), refactoring de orquestração, lint/format/type hints | 30% (diagnóstico completo; refactor iniciando) |
+| **F3 — Validações científicas** | HI, mapmaking, TOD 24h, satélites | 60% (HI e mapmaking concluídos; TOD 24h e satélites pendentes) |
+
+Detalhamento, DoD por frente e timeline semana a semana:
+[`frentes_status_consolidado.md`](../audits/frentes_status_consolidado.md) e
+[`CHECKLIST_NOV_DEC_2026.md`](../audits/CHECKLIST_NOV_DEC_2026.md).
+
+### 7.3 O que está consolidado
+
 - Layout hexagonal com ports em `application/ports/` (por pacote) e
   composition root fino no umbrella (delega para os pacotes, §6).
 - Grafo de dependências **entre pacotes** é acíclico e coerente (kernel →
@@ -216,17 +252,25 @@ em [`module_dependencies.md`](module_dependencies.md):
   em `settings.toml` (comentário explícito aponta para `credentials.env`,
   gitignored).
 
-**Dívidas / riscos ainda presentes** (ver `module_dependencies.md` para
-detalhe por pacote)
+### 7.4 Dívidas / riscos ainda presentes
+
+(ver `module_dependencies.md` para detalhe por pacote)
+
+- **Logging direto em `domain`** — `domain/*/services.py` usam logger
+  (~8–10 imports), violando a pureza do domínio. Novo item de prioridade
+  alta da auditoria de novembro; ação F2a: mover para application.
+- **Orquestração concentrada** — `sim_orchestrator.py` (~1.623 linhas) e
+  `simulation.py` (~1.573 linhas) acumulam application + infrastructure em
+  `radioskysims-simulation`; maior risco de manutenção do monorepo. Ação F2b:
+  decompor em casos de uso (com `DESIGN.md`).
 - `application → infrastructure` e `domain → infrastructure` ainda ocorrem,
   concentrados em `radioskysims-simulation` (`sim_orchestrator.py`,
   `simulation.py`) e `radioskysims-sources` (`satelliterepository.py`,
-  `selector.py`, `catalog_services.py` e afins) — maior risco de manutenção
-  do monorepo hoje.
+  `selector.py`, `catalog_services.py` e afins).
 - `GeometryProviderPort` definido em `application.ports.geometry` mas
   implementado por provider em `domain` (`radioskysims-core`) — inversão de
   dependência que destoa da regra estrita "domain não depende de
-  application".
+  application". Candidato a mover o contrato para `domain.geometry`.
 - `radioskysims_core.domain.common.models` concentrado (risco de virar
   módulo "god/common"); 654 linhas e crescendo conforme mais pacotes
   dependem dele.
@@ -234,8 +278,9 @@ detalhe por pacote)
   pacotes **sem** violação de camada detectada — referência de estrutura para
   os demais.
 
-Detalhes quantitativos (linhas, lint, formatação): `relatorio_set_2026_v2.md`
-e `code_quality.md`.
+Detalhes quantitativos (linhas, lint, formatação, docstrings):
+[`code_quality.md`](code_quality.md) e
+[`metricas_tecnicas_2026.md`](../audits/metricas_tecnicas_2026.md).
 
 ## 8. Diagramas
 
@@ -266,6 +311,24 @@ estrutura pós-desacoplamento (9 pacotes). Ver detalhamento e histórico em
   fluxo satellite→tracks→signal→assembled).
 
 ## 9. Referências
+
+Auditoria corrente (novembro/2026):
+
+- `docs/audits/november_2026_audit_report.md` — auditoria técnica completa (novembro/2026)
+- `docs/audits/frentes_status_consolidado.md` — status F1/F2/F3 + DoD + timeline
+- `docs/audits/metricas_tecnicas_2026.md` — histórico de métricas (ago–nov/2026)
+- `docs/audits/CHECKLIST_NOV_DEC_2026.md` — plano operacional semana a semana
+- `docs/audits/AUDIT_SUMMARY_NOV2026.txt` — sumário visual (5 min)
+- `.prompts/barosil.md` — documento-mestre de trabalho (todo + snapshot)
+
+Auditorias temáticas (set–out/2026):
+
+- `docs/audits/neutral_hydrogen_physical_feature_audit.md` — validação de HI (concluída)
+- `docs/audits/mapmaking_physical_feature_audit.md` / `mapmaking_binned_scaling.md` — mapmaking (concluído)
+- `docs/audits/tod_performance_audit_report.md` — performance TOD 1h (concluída)
+- `docs/audits/engineering_audit_report.md` — engenharia (agosto; parcialmente superado por novembro)
+
+Documentos de arquitetura (por tópico):
 
 - `docs/architecture/relatorio_set_2026_v2.md` — relatório de auditoria completo (setembro/2026)
 - `docs/architecture/bounded_contexts.md` — contexts e contratos
