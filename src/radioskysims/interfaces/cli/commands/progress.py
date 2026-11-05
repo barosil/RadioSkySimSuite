@@ -17,7 +17,7 @@ import json
 import time
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 
 def progress_file_path(output: Path) -> Path:
@@ -68,7 +68,7 @@ def read_progress(path: Path) -> dict[str, Any]:
     if not path.exists():
         return {}
     try:
-        return json.loads(path.read_text())
+        return cast(dict[str, Any], json.loads(path.read_text()))
     except (json.JSONDecodeError, OSError):
         return {}
 

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Protocol
+from typing import Protocol, cast
 
 from radioskysims_skymap.application.skymap.analyze import (
     AnalyzeSkyMapUseCase,
@@ -59,9 +59,9 @@ def execute_analyze_command(
 
     output_dto = use_case.execute(input_dto)
 
-    return format_analyze_result(
+    return cast(str, format_analyze_result(
         output=output_dto,
         sky_map=sky_map,
         input_path=input_path,
         output_format=output_format,
-    )
+    ))

@@ -77,7 +77,7 @@ def create_radiotelescope(
     return build_radiotelescope_from_settings(name, settings_file=settings_file)
 
 
-class Config(dict):
+class Config(dict[str, Any]):
     """Carrega configurações a partir de um arquivo TOML.
 
     Exemplos
@@ -107,10 +107,10 @@ class Config(dict):
             raise FileNotFoundError(msg)
 
         with path.open("rb") as f:
-            data: dict[str, Any] = tomllib.load(f)
+            data = tomllib.load(f)
 
         super().__init__(data)
-        self._path = path
+        self._path: Path = path
 
     @property
     def path(self) -> Path:

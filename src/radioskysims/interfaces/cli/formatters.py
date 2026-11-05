@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from collections.abc import Sequence
-from typing import Literal, TypeAlias
+from typing import Literal, TypeAlias, cast
 
 from radioskysims_skymap.application.skymap.dto import (
     GenerateSkyMapOutputDTO,

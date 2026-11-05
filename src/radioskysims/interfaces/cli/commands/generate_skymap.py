@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
+from typing import cast
 
 from radioskysims_skymap.application.skymap.dto import (
     GenerateSkyMapInputDTO,
@@ -40,9 +41,9 @@ def execute_generate_command(
 
     output_dto = use_case.execute(input_dto)
 
-    return format_generate_result(
+    return cast(str, format_generate_result(
         output=output_dto,
         frequency_ghz=frequency_ghz,
         components=components,
         output_format=output_format,
-    )
+    ))

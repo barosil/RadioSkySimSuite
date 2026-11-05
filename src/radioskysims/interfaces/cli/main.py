@@ -455,7 +455,7 @@ def run(
                 execute_gui_command,
             )
 
-            return execute_gui_command()
+            return cast(int, execute_gui_command())
 
         if args.context == "skymap" and args.skymap_command == "generate":
             result = execute_generate_command(
@@ -569,13 +569,13 @@ def run(
                     jobs_db=args.jobs_db,
                 )
             elif args.jobs_command == "monitor":
-                return execute_jobs_monitor(
+                return cast(int, execute_jobs_monitor(
                     args.job_id,
                     jobs_db=args.jobs_db,
                     watch=args.watch,
                     interval=args.interval,
                     stdout=output_stream,
-                )
+                ))
             else:
                 parser.error("Comando de jobs não reconhecido.")
 
@@ -643,5 +643,3 @@ def run(
             traceback.print_exc(file=error_stream)
 
         return 1
-
-    return 1
