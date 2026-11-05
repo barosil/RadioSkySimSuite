@@ -4,7 +4,7 @@
 **Timeline:** 2 semanas intensivas (nov 5–17)  
 **Estratégia:** 9 branches paralelas, agrupadas por categoria  
 **Total Estimado:** ~110 horas de desenvolvimento  
-**Status:** 🟢 Aprovado — Pronto para Execução
+**Status:** 🟡 Em execução — 5/9 branches concluídos (atualizado 2026-11-05)
 
 ---
 
@@ -16,9 +16,9 @@
 
 | Eixo | Foco | Branches | Esforço | Status |
 |------|------|----------|---------|--------|
-| **T1** | Dívida Técnica (ports, domain puro) | 3 | 52h | 🟡 Ativo |
-| **T2** | Qualidade Código (lint, mypy, CI) | 2 | 19.5h | 🟡 Ativo |
-| **T3** | F1 Completo (UX entrypoints) | 4 | 35h | 🟡 Ativo |
+| **T1** | Dívida Técnica (ports, domain puro) | 3 | 52h | 🟡 Parcial (B3 DI pendente) |
+| **T2** | Qualidade Código (lint, mypy, CI) | 2 | 19.5h | ✅ Concluído |
+| **T3** | F1 Completo (UX entrypoints) | 4 | 35h | 🟡 Parcial (B7/B8/B9) |
 
 **Saída esperada (nov 17):**
 - ✅ Todas 9 branches mergidas em `dev`
@@ -29,11 +29,27 @@
 
 ---
 
+## 📊 Progresso (atualizado 2026-11-05)
+
+| Branch | Status | Nota |
+|--------|--------|------|
+| B1 (TD-001 ports + DI) | ✅ Merged | ports, `bootstrap/dependencies.py`, DI |
+| B2 (TD-002 domain puro) | ✅ Merged | logging removido do domínio; factories→ports |
+| B3 (TD-003 inversão) | 🟡 Parcial | `ProcessingResources`/`MemoryEstimator`→application; falta DI nas facades (8 imports `application→infrastructure`) |
+| B4 (ruff format) | ✅ Merged | 100% conformidade + política |
+| B5 (type hints + mypy) | ✅ Merged | mypy pass 100% (CLI module) |
+| B6 (startup noise) | ✅ Merged | T3.1–T3.3 |
+| B7 (silent failures) | 🟡 Parcial | T3.4 (`radio list` erro claro) + logging em application; falta T3.5 (exit codes) e T3.6 (unidades) |
+| B8 (output + progress) | ⏳ Pendente | depende B7 |
+| B9 (docs) | ⏳ Pendente | — |
+
+---
+
 ## 🎯 Os 9 Branches
 
 ### T1 — Dívida Técnica (Eliminação de Violações Arquiteturais)
 
-#### B1: `fix/td-001-application-infrastructure-ports` [30h, 8d]
+#### B1: `fix/td-001-application-infrastructure-ports` [30h, 8d] ✅ Merged
 
 **Objetivo:** Eliminar imports diretos `application → infrastructure` via ports + dependency injection.
 
@@ -60,7 +76,7 @@
 
 ---
 
-#### B2: `fix/td-002-domain-infrastructure-boundaries` [18h, 8d]
+#### B2: `fix/td-002-domain-infrastructure-boundaries` [18h, 8d] ✅ Merged
 
 **Objetivo:** Domínio puro — promover providers/factories de domain para application/ports.
 
@@ -83,7 +99,7 @@
 
 ---
 
-#### B3: `fix/td-003-domain-application-inversion` [4h, 2d]
+#### B3: `fix/td-003-domain-application-inversion` [4h, 2d] 🟡 Parcial
 
 **Objetivo:** Remover inversão de dependência — aliases de compatibilidade para application/adapters.
 
@@ -104,7 +120,7 @@
 
 ### T2 — Qualidade de Código (Lint, Formatação, Type Hints)
 
-#### B4: `chore/ruff-format-complete` [2.5h, 1d] ⚡ Quick Win
+#### B4: `chore/ruff-format-complete` [2.5h, 1d] ⚡ Quick Win ✅ Merged
 
 **Objetivo:** 100% conformidade `ruff format`.
 
@@ -125,7 +141,7 @@
 
 ---
 
-#### B5: `chore/type-hints-coverage-expansion` [17h, 5d]
+#### B5: `chore/type-hints-coverage-expansion` [17h, 5d] ✅ Merged
 
 **Objetivo:** Elevar type hints de 65% para 75%+ (application + critical infrastructure).
 
@@ -153,7 +169,7 @@
 
 ### T3 — F1 Completo (UX Entrypoints)
 
-#### B6: `fix/f1-startup-noise-and-defaults` [3h, 1d]
+#### B6: `fix/f1-startup-noise-and-defaults` [3h, 1d] ✅ Merged
 
 **Objetivo:** Remover ruído no startup, corrigir defaults quebrados.
 
@@ -174,7 +190,7 @@
 
 ---
 
-#### B7: `fix/f1-silent-failures-and-consistency` [9h, 3d]
+#### B7: `fix/f1-silent-failures-and-consistency` [9h, 3d] 🟡 Parcial
 
 **Objetivo:** Eliminar fallbacks silenciosos, standardizar tratamento de erro e documentar unidades.
 
@@ -195,7 +211,7 @@
 
 ---
 
-#### B8: `feat/f1-output-formatting-and-progress` [16h, 4d]
+#### B8: `feat/f1-output-formatting-and-progress` [16h, 4d] ⏳ Pendente
 
 **Objetivo:** Formatação visual (cores, tables) e progress bars + logging estruturado.
 
@@ -221,7 +237,7 @@
 
 ---
 
-#### B9: `docs/f1-getting-started-and-reference` [7h, 2d]
+#### B9: `docs/f1-getting-started-and-reference` [7h, 2d] ⏳ Pendente
 
 **Objetivo:** Documentação de uso clara e acessível.
 

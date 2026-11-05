@@ -18,19 +18,21 @@
 - Contexto técnico detalhado e atualizado em `/memories/repo/*` (importante
   consultar — contém pitfalls reais e APIs validadas).
 
-## Snapshot — 2026-11-05
+## Snapshot — 2026-11-05 (atualizado)
 
-- `dev` (97b18d3): Base consolidada; 3 frentes ativas (F1 50%, F2 30%, F3 60%).
-  Workspace `uv` funcional com 9 pacotes + umbrella; 91.340 LOC de produção;
-  253 testes; lint limpo.
+- `dev` (7830dba): plano de execução em andamento — **B1/B2/B4/B5/B6 concluídos**;
+  **B3 e B7 parciais**; **B8/B9 pendentes**. Suítes verdes: simulation (309),
+  sources (535), gnsstools4astro (61), waterfall (134); lint/format limpos nos
+  pacotes tocados.
 - Branches WIP: `feat/orchestrator-processor-dask` (simulation — notebooks 02/03),
   `feat/tod-map-notebooks`, `feat/waterfall-notebook`.
-- Submódulos: todos em `main`, exceto `radioskysims-simulation` em
-  `feat/orchestrator-processor-dask`.
+- Submódulos: todos em `main`; commits recentes — simulation `a362921`,
+  sources `5f3b99a`, gnsstools4astro `06bc929`, waterfall `3d01d7e`.
 - **Relatórios atualizados** (nov 5): `november_2026_audit_report.md`,
   `frentes_status_consolidado.md`, `metricas_tecnicas_2026.md`.
 - Detalhes por frente: documentos de auditoria em `docs/audits/`.
-- Próxima ação crítica: validação TOD 24h; merge de formatação/logging.
+- Próxima ação crítica: TOD 24h; B3 (DI nas facades); B7 (exit codes + unidades);
+  B8/B9.
 
 ---
 
@@ -43,7 +45,8 @@
 | 2026-10-15 | UIRAPURU 24h executado (primeiro teste); resultados em processamento | ✓ |
 | 2026-10-30 | Bump de submódulos; preparação para release | 🟡 |
 | 2026-11-02 | Teste de UIRAPURU com janela 24h (logs em `logs/`) | 🟡 |
-| 2026-11-05 | **Auditoria consolidada e atualização de relatórios** | ← **Aqui agora** |
+| 2026-11-05 | Auditoria consolidada; plano de execução aprovado (9 branches) | ✓ |
+| 2026-11-05 | B1/B2/B4/B5/B6 merged; B3 parcial (ProcessingResources→application); B7 parcial (T3.4 + logging); resíduos B2; qualidade gnsstools4astro/waterfall | ← **Aqui agora** |
 
 ## Plano corrente — Execução Intensiva 2 Semanas (2026-11-05 a 2026-11-17)
 
@@ -56,15 +59,15 @@ Timeline: 2 semanas intensivas (nov 5–17). Saída: dev 100% verde + 1 release-
 
 | # | Branch | Foco | Esforço | Deps | Status |
 |---|--------|------|---------|------|--------|
-| B1 | `fix/td-001-application-infrastructure-ports` | Ports + DI (application→infrastructure) | 30h | — | 🟡 Ativo |
-| B2 | `fix/td-002-domain-infrastructure-boundaries` | Domain puro (infraestrutura fora) | 18h | B1 | 🟡 Ativo |
-| B3 | `fix/td-003-domain-application-inversion` | Aliases compatibilidade | 4h | — | 🟡 Ativo |
-| B4 | `chore/ruff-format-complete` | 100% formatação ruff | 2.5h | — | 🟡 Ativo |
-| B5 | `chore/type-hints-coverage-expansion` | Type hints 75%+ + mypy CI | 17h | B4 | 🟡 Ativo |
-| B6 | `fix/f1-startup-noise-and-defaults` | Ruído startup + defaults | 3h | — | 🟡 Ativo |
-| B7 | `fix/f1-silent-failures-and-consistency` | Erros claros, exit codes, unidades | 9h | — | 🟡 Ativo |
-| B8 | `feat/f1-output-formatting-and-progress` | Cores, tabelas, progress bars, logging | 16h | B7 | 🟡 Ativo |
-| B9 | `docs/f1-getting-started-and-reference` | README, docstrings, FAQ | 7h | — | 🟡 Ativo |
+| B1 | `fix/td-001-application-infrastructure-ports` | Ports + DI (application→infrastructure) | 30h | — | ✅ Merged |
+| B2 | `fix/td-002-domain-infrastructure-boundaries` | Domain puro (infraestrutura fora) | 18h | B1 | ✅ Merged |
+| B3 | `fix/td-003-domain-application-inversion` | Aliases compatibilidade + ciclo application→infra | 4h | — | 🟡 Parcial (falta DI nas facades) |
+| B4 | `chore/ruff-format-complete` | 100% formatação ruff | 2.5h | — | ✅ Merged |
+| B5 | `chore/type-hints-coverage-expansion` | Type hints 75%+ + mypy CI | 17h | B4 | ✅ Merged |
+| B6 | `fix/f1-startup-noise-and-defaults` | Ruído startup + defaults | 3h | — | ✅ Merged |
+| B7 | `fix/f1-silent-failures-and-consistency` | Erros claros, exit codes, unidades | 9h | — | 🟡 Parcial (T3.4 + logging app; falta T3.5/T3.6) |
+| B8 | `feat/f1-output-formatting-and-progress` | Cores, tabelas, progress bars, logging | 16h | B7 | ⏳ Pendente |
+| B9 | `docs/f1-getting-started-and-reference` | README, docstrings, FAQ | 7h | — | ⏳ Pendente |
 
 **Sequência de merge:** B4 → B6 → B1 → B7 → B2 → B8 → B5 → B3 → B9 (respeitar deps)
 
