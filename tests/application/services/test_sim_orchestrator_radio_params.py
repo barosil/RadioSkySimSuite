@@ -274,12 +274,26 @@ def test_run_with_processor_passes_radio_query_values_to_assembler(monkeypatch) 
         memory_mb = 256.0
         usable_memory_mb = 256.0
 
+    class _NoOpLogger:
+        """Fake logger that accepts all log methods."""
+        def debug(self, *args, **kwargs):
+            pass
+        def info(self, *args, **kwargs):
+            pass
+        def warning(self, *args, **kwargs):
+            pass
+        def error(self, *args, **kwargs):
+            pass
+        def exception(self, *args, **kwargs):
+            pass
+
     class _FakeProcessor:
         def __init__(self, **kwargs):
             # Contrato de ResourceAwareProcessor: expõe os recursos detectados
             # (o orquestrador lê processor.resources após a construção).
             self.resources = kwargs["resources"]
             self.summary = {}
+            self._log = kwargs.get("logger", _NoOpLogger())
 
         @staticmethod
         def partition_sources(**kwargs):
@@ -291,10 +305,6 @@ def test_run_with_processor_passes_radio_query_values_to_assembler(monkeypatch) 
             _ = kwargs
             return _dataset()
 
-    monkeypatch.setattr(
-        "radioskysims_simulation.infrastructure.processing.resource_processor.ProcessingResources.detect",
-        lambda **_kwargs: _FakeResources(),
-    )
     monkeypatch.setattr(
         "radioskysims_simulation.infrastructure.processing.resource_processor.ResourceAwareProcessor",
         _FakeProcessor,
