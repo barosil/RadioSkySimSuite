@@ -45,23 +45,30 @@
 | 2026-11-02 | Teste de UIRAPURU com janela 24h (logs em `logs/`) | 🟡 |
 | 2026-11-05 | **Auditoria consolidada e atualização de relatórios** | ← **Aqui agora** |
 
-## Plano corrente — Consolidação F1/F2/F3 + Release (2026-11-05)
+## Plano corrente — Execução Intensiva 2 Semanas (2026-11-05 a 2026-11-17)
 
-Objetivo: completar frentes de trabalho paralelas, atualizar documentação,
-preparar release `dev → main` em dezembro.
+**Documento principal:** [`PLANO_EXECUCAO_NOV_2026.md`](./PLANO_EXECUCAO_NOV_2026.md)
 
-| # | Tarefa | Detalhe | Status | Deadline |
-|---|--------|---------|--------|----------|
-| D1 | **Atualizar relatórios de auditoria** | Criar `november_2026_audit_report.md`, `frentes_status_consolidado.md`, `metricas_tecnicas_2026.md`. | `[x]` 2026-11-05 | — |
-| F1a | **Consolidar UX — Logging JSON/humanizado** | R5: Separar logging estruturado (JSON) de output humano em CLI. Usar stderr para JSON, stdout para user. | `[ ]` | Nov 17 |
-| F1b | **Consolidar UX — Progress bars** | R6: Adicionar `tqdm` ou similar em operações > 5s (TOD gen, export, mapmaking). | `[ ]` | Nov 17 |
-| F1c | **Consolidar UX — README** | L1: "Getting started" com 3 exemplos mínimos. | `[ ]` | Nov 24 |
-| F2a | **DDD — Mover logging de domain** | Move logger imports de `domain/*/services.py` para application. | `[ ]` | Nov 17 |
-| F2b | **DDD — Refactoring orquestração** | Esquema DESIGN.md para decompor `sim_orchestrator.py` e `simulation.py`. | `[ ]` | Nov 24 |
-| F2c | **Lint — Ruff format** | Branch `chore/formatting`; `ruff format src packages`. | `[ ]` | Nov 17 |
-| F3a | **Ciência — TOD 24h** | Executar validação TOD 24h em hardware real. | `[ ]` | Nov 20 |
-| F3b | **Ciência — Satélites auditoria** | Auditoria formal de propagação TLE e contribuição em rádio. | `[ ]` | Nov 30 |
-| C6 | **Release dev→main** | PR com changelog F1/F2/F3; merge após aprovação. | `[ ]` | Dez 5 |
+Objetivo: 9 branches paralelas atacando dívida técnica (T1), qualidade (T2) e F1 UX completo (T3).
+Timeline: 2 semanas intensivas (nov 5–17). Saída: dev 100% verde + 1 release-ready.
+
+**Branches:**
+
+| # | Branch | Foco | Esforço | Deps | Status |
+|---|--------|------|---------|------|--------|
+| B1 | `fix/td-001-application-infrastructure-ports` | Ports + DI (application→infrastructure) | 30h | — | 🟡 Ativo |
+| B2 | `fix/td-002-domain-infrastructure-boundaries` | Domain puro (infraestrutura fora) | 18h | B1 | 🟡 Ativo |
+| B3 | `fix/td-003-domain-application-inversion` | Aliases compatibilidade | 4h | — | 🟡 Ativo |
+| B4 | `chore/ruff-format-complete` | 100% formatação ruff | 2.5h | — | 🟡 Ativo |
+| B5 | `chore/type-hints-coverage-expansion` | Type hints 75%+ + mypy CI | 17h | B4 | 🟡 Ativo |
+| B6 | `fix/f1-startup-noise-and-defaults` | Ruído startup + defaults | 3h | — | 🟡 Ativo |
+| B7 | `fix/f1-silent-failures-and-consistency` | Erros claros, exit codes, unidades | 9h | — | 🟡 Ativo |
+| B8 | `feat/f1-output-formatting-and-progress` | Cores, tabelas, progress bars, logging | 16h | B7 | 🟡 Ativo |
+| B9 | `docs/f1-getting-started-and-reference` | README, docstrings, FAQ | 7h | — | 🟡 Ativo |
+
+**Sequência de merge:** B4 → B6 → B1 → B7 → B2 → B8 → B5 → B3 → B9 (respeitar deps)
+
+**Critério de sucesso:** Todas 9 branches em dev; 100% testes verde; 0 lint; type hints 75%+; CLI 100% F1.
 
 ## Frentes de trabalho vigentes (referência)
 
