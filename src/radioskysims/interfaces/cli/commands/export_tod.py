@@ -22,7 +22,7 @@ import sys
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Callable, TextIO
+from typing import Any, Callable, TextIO, cast
 
 from radioskysims_core.config.config_loader import resolve_settings_path
 from radioskysims_core.db.job_repository import JobRepository, default_jobs_db
@@ -32,7 +32,7 @@ def _project_data_dir() -> Path:
     """Diretório ``data`` do projeto (raiz detectada), independente do CWD."""
     from radioskysims_core.paths import get_project_root
 
-    return get_project_root() / "data"
+    return get_project_root() / "data"  # type: ignore[no-any-return]
 
 
 DEFAULT_OUTDIR = _project_data_dir() / "TOD"
@@ -48,7 +48,7 @@ def _resolve_config(config_path: str | Path | None) -> Path | None:
     """Resolve o arquivo de settings, se fornecido."""
     if config_path is None:
         return None
-    return resolve_settings_path(config_path)
+    return cast(Path, resolve_settings_path(config_path))
 
 
 def format_export_result(output: Path, sidecar: str) -> str:
@@ -95,7 +95,7 @@ def execute_export_tod_command(
     output: str | Path | None,
     stderr: TextIO,
     orchestrator_factory: Callable[..., Any] | None = None,
-) -> str:
+) -> ExportResult:
     """Executa ``tod export`` em foreground e retorna o resumo formatado.
 
     Se ``orchestrator_factory`` for informado (testes/injeção), é usado no
