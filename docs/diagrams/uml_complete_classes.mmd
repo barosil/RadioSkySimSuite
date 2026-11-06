@@ -372,17 +372,6 @@ classDiagram
         +load(path)* Beam
     }
 
-    class BeamEvaluatorPort {
-        <<ABC>>
-        +evaluate(beam, freq, angle)* xr.DataArray
-        +compute_properties(beam)* BeamParamsDomain
-    }
-
-    class BeamCreatorPort {
-        <<ABC>>
-        +create(params)* Beam
-    }
-
     class GeometryProviderPort {
         <<ABC>>
         +compute(tracks, observer, sat_blocks)* xr.Dataset

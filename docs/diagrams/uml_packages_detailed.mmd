@@ -10,7 +10,7 @@ flowchart TB
     subgraph P_CORE["radioskysims-core (kernel)"]
         direction TB
         CORE_DOM["domain/\n(common, geometry, tracks)"]
-        CORE_APP["application/\n(ports + adapters)"]
+        CORE_APP["application/\n(ports)"]
         CORE_INFRA["infrastructure/\n(db/engine, config, logging,\nmonitor, processing)"]
         CORE_CFG["config/ · db/ · monitor/ · processing/"]
         CORE_BOOT["bootstrap/builders\n(build_database, build_logging)"]
@@ -26,9 +26,9 @@ flowchart TB
 
     subgraph P_BEAM["radioskysims-beam"]
         direction TB
-        BEAM_DOM["domain/\n(Beam, BeamProperties, BeamFactory)"]
-        BEAM_APP["application/ports/\n(BeamLoaderPort, BeamEvaluatorPort)"]
-        BEAM_INFRA["infrastructure/beams/loaders\n(CSV, Analítico, LIT)"]
+        BEAM_DOM["domain/\n(Beam, BeamProperties)"]
+        BEAM_APP["application/ports/\n(BeamLoaderPort)"]
+        BEAM_INFRA["infrastructure/beams/\n(BeamFactory, loaders CSV, Analítico, LIT)"]
         BEAM_APP -->|implementado por| BEAM_INFRA
         BEAM_INFRA --> BEAM_DOM
     end

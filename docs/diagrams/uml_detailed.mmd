@@ -31,10 +31,6 @@ classDiagram
         +fwhm
         +directivity_db
     }
-    class BeamFactory {
-        +create(spec)
-    }
-
     %% ── Satellite ──
     class Satellite {
         +str constellation
@@ -62,7 +58,8 @@ classDiagram
     }
 
     %% ── Geometry ──
-    class SkyfieldGeometryProvider {
+    class GeometryProvider {
+        <<abstract>>
         +compute(tracks, observer, sat_block)
         +calculate_position(...)
     }
@@ -138,9 +135,9 @@ classDiagram
         +get(id)
         +list()
     }
-    class BeamEvaluatorPort {
+    class BeamLoaderPort {
         <<interface>>
-        +evaluate(beam, frequency, angle, pol)
+        +load(path)
     }
     class SkyMapGeneratorPort {
         <<interface>>
@@ -148,6 +145,13 @@ classDiagram
     }
 
     %% ── Adapters (infrastructure) ──
+    class BeamFactory {
+        +create(spec)
+    }
+    class SkyfieldGeometryProvider {
+        +compute(tracks, observer, sat_block)
+        +calculate_position(...)
+    }
     class ResourceAwareProcessor {
         +partition_sources()
         +run_batches()

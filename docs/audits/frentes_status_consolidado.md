@@ -11,7 +11,7 @@
 | Frente | Objetivo | Progresso | Próximas ações |
 |--------|----------|-----------|----------------|
 | **F1 — UX Entrypoints** | Eliminar ruído, feedback consistente | 50% (R1–R3 done, R4–R6 pending) | Logging JSON/humanizado; progress bars |
-| **F2 — Dívida Técnica** | Refactoring DDD, lint, type-hints | 30% (diagnóstico completo) | Mover logging de domain; decompor orquestração |
+| **F2 — Dívida Técnica** | Refactoring DDD, lint, type-hints | 65% (DDD+DI+LSP+SRP concluídos) | SRP residual: decompor run() do orquestrador |
 | **F3 — Validações Científicas** | HI, mapmaking, TOD 24h, satélites | 60% (HI/mapmaking validated) | TOD 24h em hardware real; resolver NVSS/PySM3 |
 
 ---
@@ -62,15 +62,15 @@
 
 | Violação | Localização | Tipo | Prioridade | Fix |
 |----------|------------|------|-----------|-----|
-| Logging direto em domain | `domain/*/services.py` | Design | Alta | Mover para application/services |
-| Providers externos em value objects | `domain/geometry/skyfield_provider.py` | Design | Alta | Promover para application/ports |
-| Dependência de domain para application | `domain/simulation/simulation.py` → application | Import | Média | Refactoring de orquestração |
+| Logging direto em domain | `domain/*/services.py` | Design | Alta | ✅ Removido (B2 — domínio puro) |
+| Providers externos em value objects | `domain/geometry/skyfield_provider.py` | Design | Alta | ✅ Movido p/ `infrastructure/external_geometry.py` |
+| Dependência de domain para application | `domain/simulation/simulation.py` → application | Import | Média | ✅ Resolvida (DI no composition root) |
 
 #### Complexidade de Módulo (candidates para refactoring)
 
 | Módulo | Linhas | Funções | Complexidade | Status | Ação |
 |--------|--------|---------|--------------|--------|------|
-| `simulation/sim_orchestrator.py` | ~800 | 20+ | Alta | `[ ]` | Decompor em casos de uso |
+| `simulation/sim_orchestrator.py` | 1419 | 20+ | Alta | `[~]` | DiffuseTODRunner extraído; run() residual |
 | `simulation/simulation.py` | ~600 | 15+ | Alta | `[ ]` | Mover lógica para domain/application |
 | `domain/beam/services.py` | ~400 | 12+ | Média | `[~]` | Revisão em progresso |
 

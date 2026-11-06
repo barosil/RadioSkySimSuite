@@ -7,7 +7,7 @@
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   ✓ Arquivos Python (produção):         669 arquivos
   ✓ Linhas de código (produção):        91.340 LOC
-  ✓ Funções de teste:                   253+ test_*
+  ✓ Testes (suíte completa):            1883+ verdes (10 suítes)
   ✓ Linting (ruleset ativo):            ~10 violações (⬇ 100× melhoria)
   ✓ Formatação:                         570/654 arquivos OK (87%)
   ✓ Cobertura de testes:                ~64% global
@@ -16,11 +16,11 @@
 
 🏗️  ARQUITETURA
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  ✓ Hexagonal + DDD:                    Implementado (aderência 85%)
+  ✓ Hexagonal + DDD:                    Implementado (0 violações de limite)
   ✓ Separation of concerns:             Domain/Application/Infrastructure OK
   ✓ Pacotes independentes:              Limpo; sem cross-imports ilícitos
-  ⚠ Orquestração concentrada:           sim_orchestrator.py (candidato refactor)
-  ⚠ Logging em domain:                  ~8 imports diretos
+  ⚠ Orquestração concentrada:           em decomposição (DiffuseTODRunner extraído)
+  ✓ Logging em domain:                  removido (domínio puro)
 
 📋 FRENTES DE TRABALHO
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -30,9 +30,9 @@
       ├─ R4–R6 (Logging, progress):      [████████░░░░░░░░░░░░] 40% [~]
       └─ L1–L3 (Documentação uso):       [░░░░░░░░░░░░░░░░░░░░] 0%  [ ]
   
-  F2 — DÍVIDA TÉCNICA                    [░░░░░░░░░░░░░░░░░░░░] 30%
-      ├─ DDD (logging, providers):       [██░░░░░░░░░░░░░░░░░░] 10% [~]
-      ├─ Refactoring orquestração:       [░░░░░░░░░░░░░░░░░░░░] 0%  [ ]
+  F2 — DÍVIDA TÉCNICA                    [█████████████░░░░░░░] 65%
+      ├─ DDD (logging, providers):       [████████████████████] 100% ✓
+      ├─ Refactoring orquestração:       [████████░░░░░░░░░░░░] 40% [~]
       ├─ Lint + Formatting:              [████████████░░░░░░░░] 60% [~]
       └─ Type hints + mypy:              [████████░░░░░░░░░░░░] 40% [~]
   
@@ -54,9 +54,9 @@
     ☐ README com 3 exemplos getting started
   
   F2 DoD:
-    ☐ 0 violações de limite arquitetural (ruleset ativo)
+    ☑ 0 violações de limite arquitetural (scan limpo)
     ☐ 100% formatação (ruff format)
-    ☐ Refactoring orquestração iniciado com DESIGN.md
+    ☑ Refactoring orquestração iniciado (DiffuseTODRunner extraído)
     ☐ Testes infraestrutura 65%+ cobertura
     ☐ mypy rodando em CI (sem falhas críticas)
   
@@ -92,9 +92,9 @@
 🚀 PRÓXIMAS AÇÕES — IMEDIATO
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   
-  1. Revisar e validar este relatório
-  2. Merge branches pendentes: chore/notebooks-cwd-anchor, audit/broad-linting
-  3. Iniciar F2a: mover logging de domain para application (5–8h)
+  1. ✓ Validado (2026-11-06): DDD+DI+LSP+SRP concluídos; suíte completa verde
+  2. Merge/push das branches F2 (fix/ddd-*) nos submódulos + meta (bump ponteiros)
+  3. SRP residual: decompor run() do sim_orchestrator e persistência do SimulationResult
   4. Setup TOD 24h: hardware, dados, schedule de execução (nov 15)
   5. Prototipo F1: progress bars em tqdm (2–3h)
 
