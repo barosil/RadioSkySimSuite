@@ -278,14 +278,14 @@ class TestGeometryProviderPortContract:
 
     def test_classe_exportada(self):
         """Verificação estrutural: a classe implementa GeometryProviderPort."""
-        from radioskysims_core.application.adapters.external_geometry import (
+        from radioskysims_core.infrastructure.external_geometry import (
             SkyfieldGeometryProvider,
         )
 
         assert issubclass(SkyfieldGeometryProvider, GeometryProviderPort)
 
     def test_compute_assinatura(self):
-        from radioskysims_core.application.adapters.external_geometry import (
+        from radioskysims_core.infrastructure.external_geometry import (
             SkyfieldGeometryProvider,
         )
 

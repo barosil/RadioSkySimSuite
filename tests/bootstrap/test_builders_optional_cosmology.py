@@ -45,6 +45,7 @@ def _patch_minimal_bootstrap_dependencies(monkeypatch: pytest.MonkeyPatch) -> No
         sim_builders,
         "build_domain_components",
         lambda **_kwargs: {
+            "track_factory": object(),
             "geometry": object(),
             "signal_factory": object(),
             "tod_simulator": object(),
