@@ -1,12 +1,3 @@
-%% RadioSkySim — visão de alto nível (pacotes, camadas e dependências)
-%%
-%% Atualizado: 2026-11-06. Cada pacote segue a arquitetura hexagonal:
-%% interfaces -> application -> domain; bootstrap monta infrastructure via DI;
-%% infrastructure implementa ports. Seta tracejada = violação (import real
-%% não declarado) ou dependência declarada sem uso.
-%%
-%% Convenção de setas idêntica a architecture.mmd.
-
 flowchart TB
     subgraph ENTRY["Interfaces / Entrypoints (umbrella)"]
         CLI["interfaces/cli (radioskysims)"]
