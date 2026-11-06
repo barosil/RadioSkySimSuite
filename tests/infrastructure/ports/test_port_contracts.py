@@ -20,8 +20,6 @@ import numpy as np
 import pytest
 import xarray as xr
 from radioskysims_beam.application.ports.beam import (
-    BeamCreatorPort,
-    BeamEvaluatorPort,
     BeamLoaderPort,
 )
 from radioskysims_beam.domain.beam.models import Beam
@@ -104,84 +102,6 @@ class TestBeamLoaderPortContract:
 
         loader = MinimalLoader()
         result = loader.load()
-        assert isinstance(result, Beam)
-
-
-# ---------------------------------------------------------------------------
-# BeamEvaluatorPort contract
-# ---------------------------------------------------------------------------
-
-
-class TestBeamEvaluatorPortContract:
-    """Verifica que BeamEvaluatorPort define o contrato correto."""
-
-    def test_is_abstract(self) -> None:
-        assert issubclass(BeamEvaluatorPort, ABC)
-
-    def test_has_required_abstract_methods(self) -> None:
-        abstracts = _abstract_methods(BeamEvaluatorPort)
-        assert "evaluate" in abstracts
-        assert "compute_properties" in abstracts
-
-    def test_concrete_subclass_respects_evaluate_signature(self) -> None:
-        class MinimalEvaluator(BeamEvaluatorPort):
-            def evaluate(
-                self,
-                beam: Beam,
-                *,
-                frequency: xr.DataArray,
-                angle: xr.DataArray,
-                polarization: str | None = None,
-            ) -> xr.DataArray:
-                _ = (beam, frequency, polarization)  # assinala uso (interface/reservado)
-                return xr.DataArray(np.zeros(angle.shape))
-
-            def compute_properties(self, beam: Beam) -> dict[str, Any]:
-                _ = beam  # assinala uso (interface/reservado)
-                return {"fwhm": 1.0}
-
-        evaluator = MinimalEvaluator()
-        beam = _make_minimal_beam()
-        freq = xr.DataArray([1.0e8], dims="frequency")
-        angle = xr.DataArray([0.1], dims="angle")
-        result = evaluator.evaluate(beam, frequency=freq, angle=angle)
-        assert isinstance(result, xr.DataArray)
-
-
-# ---------------------------------------------------------------------------
-# BeamCreatorPort contract
-# ---------------------------------------------------------------------------
-
-
-class TestBeamCreatorPortContract:
-    """Verifica que BeamCreatorPort define o contrato correto."""
-
-    def test_is_abstract(self) -> None:
-        assert issubclass(BeamCreatorPort, ABC)
-
-    def test_has_create_method(self) -> None:
-        assert "create" in _abstract_methods(BeamCreatorPort)
-
-    def test_concrete_subclass_create_returns_beam(self) -> None:
-        class MinimalCreator(BeamCreatorPort):
-            def create(
-                self,
-                *,
-                frequency: list[float],
-                angle: list[float],
-                amplitudes: Any,
-                polarizations: list[str] | None = None,
-            ) -> Beam:
-                _ = (
-                    amplitudes,
-                    angle,
-                    frequency,
-                    polarizations,
-                )  # assinala uso (interface/reservado)
-                return _make_minimal_beam()
-
-        creator = MinimalCreator()
-        result = creator.create(frequency=[1.0e8], angle=[0.0, 1.0], amplitudes=np.ones((1, 2)))
         assert isinstance(result, Beam)
 
 

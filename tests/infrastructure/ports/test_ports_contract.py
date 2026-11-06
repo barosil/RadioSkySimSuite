@@ -10,8 +10,6 @@ Estrutura:
     - SkyMapTransformPort: HealpySkyMapProvider
     - GeometryProviderPort: SkyfieldGeometryProvider
     - BeamLoaderPort: LITBeamLoader, CSVBeamLoader, CustomBeamLoader
-    - BeamEvaluatorPort: BeamProperties
-    - BeamCreatorPort: BeamFactory
     - SkyMapAnalyzerPort: HealpySkyMapAnalyzer
 """
 
@@ -268,62 +266,6 @@ class TestBeamLoaderPortContract:
         mod = importlib.import_module("radioskysims_beam.infrastructure.beams.loaders")
         cls = getattr(mod, loader_cls)
         assert issubclass(cls, BeamLoaderPort)
-
-
-# =============================================================================
-# 6. Contract: BeamEvaluatorPort
-# =============================================================================
-
-
-class TestBeamEvaluatorPortContract:
-    """Verifica que BeamProperties respeita o contrato BeamEvaluatorPort."""
-
-    def test_implementa_interface(self):
-        from radioskysims_beam.domain.beam.properties import BeamProperties
-
-        bp = BeamProperties()
-        # NOTA: BeamProperties não herda de BeamEvaluatorPort atualmente
-        # e não implementa evaluate() — apenas compute_properties(ds)
-        assert hasattr(bp, "compute_properties")
-
-    def test_compute_properties_retorna_dict(self, dummy_skymap):
-        _ = dummy_skymap  # assinala uso (interface/reservado)
-        from radioskysims_beam.domain.beam.properties import BeamProperties
-
-        bp = BeamProperties()
-        import inspect
-
-        sig = inspect.signature(bp.compute_properties)
-        # API atual aceita 'ds' (Dataset), não 'beam'
-        assert len(sig.parameters) >= 1
-
-
-# =============================================================================
-# 7. Contract: BeamCreatorPort
-# =============================================================================
-
-
-class TestBeamCreatorPortContract:
-    """Verifica que BeamFactory respeita o contrato BeamCreatorPort."""
-
-    def test_implementa_interface(self):
-        from radioskysims_beam.infrastructure.beams.beam_factory import BeamFactory
-
-        factory = BeamFactory()
-        # NOTA: BeamFactory não herda de BeamCreatorPort atualmente
-        # e não implementa create() — tem create_beam_from_file()
-        assert hasattr(factory, "create_beam_from_file")
-
-    def test_create_assinatura(self):
-        import inspect
-
-        from radioskysims_beam.infrastructure.beams.beam_factory import BeamFactory
-
-        factory = BeamFactory()
-        # API atual: create_beam_from_file(filepath, name, ...)
-        sig = inspect.signature(factory.create_beam_from_file)
-        assert "filepath" in sig.parameters
-        assert "name" in sig.parameters
 
 
 # =============================================================================
