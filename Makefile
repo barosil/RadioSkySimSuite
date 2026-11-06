@@ -4,6 +4,7 @@
 # que NÃO instala pip por padrão — por isso os targets de ambiente usam `uv`.
 #
 # Targets:
+#   make submodules     # inicializa/atualiza os 9 submódulos (uniforme)
 #   make setup          # uv sync (cria .venv + deps + pacote editable)
 #   make install        # uv sync no .venv existente
 #   make install-extra  # instala dependências extras (requirements_extra.txt)
@@ -36,9 +37,14 @@ help:
 	@echo "---------------------"
 	@grep -E '^[a-zA-Z_-]+:.*# ' $(MAKEFILE_LIST) | sed 's/:.*# /  /' | sort
 
+# ── Submódulos ────────────────────────────────────────────────────
+.PHONY: submodules
+submodules:   ## Inicializa/atualiza os 9 submódulos (uniforme)
+	bash scripts/sync_submodules.sh
+
 # ── Ambiente Python (uv workspace) ────────────────────────────────
 .PHONY: setup
-setup:   ## Cria/sincroniza o .venv via uv sync (deps + pacote editable)
+setup: submodules   ## Cria/sincroniza o .venv via uv sync (deps + pacote editable)
 	$(UV) sync --extra test --extra dev --extra docs
 	@echo "Setup concluído. Ative com: source $(VENV)/bin/activate"
 
