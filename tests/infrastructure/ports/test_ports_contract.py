@@ -307,7 +307,7 @@ class TestBeamCreatorPortContract:
     """Verifica que BeamFactory respeita o contrato BeamCreatorPort."""
 
     def test_implementa_interface(self):
-        from radioskysims_beam.application.services.beam_factory import BeamFactory
+        from radioskysims_beam.infrastructure.beams.beam_factory import BeamFactory
 
         factory = BeamFactory()
         # NOTA: BeamFactory não herda de BeamCreatorPort atualmente
@@ -317,7 +317,7 @@ class TestBeamCreatorPortContract:
     def test_create_assinatura(self):
         import inspect
 
-        from radioskysims_beam.application.services.beam_factory import BeamFactory
+        from radioskysims_beam.infrastructure.beams.beam_factory import BeamFactory
 
         factory = BeamFactory()
         # API atual: create_beam_from_file(filepath, name, ...)
@@ -336,14 +336,14 @@ class TestGeometryProviderPortContract:
 
     def test_classe_exportada(self):
         """Verificação estrutural: a classe implementa GeometryProviderPort."""
-        from radioskysims_core.domain.geometry.skyfield_provider import (
+        from radioskysims_core.application.adapters.external_geometry import (
             SkyfieldGeometryProvider,
         )
 
         assert issubclass(SkyfieldGeometryProvider, GeometryProviderPort)
 
     def test_compute_assinatura(self):
-        from radioskysims_core.domain.geometry.skyfield_provider import (
+        from radioskysims_core.application.adapters.external_geometry import (
             SkyfieldGeometryProvider,
         )
 
