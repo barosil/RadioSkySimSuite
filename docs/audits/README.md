@@ -1,7 +1,14 @@
 # RadioSkySimSuite — Auditorias e Relatórios
 
-**Última atualização:** 2026-11-05  
+**Última atualização:** 2026-11-06
+
 **Responsável:** Copilot (análise automatizada)
+
+> **Leitura atual:** consulte primeiro a
+> [auditoria de código e roadmap de 2026-11-06](code_review_2026-11-06.md).
+> Ela registra o commit examinado, três gitlinks indisponíveis e os limites da
+> revisão. Os números, percentuais, prazos e estados nas seções e documentos
+> abaixo são **históricos**, não indicadores atuais comprovados.
 
 ---
 
@@ -13,7 +20,7 @@
 
 ### 📊 **Relatórios de Alto Nível** (15–30 min)
 
-- **[november_2026_audit_report.md](november_2026_audit_report.md)** — Auditoria consolidada completa do workspace. Inclui: arquitetura, métricas de qualidade, análise por frente, dependências, riscos e próximos passos. **Principal referência.**
+- **[november_2026_audit_report.md](november_2026_audit_report.md)** — Relatório histórico de 5/11; suas métricas e afirmações devem ser lidas com as ressalvas da auditoria de 6/11.
 
 - **[frentes_status_consolidado.md](frentes_status_consolidado.md)** — Status detalhado das 3 frentes de trabalho:
   - **F1 — UX Entrypoints** (50% concluído)

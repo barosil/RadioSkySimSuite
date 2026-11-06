@@ -20,6 +20,13 @@
 
 ## Snapshot — 2026-11-05 (atualizado)
 
+> **Revalidação 2026-11-06:** a
+> [auditoria de código e roadmap](../docs/audits/code_review_2026-11-06.md)
+> examina `main` em `3bb119e`, não este snapshot de `dev`. Três gitlinks
+> falharam no fetch e foram examinados HEADs substitutos; CI e estados B1–B9
+> precisam ser reconciliados por commit antes de assumir os indicadores abaixo.
+> O roadmap complementa F1/F2/F3 sem marcar itens como concluídos.
+
 - `dev` (7830dba): plano de execução em andamento — **B1/B2/B4/B5/B6 concluídos**;
   **B3 e B7 parciais**; **B8/B9 pendentes**. Suítes verdes: simulation (309),
   sources (535), gnsstools4astro (61), waterfall (134); lint/format limpos nos
@@ -50,7 +57,7 @@
 
 ## Plano corrente — Execução Intensiva 2 Semanas (2026-11-05 a 2026-11-17)
 
-**Documento principal:** [`PLANO_EXECUCAO_NOV_2026.md`](./PLANO_EXECUCAO_NOV_2026.md)
+**Documento principal:** [`PLANO_EXECUCAO_NOV_2026.md`](../PLANO_EXECUCAO_NOV_2026.md)
 
 Objetivo: 9 branches paralelas atacando dívida técnica (T1), qualidade (T2) e F1 UX completo (T3).
 Timeline: 2 semanas intensivas (nov 5–17). Saída: dev 100% verde + 1 release-ready.
