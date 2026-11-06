@@ -4,9 +4,8 @@ from types import SimpleNamespace
 
 import numpy as np
 import xarray as xr
-
-from radioskysims_simulation.application.services.sim_orchestrator import SimOrchestrator
 from radioskysims_core.domain.common import TimeRange
+from radioskysims_simulation.application.services.sim_orchestrator import SimOrchestrator
 from radioskysims_simulation.domain.simulation import SimulationResult
 
 
@@ -226,27 +225,25 @@ def test_run_with_processor_passes_radio_query_values_to_assembler(monkeypatch) 
 
         @staticmethod
         def _frequency_range_from_beam(beam):
-            _ = (beam)  # assinala uso (interface/reservado)
-            return None
+            _ = beam  # assinala uso (interface/reservado)
 
         @staticmethod
         def _normalize_frequency_range(frequency_range, num_channels):
-            _ = (num_channels)  # assinala uso (interface/reservado)
+            _ = num_channels  # assinala uso (interface/reservado)
             return frequency_range
 
         @staticmethod
         def _beam_frequency_grid(frequency_range, num_channels):
             _ = (frequency_range, num_channels)  # assinala uso (interface/reservado)
-            return None
 
         @staticmethod
         def _interpolate_beam_frequency(beam, freq_grid):
-            _ = (freq_grid)  # assinala uso (interface/reservado)
+            _ = freq_grid  # assinala uso (interface/reservado)
             return beam
 
         @staticmethod
         def _satellites_are_assembled(satellites):
-            _ = (satellites)  # assinala uso (interface/reservado)
+            _ = satellites  # assinala uso (interface/reservado)
             return True
 
     fake_svc = _FakeSvc()
@@ -276,14 +273,19 @@ def test_run_with_processor_passes_radio_query_values_to_assembler(monkeypatch) 
 
     class _NoOpLogger:
         """Fake logger that accepts all log methods."""
+
         def debug(self, *args, **kwargs):
             pass
+
         def info(self, *args, **kwargs):
             pass
+
         def warning(self, *args, **kwargs):
             pass
+
         def error(self, *args, **kwargs):
             pass
+
         def exception(self, *args, **kwargs):
             pass
 
@@ -297,7 +299,7 @@ def test_run_with_processor_passes_radio_query_values_to_assembler(monkeypatch) 
 
         @staticmethod
         def partition_sources(**kwargs):
-            _ = (kwargs)  # assinala uso (interface/reservado)
+            _ = kwargs  # assinala uso (interface/reservado)
             return []
 
         @staticmethod
@@ -305,10 +307,16 @@ def test_run_with_processor_passes_radio_query_values_to_assembler(monkeypatch) 
             _ = kwargs
             return _dataset()
 
-    monkeypatch.setattr(
-        "radioskysims_simulation.infrastructure.processing.resource_processor.ResourceAwareProcessor",
-        _FakeProcessor,
-    )
+    # TD-001: a application não instancia o adapter concreto de processor; a
+    # factory é injetada pelo composition root. Aqui injetamos uma factory fake
+    # que devolve o _FakeProcessor com os recursos esperados pelo orquestrador.
+    def _fake_processor_factory(**kwargs):
+        return _FakeProcessor(
+            resources=_FakeResources(),
+            logger=kwargs.get("logger", _NoOpLogger()),
+        )
+
+    orchestrator._processor_factory = _fake_processor_factory
 
     tr = TimeRange.from_iso("2026-07-28T00:00:00", "2026-07-28T00:01:00", resolution=60)
     orchestrator._run_with_processor(
