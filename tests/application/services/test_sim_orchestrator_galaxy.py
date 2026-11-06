@@ -816,14 +816,14 @@ def test_sim_orchestrator_reuses_galaxy_maps_for_multiple_antennas(
         )
 
     monkeypatch.setattr(
-        orchestrator,
+        orchestrator._diffuse_runner,
         "_generate_galaxy_maps",
         _fake_generate_galaxy_maps,
     )
 
     monkeypatch.setattr(
-        orchestrator,
-        "_run_galaxy_maps_for_antenna",
+        orchestrator._diffuse_runner,
+        "run_diffuse_maps_for_antenna",
         _fake_project_galaxy_for_antenna,
     )
 
