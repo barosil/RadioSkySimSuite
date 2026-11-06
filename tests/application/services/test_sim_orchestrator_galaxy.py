@@ -5,14 +5,13 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 import xarray as xr
-
+from radioskysims_core.domain.common import TimeRange
 from radioskysims_simulation.application.services.sim_orchestrator import (
     SimOrchestrator,
 )
 from radioskysims_simulation.application.services.tod_orchestrator import (
     TODOrchestrator,
 )
-from radioskysims_core.domain.common import TimeRange
 from radioskysims_simulation.domain.simulation import SimulationResult
 
 
@@ -338,7 +337,7 @@ def test_sim_orchestrator_does_not_run_galaxy_when_disabled(
     def _galaxy_must_not_run(
         **kwargs,
     ):
-        _ = (kwargs)  # assinala uso (interface/reservado)
+        _ = kwargs  # assinala uso (interface/reservado)
         msg = "Galaxy path must not run when include_galaxy=False."
         raise AssertionError(msg)
 
@@ -637,7 +636,7 @@ def test_sim_orchestrator_requires_satellites_when_galaxy_disabled(
         ->
     RuntimeError.
     """
-    _ = (monkeypatch)  # assinala uso (interface/reservado)
+    _ = monkeypatch  # assinala uso (interface/reservado)
 
     time_range = TimeRange.from_iso(
         start="2026-07-28T00:00:00",
@@ -792,7 +791,7 @@ def test_sim_orchestrator_reuses_galaxy_maps_for_multiple_antennas(
     def _fake_generate_galaxy_maps(
         **kwargs,
     ):
-        _ = (kwargs)  # assinala uso (interface/reservado)
+        _ = kwargs  # assinala uso (interface/reservado)
         nonlocal galaxy_generation_calls
 
         galaxy_generation_calls += 1
@@ -804,7 +803,7 @@ def test_sim_orchestrator_reuses_galaxy_maps_for_multiple_antennas(
         maps,
         **kwargs,
     ) -> xr.Dataset:
-        _ = (kwargs)  # assinala uso (interface/reservado)
+        _ = kwargs  # assinala uso (interface/reservado)
         nonlocal galaxy_projection_calls
 
         galaxy_projection_calls += 1
