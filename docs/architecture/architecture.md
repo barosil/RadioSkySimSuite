@@ -44,7 +44,7 @@ virou **meta-pacote fino** (composition root + CLI/GUI + extras seletivos).
 
 ```mermaid
 flowchart LR
-    subgraph Kernel["Kernel compartilhado"]
+    subgraph Kernel["Kernel"]
         CORE[radioskysims-core]
         VIZ[radioskysims-viz]
     end
@@ -58,7 +58,7 @@ flowchart LR
         WF[radioskysims-waterfall]
     end
 
-    subgraph Infra["Infraestrutura"]
+    subgraph Infra["Infraestrutura standalone"]
         GNSS[gnsstools4astro]
     end
 
@@ -66,25 +66,36 @@ flowchart LR
 
     BEAM --> CORE
     BEAM --> VIZ
-    SKYMAP --> CORE
     RT --> CORE
     RT --> VIZ
     SRC --> CORE
     SRC --> SKYMAP
+    SRC --> GNSS
     SIM --> CORE
     SIM --> VIZ
     SIM --> BEAM
     SIM --> SKYMAP
     SIM --> SRC
     SIM --> RT
-    GNSS --> CORE
-    GNSS --> SKYMAP
+    VIZ --> CORE
+    VIZ --> BEAM
     UMB --> CORE & VIZ & BEAM & SKYMAP & RT & SRC & SIM & WF & GNSS
+
+    CORE -.-> RT
+    CORE -.-> SKYMAP
+    CORE -.-> VIZ
+    GNSS -.-> VIZ
+    SRC -.-> VIZ
+    SKYMAP -.-> CORE
 ```
 
 - `radioskysims-core` (kernel: config, db, logging, paths, monitor, progress e
   domínio `common`/`geometry`/`tracks`) e `radioskysims-viz`
-  (`PanelApplication`, `VisualizerPort`) não dependem de domínios de rádio.
+  (`PanelApplication`, `VisualizerPort`) foram desenhados como kernel, mas na
+  prática **não são puros**: `core` importa `radiotelescope`/`skymap`/`viz`
+  (`config_loader`, `exceptions`, `observer` lazy) e `viz` importa `core`/`beam`
+  — violações representadas pelas setas tracejadas acima (ver
+  `module_dependencies.md`).
 - `radioskysims-waterfall` é **autônomo** (não depende de `core`/`viz` na
   implementação atual) — integração com `simulation` via porta, sem dependência
   rígida.
