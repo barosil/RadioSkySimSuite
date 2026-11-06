@@ -11,8 +11,9 @@ Instruções para colaboradores e agentes automatizados no meta-repo **RadioSkyS
   `radioskysims_beam`, ...) — **não** usar namespace único `radioskysims.*`.
 - Documento canônico de arquitetura: `docs/architecture.md` (mantido
   continuamente). Detalhes por tópico em `docs/architecture/`.
-- Plano de desacoplamento e documentação fase a fase:
-  `prompts/plan-radioSkySimDecoupling.prompt.md` + `docs/decoupling/`.
+- Trabalho corrente (todo-mestre + planos F1/F2/F3): `.prompts/barosil.md`
+  (documento-mestre de trabalho) e `notebooks/ux_entrypoints_audit.md`.
+- Desacoplamento (encerrado, Fases 0–7): histórico em `docs/archive/decoupling/`.
 
 ## Layout dos pacotes
 
@@ -75,6 +76,8 @@ uv run ruff check src packages/*/src      # lint
 
 - `docs/architecture.md` — canônico; atualizar diagramas Mermaid (validar com
   `mermaid-diagram-validator` e prévia com `mermaid-diagram-preview`).
-- `docs/decoupling/` — documentação fase a fase do desacoplamento.
+- `.prompts/barosil.md` — documento-mestre de trabalho (todo + indicadores).
+- `docs/archive/decoupling/` — fases do desacoplamento (encerrado; referência).
+- `docs/audits/` — auditorias que alimentam o trabalho corrente (F2/F3).
 - `docs/source/` — build Sphinx (MyST).
 - `notebooks/` — exemplos executáveis dos principais fluxos.

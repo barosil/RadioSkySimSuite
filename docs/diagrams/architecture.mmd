@@ -1,23 +1,47 @@
-%% Diagrama de pacotes / contexts - RadioSkySim
+---
+title: RadioSkySim — pacotes do uv workspace (visão de dependências)
+---
+%% Diagrama de pacotes - RadioSkySimSuite (pós-desacoplamento, 2026-09)
+%% Atualizado em: 2026-09-01 — sincronizado com architecture.md §1.1
 graph LR
-  application[application] --> domain[domain]
-  application --> interfaces[interfaces]
-  application --> infrastructure[infrastructure]
-  domain --> skymap[skymap]
-  domain --> beam[beam]
-  domain --> satellite[satellite]
-  domain --> tracks[tracks]
-  domain --> signal[signal]
-  domain --> tod[tod]
-  domain --> geometry[geometry]
-  domain --> common[common]
-  domain --> map[map]
-  domain --> noise[noise]
-  domain --> rfi[rfi]
-  domain --> simulation[simulation]
-  infrastructure --> beams[beams loaders/adapters]
-  infrastructure --> db[db repositories]
-  infrastructure --> config[config/logging]
-  interfaces --> gui[gui]
+  subgraph kernel["Kernel compartilhado"]
+    core[radioskysims-core]
+    viz[radioskysims-viz]
+  end
 
+  subgraph dominios["Domínios de rádio"]
+    beam[radioskysims-beam]
+    skymap[radioskysims-skymap]
+    rt[radioskysims-radiotelescope]
+    sources[radioskysims-sources]
+    simulation[radioskysims-simulation]
+    waterfall[radioskysims-waterfall]
+  end
+
+  subgraph infra["Infraestrutura standalone"]
+    gnss[gnsstools4astro]
+  end
+
+  umbrella[radioskysim - umbrella / composition root]
+
+  beam --> core
+  beam --> viz
+  skymap --> core
+  rt --> core
+  rt --> viz
+  sources --> core
+  sources --> skymap
+  simulation --> core
+  simulation --> viz
+  simulation --> beam
+  simulation --> skymap
+  simulation --> sources
+  simulation --> rt
+  gnss --> core
+  gnss --> skymap
+  umbrella --> core & viz & beam & skymap & rt & sources & simulation & waterfall & gnss
+
+%% Cada pacote segue internamente: domain -> application -> ports
+%% infrastructure implementa ports; bootstrap monta a composição (DI)
 %% Uso: render em ferramentas compatíveis com Mermaid
+

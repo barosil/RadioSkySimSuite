@@ -1,0 +1,150 @@
+[paths]
+raw_data_folder = "data/raw/"
+auxiliary_data_folder = "data/aux/"
+log_folder = "data/logs/"
+skyfield_folder="data/aux/skyfield/"
+
+[ports]
+db_port = 5432
+panel_port = 8080
+
+[radiotelescopes]
+
+# ── UIRAPURU profile ────────────────────────────────────────────────
+[radiotelescopes.uirapuru]
+name = "UIRAPURU Telescope"
+
+[radiotelescopes.uirapuru.observer]
+lat = -7.211637
+lon = -35.90813
+height = 530.0
+
+[[radiotelescopes.uirapuru.antennas]]
+name = "BINGO Horn"
+# effective_area_m2 ausente → A_e = λ²/Ω_A (Ω integrado do feixe); override opcional.
+frequency_range = [1000, 1250, 0.05]
+
+[radiotelescopes.uirapuru.antennas.pointing]
+mode = "transit"
+alt_deg = 65
+az_deg = 0
+
+[radiotelescopes.uirapuru.antennas.beam]
+name = "BINGO Horn LIT"
+# polarizations = ["H_COPOL", "H_CROSS", "V_COPOL", "V_CROSS"]
+polarizations = ["H_COPOL"]
+beam_width_deg = 15.0
+pattern_file = "radioskysims/resources/beams/beampattern_horn01.csv"
+
+[radiotelescopes.uirapuru.antennas.backend]
+type = "spectrometer"
+frequency_range = [1000, 1250, 0.05]
+name = "UIRAPURU Backend"
+bandwidth_mhz = 250
+sampling_rate_mhz = 250
+integration_time_s = 1
+num_channels = 5000
+T_sys_K = 50
+
+# ── DEFAULT profile (cópia de uirapuru) ───────────────────────────────────
+# Perfil usado pela CLI/notebooks quando nenhum --telescope é informado
+# (create_radiotelescope() e `radioskysims tod export` sem --telescope).
+[radiotelescopes.default]
+name = "UIRAPURU Telescope"
+
+[radiotelescopes.default.observer]
+lat = -7.211637
+lon = -35.90813
+height = 530.0
+
+[[radiotelescopes.default.antennas]]
+name = "BINGO Horn"
+# effective_area_m2 ausente → A_e = λ²/Ω_A (Ω integrado do feixe); override opcional.
+frequency_range = [1000, 1250, 0.05]
+
+[radiotelescopes.default.antennas.pointing]
+mode = "transit"
+alt_deg = 65
+az_deg = 0
+
+[radiotelescopes.default.antennas.beam]
+name = "BINGO Horn LIT"
+# polarizations = ["H_COPOL", "H_CROSS", "V_COPOL", "V_CROSS"]
+polarizations = ["H_COPOL"]
+beam_width_deg = 15.0
+pattern_file = "radioskysims/resources/beams/beampattern_horn01.csv"
+
+[radiotelescopes.default.antennas.backend]
+type = "spectrometer"
+frequency_range = [1000, 1250, 0.05]
+name = "UIRAPURU Backend"
+bandwidth_mhz = 250
+sampling_rate_mhz = 250
+integration_time_s = 1
+num_channels = 5000
+T_sys_K = 50
+
+[simulations]
+time_range = ["2025-02-27T00:00:00", "2025-02-28T00:00:00", 120]
+
+[processing]
+# Limite de memória por batch em MB (opcional — detecta automático se omitido)
+# max_batch_mb = 2048
+# Número de CPUs a usar (opcional — detecta automático se omitido)
+# cpu_count = 4
+# Scheduler dask: "threads" (padrão), "synchronous" ou "distributed".
+# "distributed" sobe um LocalCluster e loga o endereço do dashboard
+# (use_processor=True).
+dask_scheduler = "threads"
+# Estratégia de execução do scheduler "distributed":
+#   - true (padrão): workers em processos separados (isolamento)
+#   - false: 1 worker com threads (menos overhead de memória)
+dask_processes = true
+
+[beams]
+name = "Default Beam"
+file_path = "radioskysims/resources/beams/beampattern_horn01.csv"
+
+[catalogs]
+[catalogs.radiosources]
+name = "Default Radio Sources Catalog"
+url = "src/radioskysims/resources/catalogs/default_radiosources.csv"
+[catalogs.spectral_indexes]
+name = "Default Spectral Index Catalog"
+url = "src/radioskysims/resources/catalogs/default_spectral_indexes.csv"
+
+[radiosources]
+query_str = "SELECT * FROM radiosources WHERE flux > 1"
+
+[noisemodels]
+pysm3_component = ["synchrotron"]
+
+[satellites]
+constellations = ["GPS", "GALILEO", "BEIDOU", "GLONASS"]
+satellites = []
+
+[signals]
+sat_signals = "radioskysims/resources/satellites/sat_signals.json"
+
+[DB]
+POSTGRES_USER = "radio"
+POSTGRES_PASSWORD = "radio"
+POSTGRES_HOST = "localhost"
+POSTGRES_PORT = 5432
+POSTGRES_DB = "radioskysims"
+
+[cosmology]
+field_model = "gaussian"
+omega_c = 0.2607
+omega_b = 0.0489
+h = 0.6766
+sigma8 = 0.8102
+n_s = 0.9665
+
+[SPACETRACK]
+# Credenciais do SpaceTrack NÃO devem ser versionadas aqui.
+# Forneça via variáveis de ambiente (ST_USER/ST_PWD) ou em credentials.env
+# (gitignored; veja credentials.env.example). O SpaceTrackClient carrega
+# credentials.env automaticamente.
+ST_USER = ""
+ST_PWD = ""

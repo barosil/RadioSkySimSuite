@@ -266,6 +266,8 @@ A classificação recomendada é:
 
 A documentação deve evitar apresentar todos esses módulos como pontos de entrada igualmente suportados.
 
+> **Atualização — 2026-09-11:** após a auditoria de entrypoints/UX, o console script oficial `radioskysims` passou a apontar para `radioskysims.bootstrap.cli:main`, que atua como composition root da CLI umbrella. O módulo `radioskysims.bootstrap.skymap_cli` foi mantido como wrapper de compatibilidade para imports legados.
+
 ### 5.3 Casos de uso da camada Application
 
 A camada `application` expõe atualmente casos de uso e serviços que podem ser agrupados em quatro grandes áreas.

@@ -79,31 +79,16 @@ class SkyMapGUIController:
 
         if model_fields is not None:
             valid_fields = set(model_fields)
-            filtered_payload = {
-                key: value
-                for key, value in payload.items()
-                if key in valid_fields
-            }
+            filtered_payload = {key: value for key, value in payload.items() if key in valid_fields}
 
-            return GenerateSkyMapInputDTO.model_validate(
-                filtered_payload
-            )
+            return GenerateSkyMapInputDTO.model_validate(filtered_payload)
 
-        valid_parameters = set(
-            signature(
-                GenerateSkyMapInputDTO
-            ).parameters
-        )
+        valid_parameters = set(signature(GenerateSkyMapInputDTO).parameters)
 
-        filtered_payload = {
-            key: value
-            for key, value in payload.items()
-            if key in valid_parameters
-        }
+        filtered_payload = {key: value for key, value in payload.items() if key in valid_parameters}
 
-        return GenerateSkyMapInputDTO(
-            **filtered_payload
-        )
+        return GenerateSkyMapInputDTO(**filtered_payload)
+
     @staticmethod
     def _invoke_use_case(use_case: Any, dto: GenerateSkyMapInputDTO) -> Any:
         if hasattr(use_case, "execute") and callable(use_case.execute):

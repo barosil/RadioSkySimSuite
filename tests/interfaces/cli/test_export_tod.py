@@ -103,6 +103,7 @@ def test_execute_export_tod_command(
     tmp_path,
 ) -> None:
     from radioskysims.interfaces.cli.commands.export_tod import (
+        ExportResult,
         execute_export_tod_command,
     )
 
@@ -128,8 +129,10 @@ def test_execute_export_tod_command(
     assert orch.run_kwargs["use_processor"] is True
 
     assert out.exists()
-    assert "TOD exportado com sucesso" in result
-    assert str(out) in result
+    assert isinstance(result, ExportResult)
+    assert result.output == out
+    assert "TOD exportado com sucesso" in str(result)
+    assert str(out) in str(result)
     assert "TOD gravado em" in stderr.getvalue()
 
 

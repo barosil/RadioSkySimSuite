@@ -1,6 +1,6 @@
-from __future__ import annotations
+"""Permite executar a CLI com ``python -m radioskysims.interfaces.cli``."""
 
-from radioskysims.bootstrap.skymap_cli import main
+from radioskysims.bootstrap.cli import main
 
 
 if __name__ == "__main__":

@@ -58,7 +58,7 @@ def _patch_minimal_bootstrap_dependencies(monkeypatch: pytest.MonkeyPatch) -> No
     monkeypatch.setattr(
         sim_builders,
         "build_local_sources_service",
-        lambda _db: object(),
+        lambda _db, **_kwargs: object(),
     )
     monkeypatch.setattr(
         sim_builders,

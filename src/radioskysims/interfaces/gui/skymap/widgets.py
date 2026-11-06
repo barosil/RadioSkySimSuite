@@ -74,9 +74,15 @@ def build_survey_widgets() -> SurveyWidgets:
         dec_deg=pn.widgets.FloatInput(name="DEC (deg)", value=0.0, step=0.1),
         fov_deg=pn.widgets.FloatInput(name="FOV (deg)", value=2.0, step=0.1, start=0.0001),
         nside=pn.widgets.IntInput(name="NSide", value=64, step=1, start=1),
-        frequency_ghz=pn.widgets.FloatInput(name="Frequência (GHz)", value=1.4, step=0.1, start=0.0001),
-        unit=pn.widgets.Select(name="Unidade", options=["K_RJ", "K_CMB", "MJy/sr", "unknown"], value="K_RJ"),
-        frame=pn.widgets.Select(name="Frame", options=["equatorial", "galactic", "ecliptic"], value="equatorial"),
+        frequency_ghz=pn.widgets.FloatInput(
+            name="Frequência (GHz)", value=1.4, step=0.1, start=0.0001
+        ),
+        unit=pn.widgets.Select(
+            name="Unidade", options=["K_RJ", "K_CMB", "MJy/sr", "unknown"], value="K_RJ"
+        ),
+        frame=pn.widgets.Select(
+            name="Frame", options=["equatorial", "galactic", "ecliptic"], value="equatorial"
+        ),
         field=pn.widgets.Select(name="Stokes", options=["I", "Q", "U"], value="I"),
         base_path=pn.widgets.TextInput(name="Base Path", value="data/hips"),
         load_survey=pn.widgets.Button(name="Load Survey", button_type="primary"),
@@ -88,8 +94,12 @@ def build_analyze_widgets() -> AnalyzeWidgets:
     return AnalyzeWidgets(
         input_path=pn.widgets.TextInput(name="Input FITS", value=""),
         lmax=pn.widgets.IntInput(name="lmax", value=16, step=1, start=0),
-        unit=pn.widgets.Select(name="Unidade", options=["uK_CMB", "K_RJ", "unknown"], value="uK_CMB"),
-        frame=pn.widgets.Select(name="Frame", options=["galactic", "equatorial", "ecliptic"], value="galactic"),
+        unit=pn.widgets.Select(
+            name="Unidade", options=["uK_CMB", "K_RJ", "unknown"], value="uK_CMB"
+        ),
+        frame=pn.widgets.Select(
+            name="Frame", options=["galactic", "equatorial", "ecliptic"], value="galactic"
+        ),
         field=pn.widgets.Select(name="Stokes", options=["I", "Q", "U"], value="I"),
         analyze=pn.widgets.Button(name="Analyze", button_type="primary"),
         reset=pn.widgets.Button(name="Reset", button_type="warning"),

@@ -33,7 +33,7 @@ The editorial policy (see `docs/CHANGELOG_DOCUMENTACAO_2026-08.md`) is:
 | `docs/_archive/reports_2026-01/SIMPLIFICACAO_IMPORTS_2026-01-24.md` | historical | keep archived (superseded by decoupling) |
 | `docs/_archive/reports_2026-01/STATUS_PROJETO.txt` | historical | keep archived |
 | `docs/architecture/_bounded_contexts.md` | outdated? | compare with `bounded_contexts.md`; merge or archive |
-| `docs/architecture/target_architecture.md` / `refactoring_roadmap.md` | historical | marked `as-of` + link to `docs/decoupling/` (2026-08-30) |
+| `docs/architecture/target_architecture.md` / `refactoring_roadmap.md` | historical | marked `as-of` + link to `docs/archive/decoupling/` (2026-08-30) |
 | `docs/architecture/relatorio_auditoria_skymap_radioskysim.md` | snapshot | add `as-of` banner |
 | `docs/architecture/skymap_gui_plan.md` | snapshot | add `as-of` banner |
 | `docs/source/barosi_docs.md`, `vanderson_docs.md` | legacy | linked from `index` as legacy; optionally move under an archive section |

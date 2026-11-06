@@ -1,0 +1,118 @@
+---
+title: RadioSkySim — pacotes individuais (camadas hexagonais internas)
+---
+%% Diagrama "Individual Applications" — layout hexagonal interno de cada
+%% pacote (packages/<nome>/src/<nome_import>/domain|application|ports|
+%% adapters|infrastructure). Atualizado em: 2026-09-01.
+%% Cada pacote é renderizado como subgrafo independente; setas cruzando
+%% subgrafos = dependências inter-pacote (ver uml_high_level.mmd/architecture.mmd
+%% para o grafo consolidado).
+
+flowchart TB
+
+    subgraph P_CORE["radioskysims-core (kernel)"]
+        direction TB
+        CORE_DOM["domain/\n(common: Observer, TimeRange,\nFrequencyRange, geometry.interface)"]
+        CORE_APP["application/ports/\n(GeometryProviderPort)"]
+        CORE_INFRA["infrastructure/\n(db/engine.Database, config/config_loader,\nlogging_config, monitor/system_monitor,\ngeometry/skyfield_provider)"]
+        CORE_BOOT["bootstrap/builders\n(build_database, build_logging)"]
+        CORE_APP -->|implementado por| CORE_INFRA
+        CORE_INFRA -.->|referencia\nGeometryProviderPort| CORE_APP
+        CORE_BOOT --> CORE_INFRA
+    end
+
+    subgraph P_VIZ["radioskysims-viz"]
+        direction TB
+        VIZ_APP["ports/\n(VisualizerPort)"]
+        VIZ_INFRA["infrastructure/\n(PanelApplication, plot adapters)"]
+        VIZ_APP -->|implementado por| VIZ_INFRA
+    end
+
+    subgraph P_BEAM["radioskysims-beam"]
+        direction TB
+        BEAM_DOM["domain/\n(Beam, BeamProperties, BeamFactory)"]
+        BEAM_APP["application/ports/\n(BeamLoaderPort, BeamEvaluatorPort)"]
+        BEAM_INFRA["infrastructure/\n(loaders CSV/Analítico/LIT)"]
+        BEAM_APP -->|implementado por| BEAM_INFRA
+        BEAM_INFRA --> BEAM_DOM
+    end
+
+    subgraph P_SKYMAP["radioskysims-skymap"]
+        direction TB
+        SKY_DOM["domain/\n(SkyMap, NSide, SkyMapDataset,\nSkyMapFactory, operations, analysis)"]
+        SKY_APP["application/ports/\n(SkyMapGeneratorPort)\n+ SkyMapManager (fachada unificada)"]
+        SKY_INFRA["infrastructure/\n(Healpy, PySM3, HiPS, cache, FITS I/O)"]
+        SKY_APP -->|implementado por| SKY_INFRA
+        SKY_INFRA --> SKY_DOM
+    end
+
+    subgraph P_RT["radioskysims-radiotelescope"]
+        direction TB
+        RT_DOM["domain/\n(Radiotelescope, Antenna,\nSpectrometerBackend)"]
+        RT_INFRA["infrastructure/bootstrap/\n(build_configuration via settings.toml)"]
+        RT_INFRA --> RT_DOM
+    end
+
+    subgraph P_SOURCES["radioskysims-sources"]
+        direction TB
+        SRC_DOM["domain/\n(Satellite, TLESelector, LocalSources,\nRadioSource, SpectralModel)"]
+        SRC_APP["application/ports/\n(SatelliteRepositoryPort, LocalSourcesPort,\nRadioSourcesCatalogPort, RadioSourcesFluxPort)"]
+        SRC_INFRA["infrastructure/\n(satelliterepository.py, CelestrakClient,\nSpaceTrack, SolarFluxDownloader, TAP/astroquery)"]
+        SRC_CLI["interfaces/cli/sources_cli\n(radioskysim-sources)"]
+        SRC_APP -->|implementado por| SRC_INFRA
+        SRC_INFRA -.->|"⚠ SatID de infra\nno domínio (débito)"| SRC_DOM
+        SRC_CLI --> SRC_APP
+    end
+
+    subgraph P_SIM["radioskysims-simulation"]
+        direction TB
+        SIM_DOM["domain/\n(Simulation, SimulationResult,\nTOD, TODSimulator, Tracks)"]
+        SIM_APP["application/services/\n(SimOrchestrator, SimulationService)\n+ ports (SimulationRepositoryPort)"]
+        SIM_INFRA["infrastructure/\n(processing/ResourceAwareProcessor,\ndb/SimulationRepository, to_zarr/to_hdf5)"]
+        SIM_BOOT["bootstrap/composition\n(create_sim_orchestrator)"]
+        SIM_APP --> SIM_DOM
+        SIM_INFRA -.->|implementado por| SIM_APP
+        SIM_BOOT --> SIM_APP
+    end
+
+    subgraph P_WATERFALL["radioskysims-waterfall (autônomo)"]
+        direction TB
+        WF_DOM["domain/\n(WaterfallDataset, máscara, baseline, SED)"]
+        WF_APP["application/ports/\n(WaterfallLoaderPort, WaterfallStoragePort)"]
+        WF_APP --> WF_DOM
+    end
+
+    subgraph P_GNSS["gnsstools4astro (autônomo)"]
+        direction TB
+        GNSS_DOM["domain/ (RINEX, broadcast ephemeris)"]
+        GNSS_INFRA["infrastructure/logging_config\n(cópia autocontida do JSONFormatter)"]
+        GNSS_CLI["bootstrap/gnss4astro_cli\n(gnss4astro)"]
+        GNSS_CLI --> GNSS_DOM
+        GNSS_INFRA -.-> GNSS_DOM
+    end
+
+    subgraph P_UMBRELLA["radioskysim (umbrella, raiz)"]
+        direction TB
+        UMB_ENTRY["interfaces/cli, interfaces/gui\n(radioskysims)"]
+        UMB_BOOT["bootstrap/composition, bootstrap/builders\n(delega para pacotes concretos)"]
+        UMB_ENTRY --> UMB_BOOT
+    end
+
+    %% Dependências inter-pacote (resumo; ver uml_high_level.mmd para o grafo completo)
+    P_BEAM -.-> P_CORE
+    P_BEAM -.-> P_VIZ
+    P_SKYMAP -.-> P_CORE
+    P_RT -.-> P_CORE
+    P_RT -.-> P_VIZ
+    P_SOURCES -.-> P_CORE
+    P_SOURCES -.-> P_SKYMAP
+    P_SIM -.-> P_CORE
+    P_SIM -.-> P_VIZ
+    P_SIM -.-> P_BEAM
+    P_SIM -.-> P_SKYMAP
+    P_SIM -.-> P_SOURCES
+    P_SIM -.-> P_RT
+    P_GNSS -.-> P_CORE
+    P_GNSS -.-> P_SKYMAP
+    UMB_BOOT -.-> P_SIM
+    UMB_BOOT -.-> P_CORE

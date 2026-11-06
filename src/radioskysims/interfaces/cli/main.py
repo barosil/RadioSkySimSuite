@@ -88,6 +88,19 @@ def build_parser() -> argparse.ArgumentParser:
         required=True,
     )
 
+    # --------------------------------------------------------------
+    # gui
+    # --------------------------------------------------------------
+
+    contexts.add_parser(
+        "gui",
+        help="Abre a interface gráfica (Panel) do RadioSkySim.",
+        description=(
+            "Abre a interface gráfica do RadioSkySim (dashboard SkyMap) no "
+            "navegador, usando o composition root do umbrella."
+        ),
+    )
+
     skymap_parser = contexts.add_parser(
         "skymap",
         help="Operações relacionadas a mapas do céu.",
@@ -111,12 +124,14 @@ def build_parser() -> argparse.ArgumentParser:
         "--frequency-ghz",
         type=float,
         required=True,
+        help="Frequência central em GHz (banda do mapa).",
     )
 
     generate_parser.add_argument(
         "--nside",
         type=int,
         required=True,
+        help="Resolução HEALPix (nside) do mapa.",
     )
 
     generate_parser.add_argument(
@@ -124,12 +139,14 @@ def build_parser() -> argparse.ArgumentParser:
         nargs="+",
         required=True,
         choices=SUPPORTED_COMPONENTS,
+        help="Componentes de emissão (cmb, synchrotron, dust, freefree, ame).",
     )
 
     generate_parser.add_argument(
         "--output-format",
         choices=("text", "json"),
         default="text",
+        help="Formato de saída: text (padrão) ou json.",
     )
 
     # --------------------------------------------------------------
@@ -144,54 +161,63 @@ def build_parser() -> argparse.ArgumentParser:
     survey_parser.add_argument(
         "--survey-id",
         required=True,
+        help="Identificador do survey contínuo (ex.: NVSS).",
     )
 
     survey_parser.add_argument(
         "--ra-deg",
         type=float,
         required=True,
+        help="Centro do campo em ascensão reta (graus).",
     )
 
     survey_parser.add_argument(
         "--dec-deg",
         type=float,
         required=True,
+        help="Centro do campo em declinação (graus).",
     )
 
     survey_parser.add_argument(
         "--fov-deg",
         type=float,
         required=True,
+        help="Campo de visão do recorte (graus).",
     )
 
     survey_parser.add_argument(
         "--nside",
         type=int,
         required=True,
+        help="Resolução HEALPix (nside) do mapa.",
     )
 
     survey_parser.add_argument(
         "--frequency-ghz",
         type=float,
         default=None,
+        help="Frequência central em GHz (omitir = banda completa do survey).",
     )
 
     survey_parser.add_argument(
         "--field",
         choices=("I", "Q", "U"),
         default="I",
+        help="Componente de polarização (I, Q ou U).",
     )
 
     survey_parser.add_argument(
         "--base-path",
         type=Path,
         required=True,
+        help="Diretório base para leitura/cache do survey.",
     )
 
     survey_parser.add_argument(
         "--output-format",
         choices=("text", "json"),
         default="text",
+        help="Formato de saída: text (padrão) ou json.",
     )
 
     # --------------------------------------------------------------
@@ -262,6 +288,13 @@ def build_parser() -> argparse.ArgumentParser:
     export_parser = tod_commands.add_parser(
         "export",
         help="Roda uma simulação TOD curta e grava o dataset.",
+        epilog=(
+            "Pré-requisitos de 1º uso: (1) settings.toml na raiz com o perfil do "
+            "radiotelescópio usado por --telescope (ex.: [radiotelescopes.default] "
+            "em settings.toml) e a seção [simulations] time_range; (2) PostgreSQL "
+            "no ar apenas para --source db/consultas de catálogo; (3) "
+            "credentials.env (ST_USER/ST_PWD) apenas para downloads do SpaceTrack."
+        ),
     )
 
     export_parser.add_argument(
@@ -281,7 +314,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--constellations",
         nargs="*",
         default=None,
-        help="Constelações GNSS (ex.: GPS GALILEO). Se omitido, sem satélites.",
+        help=(
+            "Constelações GNSS a simular. Exemplos: GPS, GALILEO, GLONASS, BEIDOU, "
+            "ou múltiplas (GPS GALILEO). Se omitido (default), nenhum satélite é "
+            "incluído (TOD apenas com fontes locais, se --local-sources)."
+        ),
     )
 
     export_parser.add_argument(
@@ -413,6 +450,13 @@ def run(
     args = parser.parse_args(argv)
 
     try:
+        if args.context == "gui":
+            from radioskysims.interfaces.cli.commands.gui_cmd import (
+                execute_gui_command,
+            )
+
+            return cast(int, execute_gui_command())
+
         if args.context == "skymap" and args.skymap_command == "generate":
             result = execute_generate_command(
                 use_case=use_cases.generate_skymap,
@@ -525,13 +569,13 @@ def run(
                     jobs_db=args.jobs_db,
                 )
             elif args.jobs_command == "monitor":
-                return execute_jobs_monitor(
+                return cast(int, execute_jobs_monitor(
                     args.job_id,
                     jobs_db=args.jobs_db,
                     watch=args.watch,
                     interval=args.interval,
                     stdout=output_stream,
-                )
+                ))
             else:
                 parser.error("Comando de jobs não reconhecido.")
 
@@ -599,5 +643,3 @@ def run(
             traceback.print_exc(file=error_stream)
 
         return 1
-
-    return 1

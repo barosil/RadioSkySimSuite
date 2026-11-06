@@ -1,0 +1,110 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║                 RadioSkySimSuite — AUDITORIA CONSOLIDADA                   ║
+║                           NOVEMBRO DE 2026                                 ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+📊 MÉTRICAS PRINCIPAIS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✓ Arquivos Python (produção):         669 arquivos
+  ✓ Linhas de código (produção):        91.340 LOC
+  ✓ Funções de teste:                   253+ test_*
+  ✓ Linting (ruleset ativo):            ~10 violações (⬇ 100× melhoria)
+  ✓ Formatação:                         570/654 arquivos OK (87%)
+  ✓ Cobertura de testes:                ~64% global
+  ✓ Type hints:                         ~65% cobertura
+  ✓ Pacotes workspace:                  8 submódulos + umbrella
+
+🏗️  ARQUITETURA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✓ Hexagonal + DDD:                    Implementado (aderência 85%)
+  ✓ Separation of concerns:             Domain/Application/Infrastructure OK
+  ✓ Pacotes independentes:              Limpo; sem cross-imports ilícitos
+  ⚠ Orquestração concentrada:           sim_orchestrator.py (candidato refactor)
+  ⚠ Logging em domain:                  ~8 imports diretos
+
+📋 FRENTES DE TRABALHO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  
+  F1 — UX ENTRYPOINTS                    [░░░░░░░░░░░░░░░░░░░░] 50%
+      ├─ R1–R3 (Ruído no startup):       [████████████████░░░░] 100% ✓
+      ├─ R4–R6 (Logging, progress):      [████████░░░░░░░░░░░░] 40% [~]
+      └─ L1–L3 (Documentação uso):       [░░░░░░░░░░░░░░░░░░░░] 0%  [ ]
+  
+  F2 — DÍVIDA TÉCNICA                    [░░░░░░░░░░░░░░░░░░░░] 30%
+      ├─ DDD (logging, providers):       [██░░░░░░░░░░░░░░░░░░] 10% [~]
+      ├─ Refactoring orquestração:       [░░░░░░░░░░░░░░░░░░░░] 0%  [ ]
+      ├─ Lint + Formatting:              [████████████░░░░░░░░] 60% [~]
+      └─ Type hints + mypy:              [████████░░░░░░░░░░░░] 40% [~]
+  
+  F3 — VALIDAÇÕES CIENTÍFICAS            [░░░░░░░░░░░░░░░░░░░░] 60%
+      ├─ HI (Hidrogênio Neutro):         [████████████████░░░░] 100% ✓
+      ├─ Mapmaking (Binned SKY):         [████████████████░░░░] 100% ✓
+      ├─ TOD Performance (1h):            [████████████████░░░░] 100% ✓
+      ├─ TOD Validação 24h:              [░░░░░░░░░░░░░░░░░░░░] 0%  [~]
+      └─ Satélites (auditoria):          [░░░░░░░░░░░░░░░░░░░░] 0%  [ ]
+
+🎯 INDICADORES DE PRONTO (DoD)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  
+  F1 DoD:
+    ☐ Sem warnings no startup (todos os entrypoints)
+    ☐ --help sempre funciona
+    ☐ Progress em operações > 5s
+    ☐ Logging estruturado (JSON) separado do output
+    ☐ README com 3 exemplos getting started
+  
+  F2 DoD:
+    ☐ 0 violações de limite arquitetural (ruleset ativo)
+    ☐ 100% formatação (ruff format)
+    ☐ Refactoring orquestração iniciado com DESIGN.md
+    ☐ Testes infraestrutura 65%+ cobertura
+    ☐ mypy rodando em CI (sem falhas críticas)
+  
+  F3 DoD:
+    ☐ TOD 24h validado (vs dados reais)
+    ☐ Satélites auditados e validados
+    ☐ Mapmaking pronto uso científico (concluído ✓)
+    ☐ HI campo validated (concluído ✓)
+    ☐ Resíduos documentados e priorizados
+
+📅 TIMELINE — NOV–DEZ 2026
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  
+  Nov 5–10   │ Merge PRs pendentes; F2 logging refactor inicia
+  Nov 11–17  │ ruff format; TOD 24h setup; F1 progress bars prototipo
+  Nov 18–24  │ Merge formatting; F2 logging concluído; TOD 24h execução
+  Nov 25–Dez │ Análise TOD 24h; F2 orquestração schema; release prep
+  Dez 1–5    │ Iteração refactoring; release dev→main
+
+📚 DOCUMENTAÇÃO ATUALIZADA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  
+  ✓ november_2026_audit_report.md       Auditoria completa + conclusões
+  ✓ frentes_status_consolidado.md       Status F1/F2/F3 + DoD + timeline
+  ✓ metricas_tecnicas_2026.md           Histórico evolução métricas
+  ✓ .prompts/barosil.md                 Snapshot + plano atualizado
+  
+  Referências:
+  • docs/architecture.md                 Canônico (ago/2026)
+  • docs/audits/*.md                     6 relatórios científicos/técnicos
+  • notebooks/ux_entrypoints_audit.md    Detalhe F1/F2/F3 (set/2026)
+
+🚀 PRÓXIMAS AÇÕES — IMEDIATO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  
+  1. Revisar e validar este relatório
+  2. Merge branches pendentes: chore/notebooks-cwd-anchor, audit/broad-linting
+  3. Iniciar F2a: mover logging de domain para application (5–8h)
+  4. Setup TOD 24h: hardware, dados, schedule de execução (nov 15)
+  5. Prototipo F1: progress bars em tqdm (2–3h)
+
+📖 COMO USAR ESTE RELATÓRIO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  
+  • Documento-mestre: .prompts/barosil.md (UPDATE THIS WEEKLY)
+  • Detalhe técnico: docs/audits/november_2026_audit_report.md
+  • Status frentes: docs/audits/frentes_status_consolidado.md
+  • Métricas: docs/audits/metricas_tecnicas_2026.md
+  
+  Todos os arquivos estão em sync no commit b725ee7 (nov 5/2026).
+

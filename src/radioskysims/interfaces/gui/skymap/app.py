@@ -33,7 +33,9 @@ from .widgets import (
 )
 
 
-def build_skymap_app(controller: SkyMapGUIController, state: SkyMapGuiState) -> pn.viewable.Viewable:
+def build_skymap_app(
+    controller: SkyMapGUIController, state: SkyMapGuiState
+) -> pn.viewable.Viewable:
     """Monta aplicação Panel sem iniciar servidor."""
     generate_w = build_generate_widgets()
     survey_w = build_survey_widgets()
@@ -217,7 +219,9 @@ def build_skymap_app(controller: SkyMapGUIController, state: SkyMapGuiState) -> 
         pn.Row(analyze_w.analyze, analyze_w.reset),
     )
 
-    tabs = pn.Tabs(("Generate", generate_tab), ("Survey", survey_tab), ("Analyze", analyze_tab), dynamic=False)
+    tabs = pn.Tabs(
+        ("Generate", generate_tab), ("Survey", survey_tab), ("Analyze", analyze_tab), dynamic=False
+    )
 
     template = pn.template.FastListTemplate(
         title="RadioSkySim - SkyMap GUI",
@@ -226,5 +230,21 @@ def build_skymap_app(controller: SkyMapGUIController, state: SkyMapGuiState) -> 
     )
 
     # Ganchos para testes de callbacks sem browser automation.
-    template._skymap_gui_handles = {"widgets": generate_w, "survey_widgets": survey_w, "analyze_widgets": analyze_w, "on_generate": _on_generate, "on_reset": _on_reset, "on_survey_load": _on_survey_load, "on_survey_reset": _on_survey_reset, "on_analyze": _on_analyze, "on_analyze_reset": _on_analyze_reset, "messages_pane": messages_pane, "metadata_pane": metadata_pane, "map_pane": map_pane, "hist_pane": hist_pane, "spectrum_pane": spectrum_pane, "cls_table_pane": cls_table_pane}
+    template._skymap_gui_handles = {
+        "widgets": generate_w,
+        "survey_widgets": survey_w,
+        "analyze_widgets": analyze_w,
+        "on_generate": _on_generate,
+        "on_reset": _on_reset,
+        "on_survey_load": _on_survey_load,
+        "on_survey_reset": _on_survey_reset,
+        "on_analyze": _on_analyze,
+        "on_analyze_reset": _on_analyze_reset,
+        "messages_pane": messages_pane,
+        "metadata_pane": metadata_pane,
+        "map_pane": map_pane,
+        "hist_pane": hist_pane,
+        "spectrum_pane": spectrum_pane,
+        "cls_table_pane": cls_table_pane,
+    }
     return template

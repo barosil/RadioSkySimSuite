@@ -55,9 +55,7 @@ def resolve_settings(path_or_name: Optional[str] = None) -> Path:
             return candidate
 
     msg = "Could not resolve settings.toml. Provide a path or set RADIOSKYSIM_SETTINGS."
-    raise FileNotFoundError(
-        msg
-    )
+    raise FileNotFoundError(msg)
 
 
 def load_settings(path: Optional[str] = None) -> dict:
@@ -67,9 +65,7 @@ def load_settings(path: Optional[str] = None) -> dict:
     """
     if _toml_load is None:
         msg = "No TOML parser available: install tomli (for Python<3.11) or use Python 3.11+."
-        raise RuntimeError(
-            msg
-        )
+        raise RuntimeError(msg)
 
     p = resolve_settings(path)
     with p.open("rb") as fh:

@@ -1,6 +1,12 @@
 ---
 title: RadioSkySim — Bounded Contexts e Relações
 ---
+%% NOTA (2026-09-01): Satellite/RadioSources/LocalSources -> radioskysims-sources;
+%% Beam -> radioskysims-beam; SkyMap -> radioskysims-skymap;
+%% Radiotelescope -> radioskysims-radiotelescope; Simulation/TOD -> radioskysims-simulation;
+%% Common/Geometry/Tracks -> radioskysims-core. Noise/RFI permanecem como
+%% sub-domínios internos de radioskysims-simulation (não viraram pacotes próprios).
+%% Ver bounded_contexts.md para o mapeamento completo.
 flowchart LR
     subgraph Common["📐 Common"]
         FR[FrequencyRange]

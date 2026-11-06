@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import cast
+
 from radioskysims_skymap.application.skymap.generate import (
     ContinuumSurveyMapUseCase,
 )
@@ -33,7 +35,7 @@ def execute_survey_command(
         field=field,
     )
 
-    return format_survey_result(
+    return cast(str, format_survey_result(
         sky_map=sky_map,
         survey_id=survey_id,
         ra_deg=ra_deg,
@@ -41,4 +43,4 @@ def execute_survey_command(
         fov_deg=fov_deg,
         frequency_ghz=frequency_ghz,
         output_format=output_format,
-    )
+    ))

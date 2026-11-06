@@ -21,7 +21,7 @@ import sys
 import time
 from pathlib import Path
 
-from radioskysims_core.db.job_repository import DEFAULT_JOBS_DB, JobRepository
+from radioskysims_core.db.job_repository import JobRepository, default_jobs_db
 from radioskysims_core.db.jobs import JobStatus
 
 from radioskysims.interfaces.cli.commands.export_tod import (
@@ -51,7 +51,7 @@ def build_worker_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     """Executa o worker e atualiza o job (RUNNING → SUCCESS/FAILED)."""
     args = build_worker_parser().parse_args(argv)
-    repo = JobRepository(args.jobs_db or DEFAULT_JOBS_DB)
+    repo = JobRepository(args.jobs_db or default_jobs_db())
     out_path = Path(args.output) if args.output else _default_output_path()
     started_at = time.monotonic()
     try:

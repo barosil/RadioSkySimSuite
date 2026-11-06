@@ -19,18 +19,27 @@ from __future__ import annotations
 
 import subprocess
 import sys
+from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Callable, TextIO
+from typing import Any, Callable, TextIO, cast
 
 from radioskysims_core.config.config_loader import resolve_settings_path
-from radioskysims_core.db.job_repository import DEFAULT_JOBS_DB, JobRepository
+from radioskysims_core.db.job_repository import JobRepository, default_jobs_db
 
-DEFAULT_OUTDIR = Path("data") / "TOD"
+
+def _project_data_dir() -> Path:
+    """Diretório ``data`` do projeto (raiz detectada), independente do CWD."""
+    from radioskysims_core.paths import get_project_root
+
+    return get_project_root() / "data"  # type: ignore[no-any-return]
+
+
+DEFAULT_OUTDIR = _project_data_dir() / "TOD"
 
 
 def _default_output_path() -> Path:
-    """Caminho padrão para o dataset exportado (timestamp UTC)."""
+    """Caminho padrão do dataset exportado (raiz do projeto, timestamp UTC)."""
     ts = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
     return DEFAULT_OUTDIR / f"tod_{ts}.nc"
 
@@ -39,7 +48,7 @@ def _resolve_config(config_path: str | Path | None) -> Path | None:
     """Resolve o arquivo de settings, se fornecido."""
     if config_path is None:
         return None
-    return resolve_settings_path(config_path)
+    return cast(Path, resolve_settings_path(config_path))
 
 
 def format_export_result(output: Path, sidecar: str) -> str:
@@ -53,6 +62,29 @@ def format_export_result(output: Path, sidecar: str) -> str:
     )
 
 
+@dataclass(frozen=True)
+class ExportResult:
+    """Resultado estruturado de ``tod export`` (foreground).
+
+    Substitui o retorno puramente textual por um objeto com os artefatos
+    gerados (UX L2); ``str()``/``__repr__`` reproduzem o resumo amigável
+    exibido pela CLI.
+    """
+
+    output: Path
+    sidecar: str
+    message: str = "TOD exportado com sucesso"
+
+    def to_text(self) -> str:
+        return format_export_result(self.output, self.sidecar)
+
+    def __str__(self) -> str:
+        return self.to_text()
+
+    def __repr__(self) -> str:
+        return f"ExportResult(output={self.output!s}, message={self.message!r})"
+
+
 def execute_export_tod_command(
     *,
     config_path: str | Path | None,
@@ -63,7 +95,7 @@ def execute_export_tod_command(
     output: str | Path | None,
     stderr: TextIO,
     orchestrator_factory: Callable[..., Any] | None = None,
-) -> str:
+) -> ExportResult:
     """Executa ``tod export`` em foreground e retorna o resumo formatado.
 
     Se ``orchestrator_factory`` for informado (testes/injeção), é usado no
@@ -82,7 +114,17 @@ def execute_export_tod_command(
     )
 
     consts = list(constellations) if constellations else []
-    include_satellites = bool(consts)
+    
+    # T3.2: Se nenhuma fonte é selecionada, usar GPS como padrão
+    if not consts and not include_local_sources:
+        consts = ["GPS"]
+        include_satellites = True
+        print(
+            "Nenhuma fonte selecionada; usando padrão: GPS (satélites).",
+            file=stderr,
+        )
+    else:
+        include_satellites = bool(consts)
 
     print("Iniciando simulação TOD...", file=stderr)
 
@@ -98,12 +140,12 @@ def execute_export_tod_command(
     sidecar = result.save_result(str(out_path))
 
     print(f"TOD gravado em: {out_path}", file=stderr)
-    return format_export_result(out_path, sidecar)
+    return ExportResult(output=out_path, sidecar=sidecar)
 
 
 def _resolve_jobs_db_url(jobs_db: str | None) -> str:
     """Resolve a URL do banco de jobs, criando o diretório se for SQLite em arquivo."""
-    url = jobs_db or DEFAULT_JOBS_DB
+    url = jobs_db or default_jobs_db()
     if url.startswith("sqlite:///"):
         Path(url[len("sqlite:///") :]).parent.mkdir(parents=True, exist_ok=True)
     return url
@@ -181,6 +223,7 @@ def launch_background_export(
 
 __all__ = [
     "DEFAULT_OUTDIR",
+    "ExportResult",
     "execute_export_tod_command",
     "format_export_result",
     "launch_background_export",

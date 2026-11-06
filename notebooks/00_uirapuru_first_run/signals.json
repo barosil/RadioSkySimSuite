@@ -1,0 +1,397 @@
+{
+  "_meta": {
+    "description": "EIRP recalculado a partir de BINGO_ASSEMBLY/notebooks/04_GNSS_SIGNAL_ESTIMATION.ipynb (link budget: C/N0 -> P_rec -> EIRP via FSPL).",
+    "source_notebook": "/share/lbarosi/BINGO_ASSEMBLY/notebooks/04_GNSS_SIGNAL_ESTIMATION.ipynb",
+    "date_reference": "2024-06-10",
+    "n_sv": 44
+  },
+  "constellations": [
+    {
+      "constellation": "GPS",
+      "eirp_dbw": 26.05,
+      "signals": [
+        {
+          "frequency": "1176.45 MHz",
+          "modulation": "BPSK(10)",
+          "signal_name": "L5"
+        },
+        {
+          "frequency": "1227.60 MHz",
+          "modulation": "BPSK(1)",
+          "signal_name": "L2C"
+        },
+        {
+          "frequency": "1575.42 MHz",
+          "modulation": "BPSK(1)",
+          "signal_name": "L1 C/A"
+        },
+        {
+          "frequency": "1575.42 MHz",
+          "modulation": "BOC(1,1)",
+          "signal_name": "L1C"
+        }
+      ]
+    },
+    {
+      "constellation": "GSAT",
+      "constellation_std": "GALILEO",
+      "eirp_dbw": 28.9,
+      "signals": [
+        {
+          "frequency": "1176.45 MHz",
+          "modulation": "QPSK(10)",
+          "signal_name": "E5a"
+        },
+        {
+          "frequency": "1207.14 MHz",
+          "modulation": "QPSK(10)",
+          "signal_name": "E5b"
+        },
+        {
+          "frequency": "1278.750 MHz",
+          "modulation": "BPSK(5)",
+          "signal_name": "E6B"
+        },
+        {
+          "frequency": "1575.42 MHz",
+          "modulation": "CBOC(6,1,1/11)",
+          "signal_name": "E1b/c"
+        }
+      ]
+    },
+    {
+      "constellation": "BEIDOU",
+      "eirp_dbw": 24.0,
+      "signals": [
+        {
+          "frequency": "1176.45 MHz",
+          "modulation": "BPSK(10)",
+          "signal_name": "B2a"
+        },
+        {
+          "frequency": "1207.14 MHz",
+          "modulation": "BPSK(2)",
+          "signal_name": "B2I"
+        },
+        {
+          "frequency": "1207.14 MHz",
+          "modulation": "BPSK(10)",
+          "signal_name": "B2b"
+        },
+        {
+          "frequency": "1268.520 MHz",
+          "modulation": "BPSK(10)",
+          "signal_name": "B3I"
+        },
+        {
+          "frequency": "1561.098 MHz",
+          "modulation": "BPSK(2)",
+          "signal_name": "B1I"
+        },
+        {
+          "frequency": "1575.42 MHz",
+          "modulation": "BOC(1,1)",
+          "signal_name": "B1C"
+        }
+      ]
+    },
+    {
+      "constellation": "COSMOS",
+      "constellation_std": "GLONASS",
+      "eirp_dbw": 21.8,
+      "signals": [
+        {
+          "frequency": "1202.025 MHz",
+          "modulation": "BPSK(10)",
+          "signal_name": "L3OC"
+        },
+        {
+          "frequency": "1246.00 MHz",
+          "modulation": "BPSK(0.5)",
+          "signal_name": "L2OF"
+        },
+        {
+          "frequency": "1248.06 MHz",
+          "modulation": "BOC(1,1)",
+          "signal_name": "L2OC"
+        },
+        {
+          "frequency": "1600.995 MHz",
+          "modulation": "BOC(1,1)",
+          "signal_name": "L1OC"
+        },
+        {
+          "frequency": "1602.00 MHz",
+          "modulation": "BPSK(0.5)",
+          "signal_name": "L1OF"
+        }
+      ]
+    }
+  ],
+  "satellites": [
+    {
+      "norad_id": 38251,
+      "constellation": "BEIDOU",
+      "sv": "C12",
+      "eirp_dbw": 22.7
+    },
+    {
+      "norad_id": 43001,
+      "constellation": "BEIDOU",
+      "sv": "C19",
+      "eirp_dbw": 24.3
+    },
+    {
+      "norad_id": 43002,
+      "constellation": "BEIDOU",
+      "sv": "C20",
+      "eirp_dbw": 26.5
+    },
+    {
+      "norad_id": 43208,
+      "constellation": "BEIDOU",
+      "sv": "C21",
+      "eirp_dbw": 23.5
+    },
+    {
+      "norad_id": 43207,
+      "constellation": "BEIDOU",
+      "sv": "C22",
+      "eirp_dbw": 25.1
+    },
+    {
+      "norad_id": 43582,
+      "constellation": "BEIDOU",
+      "sv": "C24",
+      "eirp_dbw": 24.9
+    },
+    {
+      "norad_id": 43602,
+      "constellation": "BEIDOU",
+      "sv": "C26",
+      "eirp_dbw": 23.3
+    },
+    {
+      "norad_id": 43107,
+      "constellation": "BEIDOU",
+      "sv": "C27",
+      "eirp_dbw": 23.5
+    },
+    {
+      "norad_id": 43245,
+      "constellation": "BEIDOU",
+      "sv": "C29",
+      "eirp_dbw": 23.7
+    },
+    {
+      "norad_id": 43246,
+      "constellation": "BEIDOU",
+      "sv": "C30",
+      "eirp_dbw": 24.4
+    },
+    {
+      "norad_id": 40128,
+      "constellation": "GALILEO",
+      "sv": "E05",
+      "eirp_dbw": 27.8
+    },
+    {
+      "norad_id": 40544,
+      "constellation": "GALILEO",
+      "sv": "E07",
+      "eirp_dbw": 30.8
+    },
+    {
+      "norad_id": 40545,
+      "constellation": "GALILEO",
+      "sv": "E08",
+      "eirp_dbw": 29.0
+    },
+    {
+      "norad_id": 41550,
+      "constellation": "GALILEO",
+      "sv": "E13",
+      "eirp_dbw": 27.1
+    },
+    {
+      "norad_id": 41859,
+      "constellation": "GALILEO",
+      "sv": "E15",
+      "eirp_dbw": 30.8
+    },
+    {
+      "norad_id": 43057,
+      "constellation": "GALILEO",
+      "sv": "E21",
+      "eirp_dbw": 28.4
+    },
+    {
+      "norad_id": 43564,
+      "constellation": "GALILEO",
+      "sv": "E25",
+      "eirp_dbw": 28.3
+    },
+    {
+      "norad_id": 43565,
+      "constellation": "GALILEO",
+      "sv": "E26",
+      "eirp_dbw": 28.9
+    },
+    {
+      "norad_id": 49809,
+      "constellation": "GALILEO",
+      "sv": "E27",
+      "eirp_dbw": 28.9
+    },
+    {
+      "norad_id": 59600,
+      "constellation": "GALILEO",
+      "sv": "E30",
+      "eirp_dbw": 29.7
+    },
+    {
+      "norad_id": 67160,
+      "constellation": "GALILEO",
+      "sv": "E33",
+      "eirp_dbw": 28.8
+    },
+    {
+      "norad_id": 67162,
+      "constellation": "GALILEO",
+      "sv": "E34",
+      "eirp_dbw": 29.6
+    },
+    {
+      "norad_id": 28474,
+      "constellation": "GPS",
+      "sv": "G02",
+      "eirp_dbw": 21.3
+    },
+    {
+      "norad_id": 40294,
+      "constellation": "GPS",
+      "sv": "G03",
+      "eirp_dbw": 27.6
+    },
+    {
+      "norad_id": 43873,
+      "constellation": "GPS",
+      "sv": "G04",
+      "eirp_dbw": 26.4
+    },
+    {
+      "norad_id": 35752,
+      "constellation": "GPS",
+      "sv": "G05",
+      "eirp_dbw": 20.9
+    },
+    {
+      "norad_id": 32711,
+      "constellation": "GPS",
+      "sv": "G07",
+      "eirp_dbw": 23.5
+    },
+    {
+      "norad_id": 40730,
+      "constellation": "GPS",
+      "sv": "G08",
+      "eirp_dbw": 26.0
+    },
+    {
+      "norad_id": 40105,
+      "constellation": "GPS",
+      "sv": "G09",
+      "eirp_dbw": 27.0
+    },
+    {
+      "norad_id": 41019,
+      "constellation": "GPS",
+      "sv": "G10",
+      "eirp_dbw": 26.8
+    },
+    {
+      "norad_id": 29601,
+      "constellation": "GPS",
+      "sv": "G12",
+      "eirp_dbw": 21.8
+    },
+    {
+      "norad_id": 32260,
+      "constellation": "GPS",
+      "sv": "G15",
+      "eirp_dbw": 21.7
+    },
+    {
+      "norad_id": 27663,
+      "constellation": "GPS",
+      "sv": "G16",
+      "eirp_dbw": 20.4
+    },
+    {
+      "norad_id": 44506,
+      "constellation": "GPS",
+      "sv": "G18",
+      "eirp_dbw": 27.4
+    },
+    {
+      "norad_id": 45854,
+      "constellation": "GPS",
+      "sv": "G23",
+      "eirp_dbw": 27.1
+    },
+    {
+      "norad_id": 38833,
+      "constellation": "GPS",
+      "sv": "G24",
+      "eirp_dbw": 26.3
+    },
+    {
+      "norad_id": 36585,
+      "constellation": "GPS",
+      "sv": "G25",
+      "eirp_dbw": 26.8
+    },
+    {
+      "norad_id": 40534,
+      "constellation": "GPS",
+      "sv": "G26",
+      "eirp_dbw": 26.1
+    },
+    {
+      "norad_id": 39166,
+      "constellation": "GPS",
+      "sv": "G27",
+      "eirp_dbw": 25.0
+    },
+    {
+      "norad_id": 55268,
+      "constellation": "GPS",
+      "sv": "G28",
+      "eirp_dbw": 25.9
+    },
+    {
+      "norad_id": 32384,
+      "constellation": "GPS",
+      "sv": "G29",
+      "eirp_dbw": 22.3
+    },
+    {
+      "norad_id": 39533,
+      "constellation": "GPS",
+      "sv": "G30",
+      "eirp_dbw": 28.0
+    },
+    {
+      "norad_id": 29486,
+      "constellation": "GPS",
+      "sv": "G31",
+      "eirp_dbw": 24.0
+    },
+    {
+      "norad_id": 41328,
+      "constellation": "GPS",
+      "sv": "G32",
+      "eirp_dbw": 27.5
+    }
+  ]
+}
