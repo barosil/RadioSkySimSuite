@@ -1,47 +1,57 @@
----
-title: RadioSkySim — pacotes do uv workspace (visão de dependências)
----
-%% Diagrama de pacotes - RadioSkySimSuite (pós-desacoplamento, 2026-09)
-%% Atualizado em: 2026-09-01 — sincronizado com architecture.md §1.1
-graph LR
-  subgraph kernel["Kernel compartilhado"]
-    core[radioskysims-core]
-    viz[radioskysims-viz]
-  end
+%% RadioSkySim — pacotes do uv workspace (dependências reais, nov/2026)
+%%
+%% Convenção: A --> B = "A depende de B" (A importa B).
+%%   - Seta cheia (-->)   : dependência declarada no pyproject.toml e
+%%                          confirmada por import no código.
+%%   - Seta tracejada (-.->): import real NÃO declarado (violação de camada)
+%%                          ou dependência declarada sem uso no src.
+%% Atualizado: 2026-11-06 — sincronizado com architecture.md §1.1.
 
-  subgraph dominios["Domínios de rádio"]
-    beam[radioskysims-beam]
-    skymap[radioskysims-skymap]
-    rt[radioskysims-radiotelescope]
-    sources[radioskysims-sources]
-    simulation[radioskysims-simulation]
-    waterfall[radioskysims-waterfall]
-  end
+flowchart LR
+    subgraph Kernel["Kernel"]
+        CORE[radioskysims-core]
+        VIZ[radioskysims-viz]
+    end
 
-  subgraph infra["Infraestrutura standalone"]
-    gnss[gnsstools4astro]
-  end
+    subgraph Dominios["Domínios de rádio"]
+        BEAM[radioskysims-beam]
+        SKYMAP[radioskysims-skymap]
+        RT[radioskysims-radiotelescope]
+        SRC[radioskysims-sources]
+        SIM[radioskysims-simulation]
+        WF[radioskysims-waterfall]
+    end
 
-  umbrella[radioskysim - umbrella / composition root]
+    subgraph Infra["Infraestrutura standalone"]
+        GNSS[gnsstools4astro]
+    end
 
-  beam --> core
-  beam --> viz
-  skymap --> core
-  rt --> core
-  rt --> viz
-  sources --> core
-  sources --> skymap
-  simulation --> core
-  simulation --> viz
-  simulation --> beam
-  simulation --> skymap
-  simulation --> sources
-  simulation --> rt
-  gnss --> core
-  gnss --> skymap
-  umbrella --> core & viz & beam & skymap & rt & sources & simulation & waterfall & gnss
+    UMB[radioskysim - umbrella]
 
-%% Cada pacote segue internamente: domain -> application -> ports
-%% infrastructure implementa ports; bootstrap monta a composição (DI)
-%% Uso: render em ferramentas compatíveis com Mermaid
+    %% ---- Dependências declaradas (pyproject) e confirmadas no código ----
+    BEAM --> CORE
+    BEAM --> VIZ
+    RT --> CORE
+    RT --> VIZ
+    SRC --> CORE
+    SRC --> SKYMAP
+    SRC --> GNSS
+    SIM --> CORE
+    SIM --> VIZ
+    SIM --> BEAM
+    SIM --> SKYMAP
+    SIM --> SRC
+    SIM --> RT
+    VIZ --> CORE
+    VIZ --> BEAM
+    UMB --> CORE & VIZ & BEAM & SKYMAP & RT & SRC & SIM & WF & GNSS
 
+    %% ---- Violações reais (import não declarado no pyproject) — débito ----
+    CORE -.->|config_loader → antenna/backend/specs| RT
+    CORE -.->|exceptions → SkyMapError| SKYMAP
+    CORE -.->|observer lazy → observer_map| VIZ
+    GNSS -.->|rinex lazy → plots| VIZ
+    SRC -.->|plots lazy → save_figure/mollweide| VIZ
+
+    %% ---- Declarada sem import real no src (possível dependência obsoleta) ----
+    SKYMAP -.-> CORE

@@ -1,8 +1,7 @@
----
-title: "RadioSkySim — Sequência: Simulação TOD GNSS"
----
-%% NOTA (2026-09-01): SimOrchestrator/SimulationService/TODSimulator ->
-%% radioskysims-simulation; SatelliteService -> radioskysims-sources.
+%% title: RadioSkySim — Sequência: Simulação TOD GNSS
+%% NOTA (2026-11-06): SimOrchestrator/SimulationService/TODSimulator/Simulation
+%% -> radioskysims-simulation; SatelliteService/SignalFactory ->
+%% radioskysims-sources; TrackFactory/GeometryProvider -> radioskysims-core.
 sequenceDiagram
   actor User
   participant Orch as SimOrchestrator

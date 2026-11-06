@@ -1,10 +1,12 @@
----
-title: RadioSkySim — visão de alto nível (pacotes, camadas e dependências)
----
-%% UML de alto nível - RadioSkySimSuite (pós-desacoplamento)
-%% Atualizado em: 2026-09-01. Cada subgrafo de pacote segue internamente
-%% a arquitetura hexagonal: interfaces -> application -> domain,
-%% bootstrap monta infrastructure via DI, infrastructure implementa ports.
+%% RadioSkySim — visão de alto nível (pacotes, camadas e dependências)
+%%
+%% Atualizado: 2026-11-06. Cada pacote segue a arquitetura hexagonal:
+%% interfaces -> application -> domain; bootstrap monta infrastructure via DI;
+%% infrastructure implementa ports. Seta tracejada = violação (import real
+%% não declarado) ou dependência declarada sem uso.
+%%
+%% Convenção de setas idêntica a architecture.mmd.
+
 flowchart TB
     subgraph ENTRY["Interfaces / Entrypoints (umbrella)"]
         CLI["interfaces/cli (radioskysims)"]
@@ -28,7 +30,7 @@ flowchart TB
         SOURCES["radioskysims-sources\n(Satellite, LocalSources, RadioSources)"]
         SIMULATION["radioskysims-simulation\n(SimOrchestrator, TOD, ResourceAwareProcessor)"]
         WATERFALL["radioskysims-waterfall\n(autônomo: máscara, baseline, SED)"]
-        GNSS["gnsstools4astro\n(autônomo: RINEX/broadcast ephemeris)"]
+        GNSS["gnsstools4astro\n(RINEX/broadcast ephemeris)"]
     end
 
     subgraph DATASTORE["Persistência / Dados"]
@@ -39,6 +41,8 @@ flowchart TB
 
     ENTRY --> BOOT
     BOOT --> PKGS
+
+    %% ---- Dependências declaradas (pyproject) e confirmadas ----
     SIMULATION --> BEAM
     SIMULATION --> SKYMAP
     SIMULATION --> SOURCES
@@ -47,15 +51,26 @@ flowchart TB
     SIMULATION --> VIZ
     SOURCES --> SKYMAP
     SOURCES --> CORE
+    SOURCES --> GNSS
     BEAM --> CORE
     BEAM --> VIZ
     SKYMAP --> CORE
     RT --> CORE
     RT --> VIZ
-    GNSS --> CORE
-    GNSS --> SKYMAP
+    VIZ --> CORE
+    VIZ --> BEAM
+
+    %% ---- Violações reais (import não declarado) ----
+    CORE -.-> RT
+    CORE -.-> SKYMAP
+    CORE -.-> VIZ
+    GNSS -.-> VIZ
+    SOURCES -.-> VIZ
+
+    %% ---- Declarada sem uso (possível obsoleta) ----
+    SKYMAP -.-> CORE
+
     CORE --> DATASTORE
     SIMULATION --> FILES
     SKYMAP --> FILES
     AUX -. "leitura/escrita" .- CORE
-
