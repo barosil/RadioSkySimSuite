@@ -1,5 +1,11 @@
 # RadioSkySimSuite — Relatório de Auditoria — Novembro de 2026
 
+> **Nota de revalidação (2026-11-06):** este relatório é histórico. Há
+> inconsistências de escopo nas contagens, formatação e reprodução; seus
+> números e estados não são uma baseline atual comprovada. Veja o
+> [cotejo com evidências e roadmap](code_review_2026-11-06.md), que distingue
+> commits fixados de HEADs substitutos e o que não foi executado.
+
 **Data:** 2026-11-05
 **Branch:** `dev` (último commit: `97b18d3`)
 **Escopo:** Análise completa do workspace `uv`, incluindo meta-pacote e 8 submódulos, com foco em arquitetura, qualidade de código, testes e documentação.

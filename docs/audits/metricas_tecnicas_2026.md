@@ -1,5 +1,11 @@
 # RadioSkySimSuite — Métricas Técnicas — Histórico 2026
 
+> **Nota de revalidação (2026-11-06):** as séries e estimativas abaixo são
+> históricas e não têm metodologia/artefatos suficientes para comparação
+> direta com o checkout atual. Não interpretá-las como cobertura, desempenho
+> ou status correntes. A [auditoria de código](code_review_2026-11-06.md)
+> registra uma contagem estática delimitada e as divergências identificadas.
+
 **Atualizado:** 2026-11-05  
 **Ferramenta:** Análise automatizada (ripgrep, ruff, pytest)
 

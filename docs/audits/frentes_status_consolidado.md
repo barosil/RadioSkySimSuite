@@ -1,5 +1,10 @@
 # RadioSkySimSuite — Status Consolidado de Frentes (Novembro 2026)
 
+> **Nota de revalidação (2026-11-06):** percentuais, prazos e status abaixo
+> são históricos e não foram verificados nesta revisão. Para achados atuais,
+> dependências e critérios de aceite, veja a
+> [auditoria de código e roadmap](code_review_2026-11-06.md).
+
 **Data de atualização:** 2026-11-05  
 **Documento-mestre:** `.prompts/barosil.md` (principal rastreador)  
 **Complementos:** `notebooks/ux_entrypoints_audit.md` (detalhe F1/F2/F3)
