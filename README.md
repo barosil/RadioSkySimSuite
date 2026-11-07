@@ -16,14 +16,20 @@ BINGO, combinando:
   processamento consciente de memória (batches + dask);
 - **SkyMap** — geração, transformação e análise de mapas HEALPix (Healpy, PySM3, HiPS).
 
-O projeto segue **arquitetura hexagonal (Ports and Adapters)**, com persistência
-em **PostgreSQL** (SQLModel/Pydantic) e cache/processamento local em
-`data/temp`.
+O projeto segue **arquitetura hexagonal (Ports and Adapters)**, organizado como
+**uv workspace** com **9 pacotes** em `packages/*` (submódulos git) e um
+**meta-pacote** `radioskysim` na raiz (composition root + CLI/GUI + extras
+seletivos). Persistência em **PostgreSQL** (SQLModel/Pydantic) e datasets em
+**HDF5/Zarr**.
+
+> O documento canônico de arquitetura é `docs/architecture.md` (mantido
+> continuamente). Detalhes por tópico em `docs/architecture/`.
 
 ## Stack
 
 - Python 3.11–3.14
-- `xarray` + `dask` (processamento lazy e batches com controle de memória)
+- `uv` (workspace, ambientes e dependências reproduzidas)
+- `xarray` + `dask[distributed]` (processamento lazy e batches com controle de memória)
 - `astropy` / `astroquery` (unidades, TAP, catálogos)
 - `skyfield` (ephemeris, tracks, eventos)
 - `healpy` / `PySM3` (mapas HEALPix)
@@ -35,53 +41,67 @@ em **PostgreSQL** (SQLModel/Pydantic) e cache/processamento local em
 ## Estrutura do projeto
 
 ```
-src/radioskysims/
-├── domain/            # Entidades, value objects e regras de negócio
-│   ├── beam/ catalog/ common/ geometry/ localsources/ map/ noise/
-│   ├── radiosources/ radiotelescope/ rfi/ satellite/ signal/ simulation/
-│   ├── skymap/ source/ tod/ tracks/
-├── application/       # Casos de uso e orquestração
-│   ├── ports/         # Contratos (ports) da aplicação
-│   └── services/      # Serviços e casos de uso
-├── infrastructure/    # Adapters concretos (DB, IO, providers)
-│   ├── beams/ config/ db/ external/ ports/ processing/ skymap/ utils/
-├── interfaces/        # Entrypoints (API/CLI/GUI)
-│   ├── api/ cli/ gui/
-├── bootstrap/         # Composition Root (DI)
-├── visualization/     # Plotagem (waterfall, skymap)
-└── resources/         # Dados embutidos (beams, catálogos, satélites)
+packages/
+├── radioskysims-core/           # kernel: config, db, paths, domínio comum
+├── radioskysims-beam/           # padrões de feixe e propriedades físicas
+├── radioskysims-radiotelescope/ # perfis de radiotelescópio (antenas, pointing, backend)
+├── radioskysims-sources/        # satélites, Sol, catálogos de rádio (TAP)
+├── radioskysims-simulation/     # TOD + processamento consciente de memória
+├── radioskysims-skymap/         # mapas HEALPix
+├── radioskysims-viz/            # visualização (matplotlib/holoviews)
+├── radioskysims-waterfall/      # waterfall (canal × tempo)
+└── gnsstools4astro/             # ferramentas GNSS (repo próprio)
 
-docker/postgresql/     # Postgres + adminer + backup (docker compose)
-notebooks/             # Tutoriais e demonstrações
-docs/                  # Documentação (Sphinx + MyST + Mermaid)
-tests/                 # Suíte de testes (unit, integration, e2e)
+src/radioskysims/                # meta-pacote `radioskysim` (composition root)
+├── bootstrap/                   # composition root + builders (DI)
+├── interfaces/                  # CLI/GUI (skymap, tod, painel)
+└── visualization/               # waterfall (legado)
+
+docker/postgresql/               # Postgres + adminer + backup (docker compose)
+notebooks/                       # tutoriais e demonstrações executáveis
+docs/                            # documentação (Sphinx + MyST + Mermaid)
+tests/                           # suíte de testes do meta-pacote
 ```
+
+Cada pacote em `packages/<nome>/` segue o layout hexagonal:
+
+```
+packages/<nome>/pyproject.toml     # hatchling + hatch-vcs; versão estática
+packages/<nome>/src/<nome_import>/ # domain/ application/ ports/ adapters/ infrastructure/
+packages/<nome>/tests/             # testes movem junto com o código
+```
+
+> Cada pacote é um **submódulo git** (`barosil/<nome>`, ver `.gitmodules`).
+> Alterações dentro de um pacote são commitadas **no próprio pacote** e o
+> ponteiro é atualizado no meta-repo. Os imports são **próprios por pacote**
+> (ex.: `radioskysims_core`, `radioskysims_beam`, …).
 
 ## Requisitos
 
 - Linux/macOS/Windows (WSL) com Python 3.11+
+- [uv](https://docs.astral.sh/uv/) (gerenciador de pacotes/workspace)
 - [Docker](https://www.docker.com/) com plugin Compose (para o Postgres)
 - Opcional: Git
 
 ## Instalação
 
-Use o **Makefile** (recomendado):
+Use o **uv workspace**:
 
 ```bash
-make setup          # cria .venv e instala dependências + pacote em modo editável
-make install        # instala dependências e o pacote (usa .venv existente)
+uv sync                          # sincroniza o workspace completo (9 pacotes + meta)
 ```
 
-Ou manualmente:
+Ou via **Makefile** (recomendado — inicializa submódulos + extras de dev/docs):
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -U pip
-pip install -e ".[test]"
-pip install -r requirements.txt            # dependências completas pinadas
-pip install -r requirements_extra.txt      # extras (fastapi, hvplot, ...)
+make setup                       # submodules + uv sync (test/dev/docs)
+make install                     # uv sync no .venv existente
 ```
+
+> O ambiente é reproduzido via `constraint-dependencies` (do `requirements.txt`);
+> alterações de dependência precisam ser refletidas lá.
+> Extras seletivos do umbrella: `core`, `viz`, `beam`, `skymap`, `sources`,
+> `radiotelescope`, `simulation`, `waterfall`, `gnss`, `all`.
 
 ### PostgreSQL (container)
 
@@ -103,38 +123,49 @@ arquivo `.env` na pasta `docker/postgresql/`.
 ## Uso rápido
 
 ```python
-from radioskysims.bootstrap.composition import create_sim_orchestrator
+from radioskysims_simulation.bootstrap.composition import create_sim_orchestrator
 
-orchestrator = create_sim_orchestrator(telescope="bingo")
+orchestrator = create_sim_orchestrator(telescope="default")
 result = orchestrator.run(
     constellations=["GPS"],
     use_processor=True,
 )
-result.compute()
 print(result.format_summary())
 orchestrator.shutdown()   # libera cluster dask "distributed" se usado
 ```
 
+> Perfis de radiotelescópio em `settings.toml`: `[radiotelescopes.uirapuru]` e
+> `[radiotelescopes.default]` (cópia do Uirapuru). O dataset fica em
+> `result.simulation_result.dataset`.
+
 Outros entrypoints:
 
 ```bash
+radioskysims                       # CLI do SkyMap/TOD (entry point do meta-pacote)
+radioskysim-sources                # CLI de fontes de rádio/Sol
+gnss4astro                         # CLI de ferramentas GNSS (download, tracks, sinais)
 python scripts/start_service.py    # inicia a GUI/TOD Panel
 python scripts/check_db.py         # diagnostica/repara a conexão Postgres
-radioskysims                       # CLI do SkyMap (entry point do pacote)
 ```
 
 ## Testes
 
 ```bash
-make test        # roda pytest
+uv run pytest tests                        # suíte do meta-pacote (raiz)
+uv run --package radioskysims-<nome> pytest packages/radioskysims-<nome>/tests
+                                           # suíte de um pacote isolado
+uv run ruff check src packages/*/src       # lint
+
+make test                                  # atalho: uv run pytest tests/
+make lint                                  # atalho: ruff check + format --check
 ```
 
 ## Documentação
 
 - `docs/architecture.md` — arquitetura (canônica)
+- `docs/architecture/` — detalhes por tópico (bounded contexts, DI, entrypoints)
 - `docs/diagrams/` — diagramas UML (Mermaid)
 - `docs/source/` — documentação Sphinx (HTML/PDF)
-- `docs/architecture/` — detalhes por tópico (bounded contexts, DI, entrypoints)
 
 ## Licença
 
