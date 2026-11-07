@@ -1,0 +1,60 @@
+# docker/postgresql/compose.yml
+# Postgres + Adminer + backup local (pg_dump em loop) para o RadioSkySim.
+#
+# Uso:
+#   make postgres-up       # (na raiz do projeto) sobe os 3 serviços
+#   docker compose up -d   # ou, dentro desta pasta
+#
+# Credenciais: vêm do .env desta pasta (ou dos defaults abaixo, que espelham
+# settings.toml [DB]: radio / radio / radioskysims).
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-radio}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-radio}
+      POSTGRES_DB: ${POSTGRES_DB:-radioskysims}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      # Dados preservados em <raiz>/data/DB (ignorado pelo git).
+      - ../../data/DB:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-radio} -d ${POSTGRES_DB:-radioskysims}",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  adminer:
+    image: adminer:latest
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    ports:
+      - "8080:8080"
+
+  backup:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGHOST: postgres
+      PGPORT: "5432"
+      PGUSER: ${POSTGRES_USER:-radio}
+      PGPASSWORD: ${POSTGRES_PASSWORD:-radio}
+      PGDATABASE: ${POSTGRES_DB:-radioskysims}
+    volumes:
+      - ./backups:/backups
+    command: >
+      sh -c 'while true; do
+        pg_dump -Fc -f /backups/radioskysims_$$(date +%Y%m%d_%H%M%S).dump;
+        echo "backup concluido em $$(date)";
+        sleep 3600;
+      done'
